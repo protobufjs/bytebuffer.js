@@ -50,6 +50,8 @@ Features
 * [node.js](http://nodejs.org) compatible, also available via [npm](https://npmjs.org/package/bytebuffer) (npm install bytebuffer)
 * [Closure Compiler](https://developers.google.com/closure/compiler/) ADVANCED_OPTIMIZATIONS compatible (fully annotated)
 * Fully documented ([jsdoc3](https://github.com/jsdoc3/jsdoc))
+* Zero dependencies
+* Small footprint
 
 Examples & Tests
 ----------------
