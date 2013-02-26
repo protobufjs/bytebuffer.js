@@ -38,14 +38,14 @@ var ByteBuffer = function(capacity, littleEndian) {
      * Buffer capacity.
      * @type {number}
      */
-    this.capacity = typeof capacity != 'undefined' ? parseInt(capacity, 10) : ByteBuffer.DEFAULT_CAPACITY;
-    if (this.capacity < 0) this.capacity = 0;
+    capacity = typeof capacity != 'undefined' ? parseInt(capacity, 10) : ByteBuffer.DEFAULT_CAPACITY;
+    if (capacity < 1) capacity = ByteBuffer.DEFAULT_CAPACITY;
 
     /**
      * Underlying ArrayBuffer.
      * @type {ArrayBuffer}
      */
-    this.array = arguments.length == 3 && arguments[2] === true ? null : new ArrayBuffer(this.capacity);
+    this.array = arguments.length == 3 && arguments[2] === true ? null : new ArrayBuffer(capacity);
     
     /**
      * DataView to mess with the ArrayBuffer.
@@ -90,18 +90,17 @@ ByteBuffer.allocate = function(length, littleEndian) {
 };
 
 /**
- * Wraps an ArrayBuffer. Sets the ByteBuffer's offset to 0 and its length to the specified ArrayBuffer's length.
+ * Wraps an ArrayBuffer. Sets the ByteBuffer's offset to 0 and its length to the specified ArrayBuffer's byte length.
  * @param {ArrayBuffer} buffer ArrayBuffer to wrap
  * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to true.
  * @return {dcodeIO.ByteBuffer}
  */
 ByteBuffer.wrap = function(buffer, littleEndian) {
     var b = new ByteBuffer(0, littleEndian, /* shadow copy */ true);
-    b.capacity = buffer.byteLength;
     b.array = buffer;
     b.view = new DataView(b.array);
     b.offset = 0;
-    b.length = b.capacity;
+    b.length = buffer.byteLength;
     return b;
 };
 
@@ -114,9 +113,8 @@ ByteBuffer.prototype.resize = function(capacity) {
     if (this.array == null && capacity > 0) { // Silently recreate
         this.array = new ArrayBuffer(capacity);
         this.view = new DataView(this.array);
-        this.capacity = capacity;
     }
-    if (this.capacity < capacity) {
+    if (this.array.byteLength < capacity) {
         var src = this.array;
         var srcView = new Uint8Array(src);
         var dst = new ArrayBuffer(capacity);
@@ -124,7 +122,6 @@ ByteBuffer.prototype.resize = function(capacity) {
         dstView.set(srcView);
         this.array = dst;
         this.view = new DataView(dst);
-        this.capacity = capacity;
         return true;
     }
     return false;
@@ -136,7 +133,10 @@ ByteBuffer.prototype.resize = function(capacity) {
  * @param {number} capacity Required capacity
  */
 ByteBuffer.prototype.ensureCapacity = function(capacity) {
-    if (this.capacity < capacity) this.resize(this.capacity*2 >= capacity ? this.capacity*2 : capacity);
+    if (this.array == null) {
+        return this.resize(capacity);
+    }
+    if (this.array.byteLength < capacity) this.resize(this.array.byteLength*2 >= capacity ? this.array.byteLength*2 : capacity);
 };
 
 /**
@@ -153,13 +153,22 @@ ByteBuffer.prototype.flip = function() {
 };
 
 /**
+ * Resets the ByteBuffer. Sets offset=0 and length=0.
+ * @return {dcodeIO.ByteBuffer} this
+ */
+ByteBuffer.prototype.reset = function() {
+    this.offset = 0;
+    this.length = 0;
+    return this;
+};
+
+/**
  * Clones this ByteBuffer. The returned cloned ByteBuffer shares the same ArrayBuffer but will have its own offsets.
  * @return {dcodeIO.ByteBuffer}
  */
 ByteBuffer.prototype.clone = function() {
     // When cloning, an undocumented third parameter is used to set array and view manually.
     var b = new ByteBuffer(-1, this.littleEndian, /* shadow copy */ true);
-    b.capacity = this.capacity;
     b.array = this.array;
     b.view = this.view;
     b.offset = this.offset;
@@ -201,7 +210,6 @@ ByteBuffer.prototype.destroy = function() {
     this.view = null;
     this.offset = 0;
     this.length = 0;
-    this.capacity = 0;
 }
 
 /**
@@ -569,7 +577,7 @@ ByteBuffer.prototype.printDebug = function() {
     if (this.array != null) {
         var view = new Uint8Array(this.array);
         var out = "";
-        for (var i=0; i<this.capacity; i++) {
+        for (var i=0; i<this.array.byteLength; i++) {
             var val = view[i];
             val = val.toString(16).toUpperCase();
             if (val.length < 2) val = "0"+val;
@@ -587,9 +595,9 @@ ByteBuffer.prototype.printDebug = function() {
             }
             out += val;
         }
-        if (this.length == this.capacity) {
+        if (this.length == this.array.byteLength) {
             out += ">";
-        } else if (this.offset == this.capacity) {
+        } else if (this.offset == this.array.byteLength) {
             out += "<";
         }
         console.log(out+"\n");
@@ -604,7 +612,7 @@ ByteBuffer.prototype.toString = function() {
     if (this.array == null) {
         return "ByteBuffer(DESTROYED)";
     }
-    return "ByteBuffer(offset="+this.offset+",length="+this.length+",capacity="+this.capacity+")";
+    return "ByteBuffer(offset="+this.offset+",length="+this.length+",capacity="+this.array.byteLength+")";
 };
 
 /**
@@ -678,7 +686,6 @@ ByteBuffer.encodeUTF8 = function(s, dst, offset) {
     // ref: http://en.wikipedia.org/wiki/UTF-8#Description
     for (var i=0; i<s.length; i++) {
         var a = s.charCodeAt(i);
-        console.log("a="+a);
         if (a < 0x80) {
             dst.writeUint8(a&0x7F, offset);
             offset += 1;
@@ -714,7 +721,6 @@ ByteBuffer.encodeUTF8 = function(s, dst, offset) {
             offset += 6;
         }
     }
-    console.log("offset="+offset+", start="+start);
     return offset-start;
 };
 

@@ -17,9 +17,10 @@ ByteBuffer
 * Wrapping of plain ArrayBuffers through ByteBuffer.wrap(buffer[, littleEndian])
 * Cloning by maintaining the reference to the underlying ArrayBuffer (ByteBuffer#clone)
 * Manual offset manipulation throught ByteBuffer#offset and ByteBuffer#length
+* Manual array manipulation through ByteBuffer#array
 * Explicit resizing through ByteBuffer#resize(capacity)
 * Implicit resizing through ByteBuffer#ensureCapacity(newCapacity) on each operation. Doubles the capacity by default.
-* Hate it or love it: ByteBuffer#flip
+* Hate it or love it: ByteBuffer#flip and ByteBuffer#reset
 * Compacting to a an ArrayBuffer of its actual size (offset to length) through ByteBuffer#compact. Will implicitly flip
   if required. This is used to send ByteBuffer data over the wire (e.g. a WebSocket with binaryType="arraybuffer").
 * Explicit destruction through ByteBuffer#destroy
