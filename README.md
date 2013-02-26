@@ -35,6 +35,8 @@ ByteBuffer
 * writeJSON, readJSON to stringify and write respectivly to read and parse JSON data. Allows overriding the default
   stringify (default: JSON.stringify) and parse (default: JSON.parse) implementations.
 * All with implicit offset advance if the offset parameter is omitted or without, if specified.
+* Chaining for all operations that allow this (i.e. do not return some specific value like in read operations), e.g.
+  bb.writeInt(1).writeString("Hello world!")...
 * Provides ByteBuffer#toString and ByteBuffer#printDebug (including hex encoded contents) for debugging
 * Includes an UTF8 encoder and decoder (full 1-6 bytes, [ref](http://en.wikipedia.org/wiki/UTF-8#Description)) available
   through ByteBuffer.encodeUTF8 and ByteBuffer.decodeUTF8
@@ -43,7 +45,7 @@ Features
 --------
 * [CommonJS](http://www.commonjs.org/) compatible
 * [RequireJS](http://requirejs.org/)/AMD compatible
-* Shim compatible
+* Shim compatible (include the script, then use var ByteBuffer = dcodeIO.ByteBuffer;)
 * [node.js](http://nodejs.org) compatible, also available via [npm](https://npmjs.org/package/bytebuffer) (npm install bytebuffer)
 * [Closure Compiler](https://developers.google.com/closure/compiler/) ADVANCED_OPTIMIZATIONS compatible (fully annotated)
 * Fully documented ([jsdoc3](https://github.com/jsdoc3/jsdoc))
