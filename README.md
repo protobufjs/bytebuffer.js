@@ -57,6 +57,10 @@ Examples & Tests
 ----------------
 * [View source](https://github.com/dcodeIO/ByteBuffer.js/blob/master/examples/node-ByteBuffer.js)
 
+Prerequisites to use it against IE9 etc. (i.e. browsers that do not support the typed array spec fully)
+-------------------------------------------------------------------------------------------------------
+* Simply use a [polyfill](http://www.calormen.com/polyfill/#typedarray)
+
 License
 -------
 Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.html
