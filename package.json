@@ -1,0 +1,20 @@
+{
+    "name": "bytebuffer",
+    "version": "0.0.0",
+    "author": "Daniel Wirtz <dcode@dcode.io>",
+    "description": "A Java-like ByteBuffer implementation using typed arrays.",
+    "contributors": [
+        { "name": "Daniel Wirtz", "email": "dcode@dcode.io" }
+    ],
+    "main": "ByteBuffer.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/dcodeIO/ByteBuffer.js.git"
+    },
+    "keywords": ["net", "buffer"],
+    "dependencies": {},
+    "license": "Apache License, Version 2.0",
+    "engines": {
+        "node": ">=0.6"
+    }
+}
