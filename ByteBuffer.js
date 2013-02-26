@@ -29,7 +29,7 @@
  * away by providing convenience methods for those who just want to write stuff without caring about signed, unsigned
  * and the actual bit sizes.
  * @param {number=} capacity Initial capacity. Defaults to {@link dcodeIO.ByteBuffer.DEFAULT_CAPACITY}.
- * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to true.
+ * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to false.
  * @constructor
  */
 var ByteBuffer = function(capacity, littleEndian) {
@@ -51,7 +51,7 @@ var ByteBuffer = function(capacity, littleEndian) {
      * DataView to mess with the ArrayBuffer.
      * @type {DataView}
      */
-    this.view = this.array != null ? new DataView(this) : null;
+    this.view = this.array != null ? new DataView(this.array) : null;
     
     /**
      * Current read/write offset.
@@ -69,7 +69,7 @@ var ByteBuffer = function(capacity, littleEndian) {
      * Whether to use little endian multi byte values.
      * @type {boolean}
      */
-    this.littleEndian = typeof littleEndian != 'undefined' ? !!littleEndian : true;
+    this.littleEndian = typeof littleEndian != 'undefined' ? !!littleEndian : false;
 };
 
 /**
@@ -111,6 +111,11 @@ ByteBuffer.wrap = function(buffer, littleEndian) {
  * @return {boolean} true if actually resized, false if already that large or larger
  */
 ByteBuffer.prototype.resize = function(capacity) {
+    if (this.array == null && capacity > 0) { // Silently recreate
+        this.array = new ArrayBuffer(capacity);
+        this.view = new DataView(this.array);
+        this.capacity = capacity;
+    }
     if (this.capacity < capacity) {
         var src = this.array;
         var srcView = new Uint8Array(src);
@@ -139,6 +144,9 @@ ByteBuffer.prototype.ensureCapacity = function(capacity) {
  * @return {dcodeIO.ByteBuffer} this
  */
 ByteBuffer.prototype.flip = function() {
+    if (this.array == null) {
+        throw(this+" cannot be flipped: Already destroyed");
+    }
     this.length = this.offset;
     this.offset = 0;
     return this;
@@ -167,6 +175,9 @@ ByteBuffer.prototype.clone = function() {
  * @return {ArrayBuffer}
  */
 ByteBuffer.prototype.compact = function() {
+    if (this.array == null) {
+        throw(this+" cannot be compacted: Already destroyed");
+    }
     var b;
     if (this.offset > this.length) {
         b = this.clone().flip();
@@ -180,6 +191,18 @@ ByteBuffer.prototype.compact = function() {
     dstView.set(srcView.subarray(b.offset, b.length));
     return dst;
 };
+
+/**
+ * Destroys the ByteBuffer, releasing all references to the backing array.
+ */
+ByteBuffer.prototype.destroy = function() {
+    if (this.array == null) return; // Already destroyed
+    this.array = null;
+    this.view = null;
+    this.offset = 0;
+    this.length = 0;
+    this.capacity = 0;
+}
 
 /**
  * Writes an 8bit singed integer.
@@ -460,7 +483,7 @@ ByteBuffer.prototype.writeUTF8String = function(s, offset) {
     var advance = typeof offset == 'undefined';
     offset = typeof offset != 'undefined' ? offset : this.offset;
     this.ensureCapacity(offset+4+s.length*6); // 6 bytes per character in the worst case
-    this.writeUint32(s.length); // Prepend the number of characters
+    this.writeUint32(s.length, offset); // Prepend the number of characters
     var length = ByteBuffer.encodeUTF8(s, this, offset+4);
     if (advance) {
         this.offset += 4+length;
@@ -536,6 +559,54 @@ ByteBuffer.prototype.readJSON = function(offset, parse) {
     }
 };
 
+ByteBuffer.LINE = "--------------------------------------------------";
+
+/**
+ * Prints debug information about this ByteBuffer's contents to console.
+ */
+ByteBuffer.prototype.printDebug = function() {
+    console.log(this.toString()+"\n"+ByteBuffer.LINE);
+    if (this.array != null) {
+        var view = new Uint8Array(this.array);
+        var out = "";
+        for (var i=0; i<this.capacity; i++) {
+            var val = view[i];
+            val = val.toString(16).toUpperCase();
+            if (val.length < 2) val = "0"+val;
+            if (i>0 && i%16 == 0) {
+                out += "\n";
+            }
+            if (i == this.offset && i == this.length) {
+                out += "|";
+            } else if (i == this.offset) {
+                out += "<";
+            } else if (i == this.length) {
+                out += ">";
+            } else {
+                out += " ";
+            }
+            out += val;
+        }
+        if (this.length == this.capacity) {
+            out += ">";
+        } else if (this.offset == this.capacity) {
+            out += "<";
+        }
+        console.log(out+"\n");
+    }
+};
+
+/**
+ * Returns a string representation of this object.
+ * @return {string} String representation as of "ByteBuffer(offset,length,capacity)"
+ */
+ByteBuffer.prototype.toString = function() {
+    if (this.array == null) {
+        return "ByteBuffer(DESTROYED)";
+    }
+    return "ByteBuffer(offset="+this.offset+",length="+this.length+",capacity="+this.capacity+")";
+};
+
 /**
  * Decodes the given ByteBuffer to an UTF8 string. The ByteBuffer's offsets are not modified.
  * @param {dcodeIO.ByteBuffer} src Source ByteBuffer to decode from
@@ -607,6 +678,7 @@ ByteBuffer.encodeUTF8 = function(s, dst, offset) {
     // ref: http://en.wikipedia.org/wiki/UTF-8#Description
     for (var i=0; i<s.length; i++) {
         var a = s.charCodeAt(i);
+        console.log("a="+a);
         if (a < 0x80) {
             dst.writeUint8(a&0x7F, offset);
             offset += 1;
@@ -642,6 +714,7 @@ ByteBuffer.encodeUTF8 = function(s, dst, offset) {
             offset += 6;
         }
     }
+    console.log("offset="+offset+", start="+start);
     return offset-start;
 };
 
