@@ -253,7 +253,10 @@ var suite = {
         test.equals(bb.length, 0);
         bb.flip();
         test.equal(bb.toHex(), "<01 61>00 00 00 00 00");
+        test.deepEqual({"string": "a", "length": 2}, bb.readLString(0));
+        test.equal(bb.toHex(), "<01 61>00 00 00 00 00");
         test.equal("a", bb.readLString());
+        test.equal(bb.toHex(), " 01 61|00 00 00 00 00");
         test.done();
     },
     
@@ -264,7 +267,10 @@ var suite = {
         test.equal(bb.length, 0);
         bb.flip();
         test.equal(bb.toHex(), "<61 00>00 00 00 00");
+        test.deepEqual({"string": "a", "length": 2}, bb.readCString(0));
+        test.equal(bb.toHex(), "<61 00>00 00 00 00");
         test.equal("a", bb.readCString());
+        test.equal(bb.toHex(), " 61 00|00 00 00 00");
         test.done();
     },
     
