@@ -309,7 +309,8 @@
     };
 
     /**
-     * Reverses the underlying back buffer and adapts offset and length to match the same part as before.
+     * Reverses the underlying back buffer and adapts offset and length to retain the same relative position on the
+     * reversed data in inverse order. Example: "00<01 02>03 04".reverse() = "04 03<02 01>00".
      * @return {ByteBuffer} this
      */
     ByteBuffer.prototype.reverse = function() {
@@ -353,7 +354,7 @@
 
     /**
      * Prepends another ByteBuffer to this one. Prepends only the portion between offset and length of the specified
-     * ByteBuffer and overwrites and contents before the specified offsets up to the number of bytes prepended from
+     * ByteBuffer and overwrites any contents before the specified offsets up to the number of bytes prepended from
      * the specified ByteBuffer in this ByteBuffer. Will clone and flip the specified ByteBuffer if its offset is
      * larger than its length (its offsets remain untouched through cloning).
      * @param {ByteBuffer} src ByteBuffer to prepend

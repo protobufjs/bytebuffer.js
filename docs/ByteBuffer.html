@@ -1361,6 +1361,154 @@ instead.</p>
         
             
 <dt>
+    <h4 class="name" id="append"><span class="type-signature"></span>append<span class="signature">(src, <span class="optional">offset</span>)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Appends another ByteBuffer to this one. Appends only the portion between offset and length of the specified
+ByteBuffer and overwrites any contents  behind the specified offset up to the number of bytes appended from
+the specified ByteBuffer in this ByteBuffer. Will clone and flip the specified ByteBuffer if its offset is
+larger than its length (its offsets remain untouched through cloning).</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>src</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ByteBuffer.html">ByteBuffer</a></span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>ByteBuffer to append</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>offset</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Offset to append behind. Defaults to <a href="ByteBuffer.html#length">ByteBuffer#length</a> which will be modified only if omitted.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="capacity"><span class="type-signature"></span>capacity<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
     
     
@@ -1880,6 +2028,176 @@ double the previous capacity is less than the required capacity, the required ca
     
     
     
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>this</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="ByteBuffer.html">ByteBuffer</a></span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="prepend"><span class="type-signature"></span>prepend<span class="signature">(src, <span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Prepends another ByteBuffer to this one. Prepends only the portion between offset and length of the specified
+ByteBuffer and overwrites any contents before the specified offsets up to the number of bytes prepended from
+the specified ByteBuffer in this ByteBuffer. Will clone and flip the specified ByteBuffer if its offset is
+larger than its length (its offsets remain untouched through cloning).</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>src</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ByteBuffer.html">ByteBuffer</a></span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>ByteBuffer to prepend</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>offset</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Offset to prepend before. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
     
     
     
@@ -4791,6 +5109,87 @@ length-offset.</p>
         
             
 <dt>
+    <h4 class="name" id="reverse"><span class="type-signature"></span>reverse<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Reverses the underlying back buffer and adapts offset and length to retain the same relative position on the
+reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.reverse() = &quot;04 03&lt;02 01&gt;00&quot;.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>this</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="ByteBuffer.html">ByteBuffer</a></span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="slice"><span class="type-signature"></span>slice<span class="signature">(begin, end)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
     
     
@@ -5231,7 +5630,179 @@ the unmodified backing buffer if offset=0 and length=capacity unless forceCopy i
         
             
 <dt>
-    <h4 class="name" id="toHex"><span class="type-signature"></span>toHex<span class="signature">(<span class="optional">wrap</span>)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    <h4 class="name" id="toASCII"><span class="type-signature"></span>toASCII<span class="signature">(<span class="optional">wrap</span>, <span class="optional">asArray</span>)</span><span class="type-signature"> &rarr; {string|Array.&lt;string>}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns an ASCII representation of this ByteBuffer&#39;s contents. Beware: May be large.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>wrap</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Wrap length. Defaults to 16.</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>asArray</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Set to true to return an array of lines. Defaults to false.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>ASCII representation as of &quot;abcdef...&quot; (33-126, else &quot;.&quot;, no marked offsets)</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">string</span>
+|
+
+<span class="param-type">Array.&lt;string></span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="toHex"><span class="type-signature"></span>toHex<span class="signature">(<span class="optional">wrap</span>, <span class="optional">asArray</span>)</span><span class="type-signature"> &rarr; {string|Array.&lt;string>}</span></h4>
     
     
 </dt>
@@ -5303,6 +5874,37 @@ the unmodified backing buffer if offset=0 and length=capacity unless forceCopy i
         </tr>
 	
 	
+	
+        <tr>
+            
+                <td class="name"><code>asArray</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Set to true to return an array of lines. Defaults to false.</p></td>
+        </tr>
+	
+	
 	</tbody>
 </table>
     
@@ -5356,6 +5958,9 @@ the unmodified backing buffer if offset=0 and length=capacity unless forceCopy i
 	<dd>
 		
 <span class="param-type">string</span>
+|
+
+<span class="param-type">Array.&lt;string></span>
 
 
 	</dd>
