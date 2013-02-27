@@ -29,7 +29,7 @@ ByteBuffer
   en-/decoder (full 6 bytes, [ref](http://en.wikipedia.org/wiki/UTF-8#Description))
 * `ByteBuffer#writeLString(str[, offset]))` and `ByteBuffer#readLString([offset])` to write respectively read a
   length-prepended (number of characters as UTF8 char) string (recommended over `ByteBuffer#write/readCString`, which
-  would break in that case, because it can contain NULL characters)
+  would break in the case of contained NULL characters)
 * `ByteBuffer#writeCString(str[, offset])` and `ByteBuffer#readCString([offset])` to write respectively read a
   NULL-terminated (Uint8 0x00) string
 * `ByteBuffer#writeJSON(data[, offset[, stringify]])` and `ByteBuffer#readJSON([offset[, parse]])` to write respectively
