@@ -61,7 +61,7 @@ console.log(bb.readLString()+" from ByteBuffer.js");
 ### Browser (shim) ###
 
 ```html
-<script src="https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.min.js"></script>
+<script src="//raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.min.js"></script>
 ```
 
 ```javascript
