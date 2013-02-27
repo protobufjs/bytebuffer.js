@@ -46,7 +46,7 @@ ByteBuffer
 * All with implicit offset advance if the offset parameter is omitted or without, if specified.
 * Chaining for all operations that allow this (i.e. do not return some specific value like in read operations), e.g.
   bb.writeInt(1).writeString("Hello world!")...
-* Provides ByteBuffer#toString and ByteBuffer#printDebug (including hex encoded contents) for debugging
+* Provides ByteBuffer#toString, ByteBuffer#toHex and ByteBuffer#printDebug
 * Includes an UTF8 encoder and decoder (full 1-6 bytes, [ref](http://en.wikipedia.org/wiki/UTF-8#Description)) available
   through ByteBuffer.encodeUTF8Char and ByteBuffer.decodeUTF8Char
   
