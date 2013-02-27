@@ -7,7 +7,7 @@
     },
     "opts": {
         "template": "templates/esoccer",
-        "destination": "./docs"
+        "destination": "docs"
     },
     "plugins": ["plugins/markdown"]
 }

@@ -1,4 +1,4 @@
-var ByteBuffer = require("../ByteBuffer.js");
+var ByteBuffer = require("../ByteBuffer.min.js");
 
 var suite = {
 
