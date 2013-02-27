@@ -59,6 +59,37 @@ Features
 * Zero dependencies
 * Small footprint
 
+Usage
+-----
+### Node / CommonJS ###
+* Install: npm install bytebuffer
+```js
+var ByteBuffer = require("bytebuffer");
+var bb = new ByteBuffer();
+bb.writeLString("Hello world!");
+bb.flip();
+console.log(bb.readLString()+" from ByteBuffer.js");
+```
+### Browser (shim) ###
+```html
+<script src="https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.min.js"></script>
+```
+```js
+var ByteBuffer = dcodeIO.ByteBuffer;
+var bb = new ByteBuffer();
+bb.writeLString("Hello world!");
+bb.flip();
+alert(bb.readLString()+" from ByteBuffer.js");
+```
+### Require.js / AMD ###
+```js
+var ByteBuffer = require("/path/to/ByteBuffer.js");
+var bb = new ByteBuffer();
+bb.writeLString("Hello world!");
+bb.flip();
+alert(bb.readLString()+" from ByteBuffer.js");
+```
+
 Documentation
 -------------
 * [View](http://htmlpreview.github.com/?http://github.com/dcodeIO/ByteBuffer.js/master/docs/dcodeIO.ByteBuffer.html)
