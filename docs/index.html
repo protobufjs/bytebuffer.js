@@ -60,7 +60,7 @@ if required. This is used to send ByteBuffer data over the wire (e.g. a WebSocke
 and just send the data over whatever wire you prefer afterwards. Will return a reference to the backing buffer if
 already in a compacted form unless the forceCopy parameter is set to true.</li><li>Explicit destruction through ByteBuffer#destroy</li><li>writeInt8, readInt8 with alias writeByte, readByte</li><li>writeUint8, readUint8</li><li>writeInt16, readInt16 with aliases writeShort, readShort</li><li>writeUint16, readUint16</li><li>writeInt32, readInt32 with aliases writeInt, readInt</li><li>writeUint32, readUint32</li><li>writeFloat32, readFloat32 with aliases writeFloat, readFloat</li><li>writeFloat64, readFloat64 with aliases writeDouble, readDouble</li><li>writeUTF8String, readUTF8String</li><li>writeLString, readLString to write respectively read a length-prepended (Uint32) string</li><li>writeCString, readCString to write respectively read a NULL-terminated (Uint8) string</li><li>writeJSON, readJSON to stringify and write respectivly to read and parse JSON data. Allows overriding the default
 stringify (default: JSON.stringify) and parse (default: JSON.parse) implementations.</li><li>All with implicit offset advance if the offset parameter is omitted or without, if specified.</li><li>Chaining for all operations that allow this (i.e. do not return some specific value like in read operations), e.g.
-bb.writeInt(1).writeString(&quot;Hello world!&quot;)...</li><li>Provides ByteBuffer#toString and ByteBuffer#printDebug (including hex encoded contents) for debugging</li><li>Includes an UTF8 encoder and decoder (full 1-6 bytes, <a href="http://en.wikipedia.org/wiki/UTF-8#Description">ref</a>) available
+bb.writeInt(1).writeString(&quot;Hello world!&quot;)...</li><li>Provides ByteBuffer#toString, ByteBuffer#toHex and ByteBuffer#printDebug</li><li>Includes an UTF8 encoder and decoder (full 1-6 bytes, <a href="http://en.wikipedia.org/wiki/UTF-8#Description">ref</a>) available
 through ByteBuffer.encodeUTF8Char and ByteBuffer.decodeUTF8Char</li></ul>
 
 <h2>Features</h2>
@@ -93,7 +93,7 @@ through ByteBuffer.encodeUTF8Char and ByteBuffer.decodeUTF8Char</li></ul>
 
 <nav>
     <nav-inner>
-        <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="dcodeIO.ByteBuffer.html">ByteBuffer</a></li></ul>
+        <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-dcodeIO.html">dcodeIO</a></li></ul><h3>Classes</h3><ul><li><a href="dcodeIO.ByteBuffer.html">ByteBuffer</a></li></ul><h3>Namespaces</h3><ul><li><a href="dcodeIO.html">dcodeIO</a></li></ul>
     </nav-inner>
 </nav>
 
