@@ -95,6 +95,11 @@ bb.flip();
 alert(bb.readLString()+" from ByteBuffer.js");
 ```
 
+Downloads
+---------
+* [ZIP-Archive](https://github.com/dcodeIO/ByteBuffer.js/archive/master.zip)
+* [Tarball](https://github.com/dcodeIO/ByteBuffer.js/tarball/master)
+
 Documentation
 -------------
 * [View documentation](http://htmlpreview.github.com/?http://github.com/dcodeIO/ByteBuffer.js/master/docs/ByteBuffer.html)
