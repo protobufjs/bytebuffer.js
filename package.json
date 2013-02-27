@@ -1,6 +1,6 @@
 {
     "name": "bytebuffer",
-    "version": "0.9.4",
+    "version": "1.0.0",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "description": "A Java-like ByteBuffer implementation using typed arrays.",
     "contributors": [
@@ -11,7 +11,7 @@
         "type": "git",
         "url": "https://github.com/dcodeIO/ByteBuffer.js.git"
     },
-    "keywords": ["net", "buffer"],
+    "keywords": ["net", "array", "buffer", "arraybuffer", "typed array", "bytebuffer", "json", "websocket", "webrtc"],
     "dependencies": {
     },
     "devDependencies": {
@@ -23,9 +23,9 @@
         "node": ">=0.6"
     },
     "scripts": {
-        "prepublish": "npm run-script minify && npm test",
+        "prepublish": "npm test",
         "minify": "uglifyjs ByteBuffer.js -o ByteBuffer.min.js --comments",
-        "jsdoc": "jsdoc.cmd -c jsdoc.json README.md",
+        "jsdoc": "jsdoc.cmd -c jsdoc.json",
         "pretest": "npm run-script minify",
         "test": "nodeunit tests/suite.js"
     }

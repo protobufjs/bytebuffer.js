@@ -889,7 +889,7 @@
             charCode = ((a&0x01)<<30) | ((b&0x3F)<<24) | ((c&0x3F)<<18) | ((d&0x3F)<<12) | ((e&0x3F)<<6) | (f&0x3F);
             offset += 6;
         } else {
-            throw("Invalid byte at offset "+offset+": 0x"+a.toString(16));
+            throw("Cannot decode UTF8 character at offset "+offset+": charCode (0x"+a.toString(16)+") is invalid");
         }
         return {
             "char": charCode ,
@@ -909,7 +909,7 @@
         // ref: http://en.wikipedia.org/wiki/UTF-8#Description
         // It's quite huge but should be pretty fast.
         if (charCode < 0) {
-            throw("Cannot encode character with negative charCode ("+charCode+")");
+            throw("Cannot encode UTF8 character: charCode ("+charCode+") is negative");
         }
         if (charCode < 0x80) {
             dst.writeUint8(charCode&0x7F, offset);
@@ -936,7 +936,7 @@
                 .writeUint8(((charCode>>6)&0x3F)|0x80, offset+3)
                 .writeUint8((charCode&0x3F)|0x80, offset+4);
             offset += 5;
-        } else {
+        } else if (charCode < 0x80000000) {
             dst.writeUint8(((charCode>>30)&0x01)|0xFC, offset)
                 .writeUint8(((charCode>>24)&0x3F)|0x80, offset+1)
                 .writeUint8(((charCode>>18)&0x3F)|0x80, offset+2)
@@ -944,6 +944,8 @@
                 .writeUint8(((charCode>>6)&0x3F)|0x80, offset+4)
                 .writeUint8((charCode&0x3F)|0x80, offset+5);
             offset += 6;
+        } else {
+            throw("Cannot encode UTF8 character: charCode (0x"+charCode.toString(16)+") is too large (>= 0x80000000)");
         }
         return offset-start;
     };
@@ -955,7 +957,7 @@
      */
     ByteBuffer.calculateUTF8Char = function(charCode) {
         if (charCode < 0) {
-            throw("Cannot calculate length of character with negative charCode ("+charCode+")");
+            throw("Cannot calculate length of UTF8 character: charCode ("+charCode+") is negative");
         }
         if (charCode < 0x80) {
             return 1;
@@ -967,8 +969,10 @@
             return 4;
         } else if (charCode < 0x4000000) {
             return 5;
-        } else {
+        } else if (charCode < 0x80000000) {
             return 6;
+        } else {
+            throw("Cannot calculate length of UTF8 character: charCode (0x"+charCode.toString(16)+") is too large (>= 0x80000000)");
         }
     };
 
@@ -978,10 +982,14 @@
     } else if (typeof define != 'undefined' && define["amd"]) { // AMD
         define([], function() { return ByteBuffer; });
     } else { // Shim
-        if (!window["dcodeIO"]) {
-            window["dcodeIO"] = {};
+        if (window) {
+            if (!window["dcodeIO"]) {
+                window["dcodeIO"] = {};
+            } else {
+                window["dcodeIO"]["ByteBuffer"] = ByteBuffer;
+            }
         } else {
-            window["dcodeIO"]["ByteBuffer"] = ByteBuffer;
+            throw("Cannot load ByteBuffer.js: Neigher a CommonJS or AMD loader nor a global window is available");
         }
     }
     

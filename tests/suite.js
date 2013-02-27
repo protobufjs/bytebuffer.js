@@ -329,9 +329,33 @@ var suite = {
         test.equal(bb.length, 0);
         test.equal(bb.array.byteLength, 3);
         test.done();
-    }
+    },
     
-    // TODO encode/decodeUTFChar
+    "encode/decode/calculateUTF8Char": function(test) {
+        var bb = new ByteBuffer(6)
+          , chars = [0x00, 0x7F, 0x80, 0x7FF, 0x800, 0xFFFF, 0x10000, 0x1FFFFF, 0x200000, 0x3FFFFFF, 0x4000000, 0x7FFFFFFF]
+          , dec;
+        for (var i=0; i<chars.length;i++) {
+            ByteBuffer.encodeUTF8Char(chars[i], bb, 0);
+            dec = ByteBuffer.decodeUTF8Char(bb, 0);
+            test.equals(chars[i], dec['char']);
+            test.equals(ByteBuffer.calculateUTF8Char(chars[i]), dec["length"]);
+            test.equals(String.fromCharCode(chars[i]), String.fromCharCode(dec['char']));
+        }
+        test.throws(function() {
+            ByteBuffer.encodeUTF8Char(-1, bb, 0);
+        });
+        test.throws(function() {
+            ByteBuffer.encodeUTF8Char(0x80000000, bb, 0);
+        });
+        bb.reset();
+        bb.writeByte(0xFE).writeByte(0).writeByte(0).writeByte(0).writeByte(0).writeByte(0);
+        bb.flip();
+        test.throws(function() {
+            ByteBuffer.decodeUTF8Char(bb, 0);
+        });
+        test.done();
+    }
 };
 
 module.exports = suite;

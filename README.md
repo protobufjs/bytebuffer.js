@@ -54,7 +54,7 @@ Features
 * [node.js](http://nodejs.org) compatible, also available via [npm](https://npmjs.org/package/bytebuffer)
 * [Closure Compiler](https://developers.google.com/closure/compiler/) ADVANCED_OPTIMIZATIONS compatible (fully annotated)
 * Fully documented ([jsdoc3](https://github.com/jsdoc3/jsdoc))
-* Tested through [nodeunit](https://github.com/caolan/nodeunit) (TODO: heavily test UTF8 en-/decoding)
+* Tested through [nodeunit](https://github.com/caolan/nodeunit)
 * Zero dependencies
 * Small footprint
 
