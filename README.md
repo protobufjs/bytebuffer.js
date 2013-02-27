@@ -97,12 +97,12 @@ alert(bb.readLString()+" from ByteBuffer.js");
 
 Documentation
 -------------
-* [jsdoc3](https://github.com/jsdoc3/jsdoc): [View documentation](http://htmlpreview.github.com/?http://github.com/dcodeIO/ByteBuffer.js/master/docs/dcodeIO.ByteBuffer.html)
+* [View documentation](http://htmlpreview.github.com/?http://github.com/dcodeIO/ByteBuffer.js/master/docs/dcodeIO.ByteBuffer.html)
 * Create: `jsdoc -c jsdoc.json README.md` (you'll need to comment out the eSoccer template in jsdoc.json)
 
 Tests (& Examples)
 ------------------
-* [nodeunit](https://github.com/caolan/nodeunit): [View source](https://github.com/dcodeIO/ByteBuffer.js/blob/master/tests/suite.js)
+* [View source](https://github.com/dcodeIO/ByteBuffer.js/blob/master/tests/suite.js)
 * Install: `npm install -g nodeunit`
 * Run: `nodeunit tests/suite.js`
 
