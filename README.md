@@ -4,25 +4,31 @@ Provides a Java-like ByteBuffer implementation using typed arrays. It also tries
 providing convenience methods for those who just want to write stuff without caring about signed, unsigned and the
 actual bit sizes.
 
-This is a first, mostly untested release. There is nothing more than an incomplete node-based test case, yet. However,
-it will become stable as soon as it will be used for the cross-platform multiplayer component in
-[eSoccer](http://www.esoccer.me), a HTML5 game developed at [University of Applied Sciences Bonn](http://www.h-brs.de).
-
-But beware: I'd not use it in production, yet, especially the included UTF8 de-/encoder needs some testing.
+This is a first, mostly untested release. There is nothing more than an initial node-based test case, yet. However,
+it will become stable as soon as it is used for the cross-platform multiplayer component in [eSoccer](http://www.esoccer.me),
+a HTML5 game developed at [University of Applied Sciences Bonn](http://www.h-brs.de).
 
 ByteBuffer
 ----------
 * Mimics [Java ByteBuffers](http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/ByteBuffer.html) as close as reasonable
 * Allocation through new ByteBuffer([capacity, [littleEndian]]) or ByteBuffer#allocate
-* Wrapping of plain ArrayBuffers or any object with an "array" or "buffer" property which is an ArrayBuffer through ByteBuffer.wrap(buffer[, littleEndian])
+* Wrapping of plain ArrayBuffers or any object with an "array" or "buffer" property which is an ArrayBuffer
+  through ByteBuffer.wrap(buffer[, littleEndian])
 * Cloning by maintaining the reference to the underlying ArrayBuffer (ByteBuffer#clone)
+* Copying to use an independent ArrayBuffer for the copy through ByteBuffer#copy
+* Slicing while maintaining the reference to the underlying ArrayBuffer through ByteBuffer#slice
+* Slicing to use an independent ArrayBuffer for the copy through ByteBuffer#sliceAndCompact
 * Manual offset manipulation throught ByteBuffer#offset and ByteBuffer#length
 * Manual array manipulation through ByteBuffer#array
 * Explicit resizing through ByteBuffer#resize(capacity)
-* Implicit resizing through ByteBuffer#ensureCapacity(newCapacity) on each operation. Doubles the capacity by default.
+* Implicit resizing through ByteBuffer#ensureCapacity(newCapacity) on each operation. Doubles the capacity by default
+  to be efficient in speed while maintaining reasonable memory usage.
 * Hate it or love it: ByteBuffer#flip and ByteBuffer#reset
 * Compacting to a an ArrayBuffer of its actual size (offset to length) through ByteBuffer#compact. Will implicitly flip
   if required. This is used to send ByteBuffer data over the wire (e.g. a WebSocket with binaryType="arraybuffer").
+* If you do not want to care about compacting yourself, use ByteBuffer#toArrayBuffer to do all the stuff automatically
+  and just send the data over whatever wire you prefer afterwards. Will return a reference to the backing buffer if
+  already in a compacted form unless the forceCopy parameter is set to true.
 * Explicit destruction through ByteBuffer#destroy
 * writeInt8, readInt8 with alias writeByte, readByte
 * writeUint8, readUint8

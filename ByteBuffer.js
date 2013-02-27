@@ -113,7 +113,7 @@ ByteBuffer.wrap = function(buffer, littleEndian) {
         buffer = buffer["buffer"];
     }
     if (!(buffer instanceof ArrayBuffer)) {
-        throw("Unable to wrap buffer of type "+typeof(buffer));
+        throw("Cannot wrap buffer of type "+typeof(buffer));
     }
     var b = new ByteBuffer(0, littleEndian, /* shadow copy */ true);
     b.array = buffer;
@@ -144,6 +144,40 @@ ByteBuffer.prototype.resize = function(capacity) {
         return true;
     }
     return false;
+};
+
+/**
+ * Slices the ByteBuffer. This is independent of the ByteBuffer's actual offsets. Does not compact the underlying
+ * ArrayBuffer (use {@link dcodeIO.ByteBuffer#compact} and maybe {@link dcodeIO.ByteBuffer.wrap} instead).
+ * @param {number} begin Begin offset
+ * @param {number} end End offset
+ * @return {dcodeIO.ByteBuffer} Clone of this ByteBuffer with the specified slicing applied, backed by the same ArrayBuffer
+ */
+ByteBuffer.prototype.slice = function(begin, end) {
+    if (this.array == null) {
+        throw(this+" cannot be sliced: Already destroyed");
+    }
+    if (end <= begin) {
+        throw(this+" cannot be sliced: End ("+end+") is less than begin ("+begin+")");
+    }
+    if (begin < 0 || begin > this.array.byteLength || end < 1 || end > this.array.byteLength) {
+        throw(this+" cannot be sliced: Index out of bounds (0-"+this.array.byteLength+" -> "+begin+"-"+end+")");
+    }
+    var b = this.clone();
+    b.offset = begin;
+    b.length = end;
+    return b;
+};
+
+/**
+ * Slices and compacts the ByteBuffer. The resulting ByteBuffer will have its own ArrayBuffer with the compacted contents
+ * of this ByteBuffer's contents.
+ * @param {number} begin Begin offset
+ * @param {number} end End offset
+ * @returns {dcodeIO.ByteBuffer}
+ */
+ByteBuffer.prototype.sliceAndCompact = function(begin, end) {
+    return ByteBuffer.wrap(this.slice(begin,end).toArrayBuffer(true));
 };
 
 /**
@@ -196,11 +230,25 @@ ByteBuffer.prototype.clone = function() {
 };
 
 /**
- * Compacts the ByteBuffer into an ArrayBuffer of its actual length. Use this method to send the ByteBuffer's contents
- * over the network, e.g. using a WebSocket. Will {@link ByteBuffer#clone} this and {@link ByteBuffer#flip} the cloned
- * ByteBuffer if this ByteBuffer's offset is larger than its length. If this ByteBuffer's offset is less than its
- * length, only the portion between its offset and length will be contained in the returned ArrayBuffer.
- * @return {ArrayBuffer}
+ * Copies this ByteBuffer. The returned copied ByteBuffer has its own ArrayBuffer and uses the same offsets as this one.
+ * @return {dcodeIO.ByteBuffer}
+ */
+ByteBuffer.prototype.copy = function() {
+    var b = new ByteBuffer(this.array.byteLength, this.littleEndian);
+    var src = new Uint8Array(this.array);
+    var dst = new Uint8Array(b.array);
+    dst.set(src);
+    b.offset = this.offset;
+    b.length = this.length;
+    return b;
+};
+
+/**
+ * Compacts the ByteBuffer to be backed by an ArrayBuffer of its actual length. Will {@link ByteBuffer#flip} the 
+ * ByteBuffer if its offset is larger than its length. If the ByteBuffer's offset is less than its length, only the
+ * portion between its offset and length will be contained in the compacted backing buffer. Will set offset=0 and
+ * length=capacity. Will do nothing but flipping, if required, if already compacted.
+ * @return {ByteBuffer} this
  */
 ByteBuffer.prototype.compact = function() {
     if (this.array == null) {
@@ -208,16 +256,22 @@ ByteBuffer.prototype.compact = function() {
     }
     var b;
     if (this.offset > this.length) {
-        b = this.clone().flip();
-    } else {
-        b = this;
+        this.flip();
     }
-    var src = b.array;
-    var srcView = new Uint8Array(src);
-    var dst = new ArrayBuffer(b.length-b.offset);
+    if (this.offset == this.length) {
+        throw(this+" cannot be compacted: Offset ("+this.offset+") is equal to its length ("+this.length+")");
+    }
+    if (this.offset == 0 && this.length == this.array.byteLength) {
+        return this; // Already compacted
+    }
+    var srcView = new Uint8Array(this.array);
+    var dst = new ArrayBuffer(this.length-this.offset);
     var dstView = new Uint8Array(dst);
-    dstView.set(srcView.subarray(b.offset, b.length));
-    return dst;
+    dstView.set(srcView.subarray(this.offset, this.length));
+    this.array = dst;
+    this.offset = 0;
+    this.length = this.array.byteLength;
+    return this;
 };
 
 /**
@@ -670,34 +724,43 @@ ByteBuffer.LINE = "--------------------------------------------------";
  */
 ByteBuffer.prototype.printDebug = function() {
     console.log(this.toString()+"\n"+ByteBuffer.LINE);
-    if (this.array != null) {
-        var view = new Uint8Array(this.array);
-        var out = "";
-        for (var i=0; i<this.array.byteLength; i++) {
-            var val = view[i];
-            val = val.toString(16).toUpperCase();
-            if (val.length < 2) val = "0"+val;
-            if (i>0 && i%16 == 0) {
-                out += "\n";
-            }
-            if (i == this.offset && i == this.length) {
-                out += "|";
-            } else if (i == this.offset) {
-                out += "<";
-            } else if (i == this.length) {
-                out += ">";
-            } else {
-                out += " ";
-            }
-            out += val;
+    console.log(this.toHex()+"\n");
+};
+
+/**
+ * Returns a hex representation of this ByteBuffer's contents. Beware: May be large.
+ * @param {number=} wrap Wrap length. Defaults to 16.
+ * @return {string} Hex representation as of " 00<01 02>03..." with marked offsets
+ */
+ByteBuffer.prototype.toHex = function(wrap) {
+    if (this.array == null) return "DESTROYED";
+    wrap = typeof wrap != 'undefined' ? parseInt(wrap, 10) : 16;
+    if (wrap < 1) wrap = 16;
+    var out = "", view = new Uint8Array(this.array);
+    for (var i=0; i<this.array.byteLength; i++) {
+        var val = view[i];
+        val = val.toString(16).toUpperCase();
+        if (val.length < 2) val = "0"+val;
+        if (i>0 && i%wrap == 0) {
+            out += "\n";
         }
-        if (this.length == this.array.byteLength) {
-            out += ">";
-        } else if (this.offset == this.array.byteLength) {
+        if (i == this.offset && i == this.length) {
+            out += "|";
+        } else if (i == this.offset) {
             out += "<";
+        } else if (i == this.length) {
+            out += ">";
+        } else {
+            out += " ";
         }
-        console.log(out+"\n");
+        out += val;
     }
+    if (this.length == this.array.byteLength) {
+        out += ">";
+    } else if (this.offset == this.array.byteLength) {
+        out += "<";
+    }
+    return out;
 };
 
 /**
@@ -709,6 +772,26 @@ ByteBuffer.prototype.toString = function() {
         return "ByteBuffer(DESTROYED)";
     }
     return "ByteBuffer(offset="+this.offset+",length="+this.length+",capacity="+this.array.byteLength+")";
+};
+
+/**
+ * Returns an ArrayBuffer compacted to contain this ByteBuffer's actual contents. Will implicitly
+ * {@link dcodeIO.ByteBuffer#flip} the ByteBuffer if its offset is larger than its length. Will return a reference to
+ * the unmodified backing buffer if offset=0 and length=capacity unless forceCopy is set to true.
+ * @param {boolean=} forceCopy Forces the creation of a copy if set to true. Defaults to false.
+ * @return {ArrayBuffer} Compacted ArrayBuffer
+ */
+ByteBuffer.prototype.toArrayBuffer = function(forceCopy) {
+    var b = this.clone();
+    if (b.offset > b.length) {
+        b.flip();
+    }
+    var copied = false;
+    if (b.offset > 0 || b.length < b.array.byteLength) {
+        b.compact(); // Will always create a new backing buffer because of the above condition
+        copied = true;
+    }
+    return forceCopy && !copied ? b.copy().array : b.array;
 };
 
 /**
