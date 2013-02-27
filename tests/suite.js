@@ -1,4 +1,4 @@
-var ByteBuffer = require("../ByteBuffer.js");
+var ByteBuffer = require("../ByteBuffer.min.js");
 
 var suite = {
 
@@ -393,6 +393,61 @@ var suite = {
         test.throws(function() {
             ByteBuffer.decodeUTF8Char(bb, 0);
         });
+        test.done();
+    },
+    
+    "commonjs": function(test) {
+        var fs = require("fs")
+          , vm = require("vm")
+          , util = require('util');
+        
+        var code = fs.readFileSync(__dirname+"/../ByteBuffer.js");
+        var sandbox = {
+            module: {
+                exports: {}
+            }
+        };
+        vm.runInNewContext(code, sandbox, "ByteBuffer.js in CommonJS-VM");
+        // console.log(util.inspect(sandbox));
+        test.ok(typeof sandbox.module.exports == 'function');
+        test.done();
+    },
+    
+    "amd": function(test) {
+        var fs = require("fs")
+          , vm = require("vm")
+          , util = require('util');
+
+        var code = fs.readFileSync(__dirname+"/../ByteBuffer.js");
+        var sandbox = {
+            require: function() {},
+            define: (function() {
+                function define() {
+                    define.called = true;
+                }
+                define.amd = true;
+                define.called = false;
+                return define;
+            })()
+        };
+        vm.runInNewContext(code, sandbox, "ByteBuffer.js in AMD-VM");
+        // console.log(util.inspect(sandbox));
+        test.ok(sandbox.define.called == true);
+        test.done();
+    },
+    
+    "shim": function(test) {
+        var fs = require("fs")
+            , vm = require("vm")
+            , util = require('util');
+
+        var code = fs.readFileSync(__dirname+"/../ByteBuffer.js");
+        var sandbox = {
+            window: {}
+        };
+        vm.runInNewContext(code, sandbox, "ByteBuffer.js in AMD-VM");
+        // console.log(util.inspect(sandbox));
+        test.ok(typeof sandbox.window.dcodeIO != 'undefined' && typeof sandbox.window.dcodeIO.ByteBuffer != 'undefined');
         test.done();
     },
     

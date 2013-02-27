@@ -1108,9 +1108,8 @@
         if (window) {
             if (!window["dcodeIO"]) {
                 window["dcodeIO"] = {};
-            } else {
-                window["dcodeIO"]["ByteBuffer"] = ByteBuffer;
             }
+            window["dcodeIO"]["ByteBuffer"] = ByteBuffer;
         } else {
             throw("Cannot load ByteBuffer.js: Neigher a CommonJS or AMD loader nor a global window is available");
         }
