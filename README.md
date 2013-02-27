@@ -52,7 +52,7 @@ Features
 * [CommonJS](http://www.commonjs.org/) compatible
 * [RequireJS](http://requirejs.org/)/AMD compatible
 * Shim compatible (include the script, then use var ByteBuffer = dcodeIO.ByteBuffer;)
-* [node.js](http://nodejs.org) compatible, also available via [npm](https://npmjs.org/package/bytebuffer) (npm install bytebuffer)
+* [node.js](http://nodejs.org) compatible, also available via [npm](https://npmjs.org/package/bytebuffer)
 * [Closure Compiler](https://developers.google.com/closure/compiler/) ADVANCED_OPTIMIZATIONS compatible (fully annotated)
 * Fully documented ([jsdoc3](https://github.com/jsdoc3/jsdoc))
 * Tested through [nodeunit](https://github.com/caolan/nodeunit) (TODO: heavily test UTF8 en-/decoding)
@@ -63,6 +63,7 @@ Usage
 -----
 ### Node / CommonJS ###
 * Install: npm install bytebuffer
+
 ```javascript
 var ByteBuffer = require("bytebuffer");
 var bb = new ByteBuffer();
@@ -70,10 +71,13 @@ bb.writeLString("Hello world!");
 bb.flip();
 console.log(bb.readLString()+" from ByteBuffer.js");
 ```
+
 ### Browser (shim) ###
+
 ```
 <script src="https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.min.js"></script>
 ```
+
 ```javascript
 var ByteBuffer = dcodeIO.ByteBuffer;
 var bb = new ByteBuffer();
@@ -81,7 +85,9 @@ bb.writeLString("Hello world!");
 bb.flip();
 alert(bb.readLString()+" from ByteBuffer.js");
 ```
+
 ### Require.js / AMD ###
+
 ```javascript
 var ByteBuffer = require("/path/to/ByteBuffer.js");
 var bb = new ByteBuffer();
