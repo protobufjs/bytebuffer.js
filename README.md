@@ -37,7 +37,13 @@ ByteBuffer
   JSON.parse) implementations.
 * All with implicit offset advance if the offset parameter is omitted or without, if specified
 * Chaining of all operations that allow this (i.e. do not return some specific value like in read operations), e.g.
-  `bb.reset().writeInt(1).writeLString("Hello world!").flip().compact()...`
+
+  ```javascript
+  var bb = new ByteBuffer();
+  ...
+  bb.reset().writeInt(1).writeLString("Hello world!").flip().compact()...
+  ```
+  
 * `ByteBuffer#toString()`, `ByteBuffer#toHex([wrap])` and `ByteBuffer#printDebug()` for easy debugging
   
 Features
