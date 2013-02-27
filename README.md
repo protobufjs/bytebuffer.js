@@ -21,8 +21,8 @@ ByteBuffer
 * Conversion to ArrayBuffer (`ByteBuffer#toArrayBuffer([forceCopy])`) (i.e. to send data over the wire, e.g. a WebSocket
   with `binaryType="arraybuffer"`)
 * Explicit destruction (`ByteBuffer#destroy()`)
-* Provides `ByteBuffer#writeUint/Int8/16/32(value[, offset])` and `ByteBuffer#readUint/Int8/16/32([offset])` 
-* Provides `ByteBuffer#writeFloat32/64(value[, offset])` and `ByteBuffer#readFloat32/64([offset])`
+* `ByteBuffer#writeUint/Int8/16/32(value[, offset])` and `ByteBuffer#readUint/Int8/16/32([offset])` 
+* `ByteBuffer#writeFloat32/64(value[, offset])` and `ByteBuffer#readFloat32/64([offset])`
 * `ByteBuffer#write/readByte`, `ByteBuffer#write/readShort`, `ByteBuffer#write/readInt`, `ByteBuffer#write/readLong`
   (all signed), `ByteBuffer#write/readFloat`, `ByteBuffer#write/readDouble` aliases for the above for convenience
 * `ByteBuffer#writeUTF8String(str[, offset])` and `ByteBuffer#readUTF8String(chars[, offset])` using the included UTF8
@@ -37,7 +37,7 @@ ByteBuffer
 * All with implicit offset advance if the offset parameter is omitted or without, if specified
 * Chaining of all operations that allow this (i.e. do not return some specific value like in read operations), e.g.
   `bb.reset().writeInt(1).writeLString("Hello world!").flip().compact()...`
-* Provides `ByteBuffer#toString()`, `ByteBuffer#toHex([wrap])` and `ByteBuffer#printDebug()` for easy debugging
+* `ByteBuffer#toString()`, `ByteBuffer#toHex([wrap])` and `ByteBuffer#printDebug()` for easy debugging
   
 Features
 --------
