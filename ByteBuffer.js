@@ -92,12 +92,12 @@ ByteBuffer.BIG_ENDIAN = false;
 
 /**
  * Allocates a new ByteBuffer.
- * @param {number=} length Initial length. Defaults to {@link ByteBuffer.DEFAULT_CAPACITY}.
+ * @param {number=} capacity Initial capacity. Defaults to {@link ByteBuffer.DEFAULT_CAPACITY}.
  * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to true.
  * @return {dcodeIO.ByteBuffer}
  */
-ByteBuffer.allocate = function(length, littleEndian) {
-    return new ByteBuffer(length, littleEndian);
+ByteBuffer.allocate = function(capacity, littleEndian) {
+    return new ByteBuffer(capacity, littleEndian);
 };
 
 /**
@@ -798,11 +798,12 @@ ByteBuffer.prototype.toArrayBuffer = function(forceCopy) {
  * Decodes a single UTF8 character from the specified ByteBuffer. The ByteBuffer's offsets are not modified.
  * @param {dcodeIO.ByteBuffer} src
  * @param {number} offset Offset to read from
- * @return {{char: number, length: number}}
+ * @return {{char: number, length: number}} Decoded char code and the actual number of bytes read 
  */
 ByteBuffer.decodeUTF8Char = function(src, offset) {
     var a = src.readUint8(offset), b, c, d, e, f, start = offset, charCode;
     // ref: http://en.wikipedia.org/wiki/UTF-8#Description
+    // It's quite huge but should be pretty fast.
     if ((a&0x80)==0) {
         charCode = a;
         offset += 1;
@@ -855,6 +856,7 @@ ByteBuffer.decodeUTF8Char = function(src, offset) {
 ByteBuffer.encodeUTF8Char = function(charCode, dst, offset) {
     var a = charCode, start = offset;
     // ref: http://en.wikipedia.org/wiki/UTF-8#Description
+    // It's quite huge but should be pretty fast.
     if (a < 0x80) {
         dst.writeUint8(a&0x7F, offset);
         offset += 1;

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Index</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="scripts/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-esoccer.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Index</h1>
+    
+    
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>ByteBuffer.js - A Java-like ByteBuffer</h1>
+
+<p>Provides a Java-like ByteBuffer implementation using typed arrays. It also tries to abstract the complexity away by
+providing convenience methods for those who just want to write stuff without caring about signed, unsigned and the
+actual bit sizes.</p>
+
+<p>This is a first, mostly untested release. There is nothing more than an initial node-based test case, yet. However,
+it will become stable as soon as it is used for the cross-platform multiplayer component in <a href="http://www.esoccer.me">eSoccer</a>,
+a HTML5 game developed at <a href="http://www.h-brs.de">University of Applied Sciences Bonn</a>.</p>
+
+<h2>ByteBuffer</h2>
+
+<ul><li>Mimics <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/ByteBuffer.html">Java ByteBuffers</a> as close as reasonable</li><li>Allocation through new ByteBuffer([capacity, [littleEndian]]) or ByteBuffer#allocate</li><li>Wrapping of plain ArrayBuffers or any object with an &quot;array&quot; or &quot;buffer&quot; property which is an ArrayBuffer
+through ByteBuffer.wrap(buffer[, littleEndian])</li><li>Cloning by maintaining the reference to the underlying ArrayBuffer (ByteBuffer#clone)</li><li>Copying to use an independent ArrayBuffer for the copy through ByteBuffer#copy</li><li>Slicing while maintaining the reference to the underlying ArrayBuffer through ByteBuffer#slice</li><li>Slicing to use an independent ArrayBuffer for the copy through ByteBuffer#sliceAndCompact</li><li>Manual offset manipulation throught ByteBuffer#offset and ByteBuffer#length</li><li>Manual array manipulation through ByteBuffer#array</li><li>Explicit resizing through ByteBuffer#resize(capacity)</li><li>Implicit resizing through ByteBuffer#ensureCapacity(newCapacity) on each operation. Doubles the capacity by default
+to be efficient in speed while maintaining reasonable memory usage.</li><li>Hate it or love it: ByteBuffer#flip and ByteBuffer#reset</li><li>Compacting to a an ArrayBuffer of its actual size (offset to length) through ByteBuffer#compact. Will implicitly flip
+if required. This is used to send ByteBuffer data over the wire (e.g. a WebSocket with binaryType=&quot;arraybuffer&quot;).</li><li>If you do not want to care about compacting yourself, use ByteBuffer#toArrayBuffer to do all the stuff automatically
+and just send the data over whatever wire you prefer afterwards. Will return a reference to the backing buffer if
+already in a compacted form unless the forceCopy parameter is set to true.</li><li>Explicit destruction through ByteBuffer#destroy</li><li>writeInt8, readInt8 with alias writeByte, readByte</li><li>writeUint8, readUint8</li><li>writeInt16, readInt16 with aliases writeShort, readShort</li><li>writeUint16, readUint16</li><li>writeInt32, readInt32 with aliases writeInt, readInt</li><li>writeUint32, readUint32</li><li>writeFloat32, readFloat32 with aliases writeFloat, readFloat</li><li>writeFloat64, readFloat64 with aliases writeDouble, readDouble</li><li>writeUTF8String, readUTF8String</li><li>writeLString, readLString to write respectively read a length-prepended (Uint32) string</li><li>writeCString, readCString to write respectively read a NULL-terminated (Uint8) string</li><li>writeJSON, readJSON to stringify and write respectivly to read and parse JSON data. Allows overriding the default
+stringify (default: JSON.stringify) and parse (default: JSON.parse) implementations.</li><li>All with implicit offset advance if the offset parameter is omitted or without, if specified.</li><li>Chaining for all operations that allow this (i.e. do not return some specific value like in read operations), e.g.
+bb.writeInt(1).writeString(&quot;Hello world!&quot;)...</li><li>Provides ByteBuffer#toString and ByteBuffer#printDebug (including hex encoded contents) for debugging</li><li>Includes an UTF8 encoder and decoder (full 1-6 bytes, <a href="http://en.wikipedia.org/wiki/UTF-8#Description">ref</a>) available
+through ByteBuffer.encodeUTF8Char and ByteBuffer.decodeUTF8Char</li></ul>
+
+<h2>Features</h2>
+
+<ul><li><a href="http://www.commonjs.org/">CommonJS</a> compatible</li><li><a href="http://requirejs.org/">RequireJS</a>/AMD compatible</li><li>Shim compatible (include the script, then use var ByteBuffer = dcodeIO.ByteBuffer;)</li><li><a href="http://nodejs.org">node.js</a> compatible, also available via <a href="https://npmjs.org/package/bytebuffer">npm</a> (npm install bytebuffer)</li><li><a href="https://developers.google.com/closure/compiler/">Closure Compiler</a> ADVANCED_OPTIMIZATIONS compatible (fully annotated)</li><li>Fully documented (<a href="https://github.com/jsdoc3/jsdoc">jsdoc3</a>)</li><li>Zero dependencies</li><li>Small footprint</li></ul>
+
+<h2>Documentation</h2>
+
+<ul><li><a href="http://htmlpreview.github.com/?http://github.com/dcodeIO/ByteBuffer.js/master/docs/dcodeIO.ByteBuffer.html">View</a></li></ul>
+
+<h2>Examples &amp; Tests</h2>
+
+<ul><li><a href="https://github.com/dcodeIO/ByteBuffer.js/blob/master/examples/node-ByteBuffer.js">View source</a></li></ul>
+
+<h2>Prerequisites to run it against IE&lt;10, FF&lt;15, Chrome&lt;9 etc.</h2>
+
+<ul><li>Working ArrayBuffer, DataView &amp; Uint8Array implementations (e.g. use a <a href="http://www.calormen.com/polyfill/#typedarray">polyfill</a>)</li></ul>
+
+<h2>License</h2>
+
+<p>Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.html</p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <nav-inner>
+        <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="dcodeIO.ByteBuffer.html">ByteBuffer</a></li></ul>
+    </nav-inner>
+</nav>
+
+<br clear="both">
+
+<script> prettyPrint(); </script>
+</body>
+</html>

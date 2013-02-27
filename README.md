@@ -61,6 +61,10 @@ Features
 * Zero dependencies
 * Small footprint
 
+Documentation
+-------------
+* [View](http://htmlpreview.github.com/?http://github.com/dcodeIO/ByteBuffer.js/master/docs/dcodeIO.ByteBuffer.html)
+
 Examples & Tests
 ----------------
 * [View source](https://github.com/dcodeIO/ByteBuffer.js/blob/master/examples/node-ByteBuffer.js)
