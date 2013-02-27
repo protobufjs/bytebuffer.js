@@ -1,6 +1,6 @@
 {
     "name": "bytebuffer",
-    "version": "0.9.1",
+    "version": "0.9.2",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "description": "A Java-like ByteBuffer implementation using typed arrays.",
     "contributors": [
