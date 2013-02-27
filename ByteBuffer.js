@@ -61,7 +61,7 @@ dcodeIO.ByteBuffer = function(capacity, littleEndian) {
     this.offset = 0;
 
     /**
-     * Number of bytes contained in our ArrayBuffer.
+     * Length of the data contained in our ArrayBuffer.
      * @type {number}
      */
     this.length = 0;
@@ -570,8 +570,12 @@ dcodeIO.ByteBuffer.prototype.writeUTF8String = function(s, offset) {
     var advance = typeof offset == 'undefined';
     offset = typeof offset != 'undefined' ? offset : this.offset;
     var start = offset;
-    this.ensureCapacity(offset+s.length*6); // 6 bytes per character in the worst case
-    for (var i=0; i<s.length; i++) {
+    var encLen = 0, i;
+    for (i=0;i< s.length; i++) {
+        encLen += dcodeIO.ByteBuffer.calculateUTF8Char(s.charCodeAt(i));
+    }
+    this.ensureCapacity(offset+encLen);
+    for (i=0; i<s.length; i++) {
         offset += dcodeIO.ByteBuffer.encodeUTF8Char(s.charCodeAt(i), this, offset);
     }
     if (advance) {
@@ -761,7 +765,9 @@ dcodeIO.ByteBuffer.prototype.toHex = function(wrap) {
         }
         out += val;
     }
-    if (this.length == this.array.byteLength) {
+    if (this.offset == this.array.byteLength && this.length == this.array.byteLength) {
+        out += "|";
+    } else if (this.length == this.array.byteLength) {
         out += ">";
     } else if (this.offset == this.array.byteLength) {
         out += "<";
@@ -863,6 +869,9 @@ dcodeIO.ByteBuffer.encodeUTF8Char = function(charCode, dst, offset) {
     var start = offset;
     // ref: http://en.wikipedia.org/wiki/UTF-8#Description
     // It's quite huge but should be pretty fast.
+    if (charCode < 0) {
+        throw("Cannot encode character with negative charCode ("+charCode+")");
+    }
     if (charCode < 0x80) {
         dst.writeUint8(charCode&0x7F, offset);
         offset += 1;
@@ -898,6 +907,30 @@ dcodeIO.ByteBuffer.encodeUTF8Char = function(charCode, dst, offset) {
         offset += 6;
     }
     return offset-start;
+};
+
+/**
+ * Calculates the actual number of bytes required to encode the specified char code.
+ * @param {number} charCode Character to encode as char code
+ * @return {number} Number of bytes required to encode the specified char code
+ */
+dcodeIO.ByteBuffer.calculateUTF8Char = function(charCode) {
+    if (charCode < 0) {
+        throw("Cannot calculate length of character with negative charCode ("+charCode+")");
+    }
+    if (charCode < 0x80) {
+        return 1;
+    } else if (charCode < 0x800) {
+        return 2;
+    } else if (charCode < 0x10000) {
+        return 3;
+    } else if (charCode < 0x200000) {
+        return 4;
+    } else if (charCode < 0x4000000) {
+        return 5;
+    } else {
+        return 6;
+    }
 };
 
 // Enable module loading if available

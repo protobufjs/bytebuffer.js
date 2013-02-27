@@ -248,29 +248,31 @@ var suite = {
     
     "write/readLString": function(test) {
         var bb = new ByteBuffer(2);
-        bb.writeLString("a");
-        test.equal(bb.offset, 2);
+        bb.writeLString("ab"); // resizes to 4
+        test.equal(bb.array.byteLength, 4);
+        test.equal(bb.offset, 3);
         test.equals(bb.length, 0);
         bb.flip();
-        test.equal(bb.toHex(), "<01 61>00 00 00 00 00");
-        test.deepEqual({"string": "a", "length": 2}, bb.readLString(0));
-        test.equal(bb.toHex(), "<01 61>00 00 00 00 00");
-        test.equal("a", bb.readLString());
-        test.equal(bb.toHex(), " 01 61|00 00 00 00 00");
+        test.equal(bb.toHex(), "<02 61 62>00");
+        test.deepEqual({"string": "ab", "length": 3}, bb.readLString(0));
+        test.equal(bb.toHex(), "<02 61 62>00");
+        test.equal("ab", bb.readLString());
+        test.equal(bb.toHex(), " 02 61 62|00");
         test.done();
     },
     
     "write/readCString": function(test) {
         var bb = new ByteBuffer(2);
-        bb.writeCString("a");
-        test.equal(bb.offset, 2);
+        bb.writeCString("ab"); // resizes to 4
+        test.equal(bb.array.byteLength, 4);
+        test.equal(bb.offset, 3);
         test.equal(bb.length, 0);
         bb.flip();
-        test.equal(bb.toHex(), "<61 00>00 00 00 00");
-        test.deepEqual({"string": "a", "length": 2}, bb.readCString(0));
-        test.equal(bb.toHex(), "<61 00>00 00 00 00");
-        test.equal("a", bb.readCString());
-        test.equal(bb.toHex(), " 61 00|00 00 00 00");
+        test.equal(bb.toHex(), "<61 62 00>00");
+        test.deepEqual({"string": "ab", "length": 3}, bb.readCString(0));
+        test.equal(bb.toHex(), "<61 62 00>00");
+        test.equal("ab", bb.readCString());
+        test.equal(bb.toHex(), " 61 62 00|00");
         test.done();
     },
     
