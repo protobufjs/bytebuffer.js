@@ -1,4 +1,4 @@
-var ByteBuffer = require("../ByteBuffer.min.js");
+var ByteBuffer = require("../ByteBuffer.js");
 
 var suite = {
 
@@ -44,7 +44,7 @@ var suite = {
         var bb = new ByteBuffer(1);
         bb.resize(2);
         test.equal(bb.array.byteLength, 2);
-        test.equal(bb.toHex(), "|00 00");
+        test.equal(bb.toHex(), "|00 00 ");
         test.done();
     },
     
@@ -144,6 +144,45 @@ var suite = {
         test.equal(bb.offset, 0);
         test.equal(bb.length, 0);
         test.equal(bb.toHex(), "DESTROYED");
+        test.done();
+    },
+    
+    "reverse": function(test) {
+        var bb = new ByteBuffer(4);
+        bb.writeUint32(0x12345678);
+        bb.flip();
+        bb.reverse();
+        test.equal(bb.toHex(), "<78 56 34 12>");
+        test.done();
+    },
+    
+    "append": function(test) {
+        var bb = new ByteBuffer(2);
+        bb.writeUint16(0x1234);
+        bb.flip();
+        var bb2 = new ByteBuffer(2);
+        bb2.writeUint16(0x5678);
+        bb2.flip();
+        bb.append(bb2);
+        test.equal(bb.toHex(), "<12 34 56 78>");
+        bb.length = 0;
+        bb.append(bb2, 1);
+        test.equal(bb.toHex(), "|12 56 78 78 ");
+        test.done();
+    },
+    
+    "prepend": function(test) {
+        var bb = new ByteBuffer(2);
+        bb.writeUint16(0x1234);
+        bb.flip();
+        var bb2 = new ByteBuffer(2);
+        bb2.writeUint16(0x5678);
+        bb2.flip();
+        bb.prepend(bb2);
+        test.equal(bb.toHex(), "<56 78 12 34>");
+        bb.offset = 4;
+        bb.prepend(bb2, 3);
+        test.equal(bb.toHex(), " 56 56 78 34|")
         test.done();
     },
     
@@ -272,11 +311,11 @@ var suite = {
         test.equal(bb.offset, 3);
         test.equals(bb.length, 0);
         bb.flip();
-        test.equal(bb.toHex(), "<02 61 62>00");
+        test.equal(bb.toHex(), "<02 61 62>00 ");
         test.deepEqual({"string": "ab", "length": 3}, bb.readLString(0));
-        test.equal(bb.toHex(), "<02 61 62>00");
+        test.equal(bb.toHex(), "<02 61 62>00 ");
         test.equal("ab", bb.readLString());
-        test.equal(bb.toHex(), " 02 61 62|00");
+        test.equal(bb.toHex(), " 02 61 62|00 ");
         test.done();
     },
     
@@ -287,11 +326,11 @@ var suite = {
         test.equal(bb.offset, 3);
         test.equal(bb.length, 0);
         bb.flip();
-        test.equal(bb.toHex(), "<61 62 00>00");
+        test.equal(bb.toHex(), "<61 62 00>00 ");
         test.deepEqual({"string": "ab", "length": 3}, bb.readCString(0));
-        test.equal(bb.toHex(), "<61 62 00>00");
+        test.equal(bb.toHex(), "<61 62 00>00 ");
         test.equal("ab", bb.readCString());
-        test.equal(bb.toHex(), " 61 62 00|00");
+        test.equal(bb.toHex(), " 61 62 00|00 ");
         test.done();
     },
     
@@ -307,7 +346,7 @@ var suite = {
     "toHex": function(test) {
         var bb = new ByteBuffer(3);
         bb.writeUint16(0x1234);
-        test.equal(bb.toHex(), ">12 34<00");
+        test.equal(bb.toHex(), ">12 34<00 ");
         test.done();
     },
     
@@ -354,6 +393,14 @@ var suite = {
         test.throws(function() {
             ByteBuffer.decodeUTF8Char(bb, 0);
         });
+        test.done();
+    },
+    
+    "helloworld": function(test) {
+        var bb = new ByteBuffer();
+        bb.writeUTF8String("Hello world! from ByteBuffer.js. This is just a visual test of ByteBuffer#printDebug.");
+        bb.flip();
+        bb.printDebug();
         test.done();
     }
 };

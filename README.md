@@ -20,6 +20,7 @@ ByteBuffer [![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.png?bran
 * Compacting of the backing buffer (`ByteBuffer#compact()`)
 * Conversion to ArrayBuffer (`ByteBuffer#toArrayBuffer([forceCopy])`) (i.e. to send data over the wire, e.g. a WebSocket
   with `binaryType="arraybuffer"`)
+* Reversing (`ByteBuffer#reverse()`), appending (`ByteBuffer#append([offset])`) and prepending (`ByteBuffer#prepend([offset])`)
 * Explicit destruction (`ByteBuffer#destroy()`)
 * `ByteBuffer#writeUint/Int8/16/32(value[, offset])` and `ByteBuffer#readUint/Int8/16/32([offset])` 
 * `ByteBuffer#writeFloat32/64(value[, offset])` and `ByteBuffer#readFloat32/64([offset])`
@@ -44,7 +45,8 @@ ByteBuffer [![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.png?bran
   bb.reset().writeInt(1).writeLString("Hello world!").flip().compact()...
   ```
   
-* `ByteBuffer#toString()`, `ByteBuffer#toHex([wrap])` and `ByteBuffer#printDebug()` for easy debugging
+* `ByteBuffer#toString()`, `ByteBuffer#toHex([wrap])`, `ByteBuffer#toASCII([wrap])` and `ByteBuffer#printDebug()`
+  (emits hex + ASCII + offsets to console, looks like your favourite hex editor) for pain-free debugging
   
 Features
 --------

@@ -307,6 +307,87 @@
         this.offset = 0;
         this.length = 0;
     };
+
+    /**
+     * Reverses the underlying back buffer and adapts offset and length to match the same part as before.
+     * @return {ByteBuffer} this
+     */
+    ByteBuffer.prototype.reverse = function() {
+        if (this.array == null) {
+            throw(this+" cannot be reversed: Already destroyed");
+        }
+        // Not sure what for, but other implementations seem to have it :-)
+        Array.prototype.reverse.call(new Uint8Array(this.array));
+        var o = this.offset;
+        this.offset = this.array.byteLength - this.length;
+        this.length = this.array.byteLength - o;
+        return this;
+    };
+
+    /**
+     * Appends another ByteBuffer to this one. Appends only the portion between offset and length of the specified
+     * ByteBuffer and overwrites any contents  behind the specified offset up to the number of bytes appended from
+     * the specified ByteBuffer in this ByteBuffer. Will clone and flip the specified ByteBuffer if its offset is
+     * larger than its length (its offsets remain untouched through cloning).
+     * @param {ByteBuffer} src ByteBuffer to append
+     * @param {number=} offset Offset to append behind. Defaults to {@link ByteBuffer#length} which will be modified only if omitted. 
+     * @retirm {ByteBuffer} this
+     */
+    ByteBuffer.prototype.append = function(src, offset) {
+        if (src.array == null) {
+            throw(src+" cannot be appended to "+this+": Already destroyed");
+        }
+        var n = src.length - src.offset;
+        if (n == 0) return this; // Nothing to append
+        if (n < 0) {
+            src = src.clone().flip();
+            n = src.length - src.offset;
+        }
+        offset = typeof offset != 'undefined' ? offset : (this.length+=n)-n;
+        this.ensureCapacity(offset+n);
+        var srcView = new Uint8Array(src.array);
+        var dstView = new Uint8Array(this.array);
+        dstView.set(srcView.subarray(src.offset, src.length), offset);
+        return this;
+    };
+
+    /**
+     * Prepends another ByteBuffer to this one. Prepends only the portion between offset and length of the specified
+     * ByteBuffer and overwrites and contents before the specified offsets up to the number of bytes prepended from
+     * the specified ByteBuffer in this ByteBuffer. Will clone and flip the specified ByteBuffer if its offset is
+     * larger than its length (its offsets remain untouched through cloning).
+     * @param {ByteBuffer} src ByteBuffer to prepend
+     * @param {number=} offset Offset to prepend before. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+     * @return {ByteBuffer} this
+     */
+    ByteBuffer.prototype.prepend = function(src, offset) {
+        if (src.array == null) {
+            throw(src+" cannot be prepended to "+this+": Already destroyed");
+        }
+        var n = src.length - src.offset;
+        if (n == 0) return this; // Nothing to prepend
+        if (n < 0) {
+            src = src.clone().flip();
+            n = src.length - src.offset;
+        }
+        var modify = typeof offset == 'undefined';
+        offset = typeof offset != 'undefined' ? offset : this.offset;
+        var diff = n-offset;
+        if (diff > 0) {
+            // Doesn't fit, so maybe resize and move the contents that are already contained
+            this.ensureCapacity(this.length+diff);
+            this.append(this, n);
+            this.offset += diff;
+            this.length += diff;
+            this.append(src, 0);
+        } else {
+            this.append(src, offset-n);
+        }
+        if (modify) {
+            this.offset -= n;
+        }
+        return this;
+    };
     
     /**
      * Writes an 8bit singed integer.
@@ -768,50 +849,91 @@
      */
     ByteBuffer.prototype.printDebug = function() {
         if (typeof console != "undefined" && console["log"]) {
-            console.log(
-                this.toString()+"\n"+
-                "--------------------------------------------------\n"+
-                this.toHex()+"\n"
-            );
+            var s = this.toString()+"\n"+
+                    "-------------------------------------------------------------------\n";
+            var h = this.toHex(16, true);
+            var a = this.toASCII(16, true);
+            for (var i=0; i<h.length; i++) {
+                s += h[i]+"  "+a[i]+"\n";
+            }
+            console.log(s);
         }
     };
     
     /**
      * Returns a hex representation of this ByteBuffer's contents. Beware: May be large.
      * @param {number=} wrap Wrap length. Defaults to 16.
-     * @return {string} Hex representation as of " 00<01 02>03..." with marked offsets
+     * @param {boolean=} asArray Set to true to return an array of lines. Defaults to false.
+     * @return {string|Array.<string>} Hex representation as of " 00<01 02>03..." with marked offsets
      */
-    ByteBuffer.prototype.toHex = function(wrap) {
+    ByteBuffer.prototype.toHex = function(wrap, asArray) {
         if (this.array == null) return "DESTROYED";
+        asArray = !!asArray;
         wrap = typeof wrap != 'undefined' ? parseInt(wrap, 10) : 16;
         if (wrap < 1) wrap = 16;
-        var out = "", view = new Uint8Array(this.array);
+        var out = "", lines = [], view = new Uint8Array(this.array);
+        if (this.offset == 0 && this.length == 0) {
+            out += "|";
+        } else if (this.length == 0) {
+            out += ">";
+        } else if (this.offset == 0) {
+            out += "<";
+        } else {
+            out += " ";
+        }
         for (var i=0; i<this.array.byteLength; i++) {
+            if (i>0 && i%wrap == 0) {
+                lines.push(out);
+                out = " ";
+            }
             var val = view[i];
             val = val.toString(16).toUpperCase();
             if (val.length < 2) val = "0"+val;
-            if (i>0 && i%wrap == 0) {
-                out += "\n";
-            }
-            if (i == this.offset && i == this.length) {
+            out += val;
+            if (i+1 == this.offset && i+1 == this.length) {
                 out += "|";
-            } else if (i == this.offset) {
+            } else if (i+1 == this.offset) {
                 out += "<";
-            } else if (i == this.length) {
+            } else if (i+1 == this.length) {
                 out += ">";
             } else {
                 out += " ";
             }
+        }
+        if (asArray) {
+            while (out.length < 3*wrap+1) out += "   "; // Make it equal to maybe show something on the right
+        }
+        lines.push(out);
+        return asArray ? lines : lines.join("\n");
+    };
+
+    /**
+     * Returns an ASCII representation of this ByteBuffer's contents. Beware: May be large.
+     * @param {number=} wrap Wrap length. Defaults to 16.
+     * @param {boolean=} asArray Set to true to return an array of lines. Defaults to false.
+     * @return {string|Array.<string>} ASCII representation as of "abcdef..." (33-126, else ".", no marked offsets)
+     */
+    ByteBuffer.prototype.toASCII = function(wrap, asArray) {
+        if (this.array == null) return "";
+        asArray = !!asArray;
+        wrap = typeof wrap != 'undefined' ? parseInt(wrap, 10) : 16;
+        if (wrap < 1) wrap = 16;
+        var out = "", lines = [], view = new Uint8Array(this.array);
+        for (var i=0; i<this.array.byteLength; i++) {
+            if (i>0 && i%wrap == 0) {
+                lines.push(out);
+                out = "";
+            }
+            var val = view[i];
+            if (val >  32 && val < 127) {
+                val = String.fromCharCode(val);
+            } else {
+                val = ".";
+            }
             out += val;
         }
-        if (this.offset == this.array.byteLength && this.length == this.array.byteLength) {
-            out += "|";
-        } else if (this.length == this.array.byteLength) {
-            out += ">";
-        } else if (this.offset == this.array.byteLength) {
-            out += "<";
-        }
-        return out;
+        lines.push(out);
+        return asArray ? lines : lines.join("\n")+"\n";
     };
     
     /**
