@@ -7,7 +7,7 @@ a HTML5 game developed at [University of Applied Sciences Bonn](http://www.h-brs
 
 ByteBuffer
 ----------
-* Mimics [Java ByteBuffers](http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/ByteBuffer.html) as close as reasonable
+* Mimics [Java ByteBuffers](http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/ByteBuffer.html) as close as reasonable while using typed array terms
 * Simple allocation (new ByteBuffer or ByteBuffer#allocate)
 * Wrapping of quite everything which is or includes an ArrayBuffer (ByteBuffer.wrap)
 * Cloning using the same (ByteBuffer#clone) and copying using an independent backing buffer (ByteBuffer#copy)
