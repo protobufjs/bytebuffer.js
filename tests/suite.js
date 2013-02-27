@@ -1,4 +1,5 @@
-var ByteBuffer = require("../ByteBuffer.min.js");
+var BYTEBUFFER_FILE = "../ByteBuffer.min.js";
+var ByteBuffer = require(BYTEBUFFER_FILE);
 
 var suite = {
 
@@ -401,7 +402,7 @@ var suite = {
           , vm = require("vm")
           , util = require('util');
         
-        var code = fs.readFileSync(__dirname+"/../ByteBuffer.js");
+        var code = fs.readFileSync(__dirname+"/"+BYTEBUFFER_FILE);
         var sandbox = {
             module: {
                 exports: {}
@@ -418,7 +419,7 @@ var suite = {
           , vm = require("vm")
           , util = require('util');
 
-        var code = fs.readFileSync(__dirname+"/../ByteBuffer.js");
+        var code = fs.readFileSync(__dirname+"/"+BYTEBUFFER_FILE);
         var sandbox = {
             require: function() {},
             define: (function() {
@@ -441,7 +442,7 @@ var suite = {
             , vm = require("vm")
             , util = require('util');
 
-        var code = fs.readFileSync(__dirname+"/../ByteBuffer.js");
+        var code = fs.readFileSync(__dirname+"/"+BYTEBUFFER_FILE);
         var sandbox = {
             window: {}
         };
