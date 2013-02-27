@@ -305,7 +305,7 @@ ByteBuffer.prototype.writeInt8 = function(value, offset) {
  */
 ByteBuffer.prototype.readInt8 = function(offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
-    return this.view.getUint8(offset, this.littleEndian);
+    return this.view.getInt8(offset, this.littleEndian);
 };
 
 /**
@@ -523,7 +523,7 @@ ByteBuffer.prototype.readFloat = ByteBuffer.prototype.readFloat32;
 ByteBuffer.prototype.writeFloat64 = function(value, offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=8)-8;
     this.ensureCapacity(offset+8);
-    this.view.setFloat32(offset, value, this.littleEndian);
+    this.view.setFloat64(offset, value, this.littleEndian);
     return this;
 };
 
@@ -534,7 +534,7 @@ ByteBuffer.prototype.writeFloat64 = function(value, offset) {
  */
 ByteBuffer.prototype.readFloat64 = function(offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=8)-8;
-    return this.view.getFloat32(offset, this.littleEndian);
+    return this.view.getFloat64(offset, this.littleEndian);
 };
 
 /**
@@ -603,7 +603,7 @@ ByteBuffer.prototype.readUTF8String = function(chars, offset) {
 };
 
 /**
- * Writes a string with prepended number of characters (Uint32).
+ * Writes a string with prepended number of characters, which is also encoded as an UTF8 character..
  * @param {string} s String to write
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
@@ -611,33 +611,33 @@ ByteBuffer.prototype.readUTF8String = function(chars, offset) {
 ByteBuffer.prototype.writeLString = function(s, offset) {
     var advance = typeof offset == 'undefined';
     offset = typeof offset != 'undefined' ? offset : this.offset;
-    this.writeUint32(s.length, offset);
-    var encLen = this.writeUTF8String(s, offset+4);
+    var encLen = ByteBuffer.encodeUTF8Char(s.length, this, offset);
+    encLen += this.writeUTF8String(s, offset+encLen);
     if (advance) {
-        this.offset += 4+encLen;
+        this.offset += encLen;
         return this;
     } else {
-        return 4+encLen;
+        return encLen;
     }
 };
 
 /**
- * Reads a string with a prepended number of characters (Uint32).
+ * Reads a string with a prepended number of characters, which is also encoded as an UTF8 character.
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
  */
 ByteBuffer.prototype.readLString = function(offset) {
     var advance = typeof offset == 'undefined';
     offset = typeof offset != 'undefined' ? offset : this.offset;
-    var chars = this.readUint32(offset);
-    var dec = this.readUTF8String(chars, offset+4);
+    var lenDec = ByteBuffer.decodeUTF8Char(this, offset);
+    var dec = this.readUTF8String(lenDec["char"], offset+lenDec["length"]);
     if (advance) {
-        this.offset += 4+dec["length"];
+        this.offset += lenDec["length"]+dec["length"];
         return dec["string"];
     } else {
         return {
             "string": dec["string"],
-            "length": 4+dec["length"]
+            "length": lenDec["length"]+dec["length"]
         };
     }
 };
@@ -695,7 +695,7 @@ ByteBuffer.prototype.readCString = function(offset) {
  */
 ByteBuffer.prototype.writeJSON = function(data, offset, stringify) {
     stringify = stringify || JSON.stringify.bind(JSON);
-    return this.writeUTF8String(stringify(data), offset);
+    return this.writeLString(stringify(data), offset);
 };
 
 /**
@@ -706,7 +706,7 @@ ByteBuffer.prototype.writeJSON = function(data, offset, stringify) {
  */
 ByteBuffer.prototype.readJSON = function(offset, parse) {
     parse = parse || JSON.parse.bind(JSON);
-    var result = this.readUTF8String(offset);
+    var result = this.readLString(offset);
     if (typeof result == "string") {
         return parse(result);
     } else {
@@ -898,7 +898,7 @@ ByteBuffer.encodeUTF8Char = function(charCode, dst, offset) {
 if (typeof module != 'undefined' && module["exports"]) {
     module["exports"] = ByteBuffer;
 } else if (typeof require != 'undefined' && typeof define != 'undefined') {
-    define("dcodeIO/ByteBuffer/ByteBuffer", [], function() { return ByteBuffer; });
+    define([], function() { return ByteBuffer; });
 } else if (typeof window != "undefined") {
     if (typeof window["dcodeIO"] == "undefined") {
        window["dcodeIO"] = {};

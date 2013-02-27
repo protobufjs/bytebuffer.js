@@ -2,10 +2,7 @@ ByteBuffer.js - A Java-like ByteBuffer
 ======================================
 Provides a Java-like ByteBuffer implementation using typed arrays. It also tries to abstract the complexity away by
 providing convenience methods for those who just want to write stuff without caring about signed, unsigned and the
-actual bit sizes.
-
-This is a first, mostly untested release. There is nothing more than an initial node-based test case, yet. However,
-it will become stable as soon as it is used for the cross-platform multiplayer component in [eSoccer](http://www.esoccer.me),
+actual bit sizes. It's also used for the cross-platform multiplayer component in [eSoccer](http://www.esoccer.me),
 a HTML5 game developed at [University of Applied Sciences Bonn](http://www.h-brs.de).
 
 ByteBuffer
@@ -58,6 +55,7 @@ Features
 * [node.js](http://nodejs.org) compatible, also available via [npm](https://npmjs.org/package/bytebuffer) (npm install bytebuffer)
 * [Closure Compiler](https://developers.google.com/closure/compiler/) ADVANCED_OPTIMIZATIONS compatible (fully annotated)
 * Fully documented ([jsdoc3](https://github.com/jsdoc3/jsdoc))
+* Tested through [nodeunit](https://github.com/caolan/nodeunit) (TODO: heavily test UTF8 en-/decoding)
 * Zero dependencies
 * Small footprint
 
@@ -65,13 +63,13 @@ Documentation
 -------------
 * [View](http://htmlpreview.github.com/?http://github.com/dcodeIO/ByteBuffer.js/master/docs/dcodeIO.ByteBuffer.html)
 
-Examples & Tests
-----------------
-* [View source](https://github.com/dcodeIO/ByteBuffer.js/blob/master/examples/node-ByteBuffer.js)
+Tests (& Examples)
+------------------
+* [View source](https://github.com/dcodeIO/ByteBuffer.js/blob/master/tests/suite.js)
 
 Prerequisites to run it against IE<10, FF<15, Chrome<9 etc.
 -----------------------------------------------------------
-* Working ArrayBuffer, DataView & Uint8Array implementations (e.g. use a [polyfill](http://www.calormen.com/polyfill/#typedarray))
+* Working ArrayBuffer, DataView & Uint8Array implementations (i.e. use a [polyfill](http://www.calormen.com/polyfill/#typedarray), [2](https://github.com/davidflanagan/DataView.js))
 
 License
 -------
