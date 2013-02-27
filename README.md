@@ -13,6 +13,7 @@ ByteBuffer
 * Cloning using the same (ByteBuffer#clone) and copying using an independent backing buffer (ByteBuffer#copy)
 * Slicing using the same (ByteBuffer#slice) and using an indepentent backing buffer (ByteBuffer#sliceAndCompact)
 * Manual offset (ByteBuffer#offset and ByteBuffer#length) and array manipulation (ByteBuffer#array)
+* Remaining readable bytes (ByteBuffer#remaining) and backing buffer capacity getters (ByteBuffer#capacity)
 * Explicit (ByteBuffer#resize) and implicit resizing (ByteBuffer#ensureCapacity)
 * Efficient implicit resizing by doubling the current capacity
 * Flipping (ByteBuffer#flip) and resetting (ByteBuffer#reset) like known from Java ByteBuffers

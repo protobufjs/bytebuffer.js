@@ -50,19 +50,52 @@ a HTML5 game developed at <a href="http://www.h-brs.de">University of Applied Sc
 
 <h2>ByteBuffer</h2>
 
-<ul><li>Mimics <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/ByteBuffer.html">Java ByteBuffers</a> as close as reasonable</li><li>Allocation through new ByteBuffer([capacity, [littleEndian]]) or ByteBuffer#allocate</li><li>Wrapping of plain ArrayBuffers or any object with an &quot;array&quot; or &quot;buffer&quot; property which is an ArrayBuffer
-through ByteBuffer.wrap(buffer[, littleEndian])</li><li>Cloning by maintaining the reference to the underlying ArrayBuffer (ByteBuffer#clone)</li><li>Copying to use an independent ArrayBuffer for the copy through ByteBuffer#copy</li><li>Slicing while maintaining the reference to the underlying ArrayBuffer through ByteBuffer#slice</li><li>Slicing to use an independent ArrayBuffer for the copy through ByteBuffer#sliceAndCompact</li><li>Manual offset manipulation throught ByteBuffer#offset and ByteBuffer#length</li><li>Manual array manipulation through ByteBuffer#array</li><li>Explicit resizing through ByteBuffer#resize(capacity)</li><li>Implicit resizing through ByteBuffer#ensureCapacity(newCapacity) on each operation. Doubles the capacity by default
-to be efficient in speed while maintaining reasonable memory usage.</li><li>Hate it or love it: ByteBuffer#flip and ByteBuffer#reset</li><li>Compacting to a an ArrayBuffer of its actual size (offset to length) through ByteBuffer#compact. Will implicitly flip
-if required. This is used to send ByteBuffer data over the wire (e.g. a WebSocket with binaryType=&quot;arraybuffer&quot;).</li><li>If you do not want to care about compacting yourself, use ByteBuffer#toArrayBuffer to do all the stuff automatically
-and just send the data over whatever wire you prefer afterwards. Will return a reference to the backing buffer if
-already in a compacted form unless the forceCopy parameter is set to true.</li><li>Explicit destruction through ByteBuffer#destroy</li><li>writeInt8, readInt8 with alias writeByte, readByte</li><li>writeUint8, readUint8</li><li>writeInt16, readInt16 with aliases writeShort, readShort</li><li>writeUint16, readUint16</li><li>writeInt32, readInt32 with aliases writeInt, readInt</li><li>writeUint32, readUint32</li><li>writeFloat32, readFloat32 with aliases writeFloat, readFloat</li><li>writeFloat64, readFloat64 with aliases writeDouble, readDouble</li><li>writeUTF8String, readUTF8String</li><li>writeLString, readLString to write respectively read a length-prepended (as UTF8 character) string</li><li>writeCString, readCString to write respectively read a NULL-terminated (Uint8) string</li><li>writeJSON, readJSON to stringify and write respectivly to read and parse JSON data. Allows overriding the default
-stringify (default: JSON.stringify) and parse (default: JSON.parse) implementations.</li><li>All with implicit offset advance if the offset parameter is omitted or without, if specified.</li><li>Chaining for all operations that allow this (i.e. do not return some specific value like in read operations), e.g.
-bb.writeInt(1).writeString(&quot;Hello world!&quot;)...</li><li>Provides ByteBuffer#toString, ByteBuffer#toHex and ByteBuffer#printDebug</li><li>Includes an UTF8 encoder and decoder (full 1-6 bytes, <a href="http://en.wikipedia.org/wiki/UTF-8#Description">ref</a>) available
-through ByteBuffer.encodeUTF8Char and ByteBuffer.decodeUTF8Char</li></ul>
+<ul><li>Mimics <a href="http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/ByteBuffer.html">Java ByteBuffers</a> as close as reasonable while using typed array terms</li><li>Simple allocation (new ByteBuffer or ByteBuffer#allocate)</li><li>Wrapping of quite everything which is or includes an ArrayBuffer (ByteBuffer.wrap)</li><li>Cloning using the same (ByteBuffer#clone) and copying using an independent backing buffer (ByteBuffer#copy)</li><li>Slicing using the same (ByteBuffer#slice) and using an indepentent backing buffer (ByteBuffer#sliceAndCompact)</li><li>Manual offset (ByteBuffer#offset and ByteBuffer#length) and array manipulation (ByteBuffer#array)</li><li>Explicit (ByteBuffer#resize) and implicit resizing (ByteBuffer#ensureCapacity)</li><li>Efficient implicit resizing by doubling the current capacity</li><li>Flipping (ByteBuffer#flip) and resetting (ByteBuffer#reset) like known from Java ByteBuffers</li><li>Compacting of the backing buffer (ByteBuffer#compact)</li><li>Conversion to ArrayBuffer (ByteBuffer#toArrayBuffer) (i.e. to send data over the wire, e.g. a WebSocket with
+binaryType=&quot;arraybuffer&quot;)</li><li>Explicit destruction (ByteBuffer#destroy)</li><li>writeInt8/16/32, readInt8/16/32, writeUint8/16/32, readUint8/16/32</li><li>writeFloat32/64, readFloat32/64</li><li>write/readByte, write/readShort, write/readInt (all signed), write/readFloat, write/readDouble for convenience</li><li>write/readUTF8String using the included UTF8 en-/decoder (full 6 bytes, <a href="http://en.wikipedia.org/wiki/UTF-8#Description">ref</a>)</li><li>write/readLString to write respectively read a length-prepended (number of characters as UTF8 char) string</li><li>write/readCString to write respectively read a NULL-terminated (Uint8 0x00) string</li><li>write/readJSON to write respectively read arbitraty object data. Allows overriding the default stringify
+(default: JSON.stringify) and parse (default: JSON.parse) implementations.</li><li>All with implicit offset advance if the offset parameter is omitted or without, if specified</li><li>Chaining of all operations that allow this (i.e. do not return some specific value like in read operations), e.g.
+bb.reset().writeInt(1).writeLString(&quot;Hello world!&quot;).flip().compact()...</li><li>Provides ByteBuffer#toString, ByteBuffer#toHex and ByteBuffer#printDebug for easy debugging</li></ul>
 
 <h2>Features</h2>
 
-<ul><li><a href="http://www.commonjs.org/">CommonJS</a> compatible</li><li><a href="http://requirejs.org/">RequireJS</a>/AMD compatible</li><li>Shim compatible (include the script, then use var ByteBuffer = dcodeIO.ByteBuffer;)</li><li><a href="http://nodejs.org">node.js</a> compatible, also available via <a href="https://npmjs.org/package/bytebuffer">npm</a> (npm install bytebuffer)</li><li><a href="https://developers.google.com/closure/compiler/">Closure Compiler</a> ADVANCED_OPTIMIZATIONS compatible (fully annotated)</li><li>Fully documented (<a href="https://github.com/jsdoc3/jsdoc">jsdoc3</a>)</li><li>Tested through <a href="https://github.com/caolan/nodeunit">nodeunit</a> (TODO: heavily test UTF8 en-/decoding)</li><li>Zero dependencies</li><li>Small footprint</li></ul>
+<ul><li><a href="http://www.commonjs.org/">CommonJS</a> compatible</li><li><a href="http://requirejs.org/">RequireJS</a>/AMD compatible</li><li>Shim compatible (include the script, then use var ByteBuffer = dcodeIO.ByteBuffer;)</li><li><a href="http://nodejs.org">node.js</a> compatible, also available via <a href="https://npmjs.org/package/bytebuffer">npm</a></li><li><a href="https://developers.google.com/closure/compiler/">Closure Compiler</a> ADVANCED_OPTIMIZATIONS compatible (fully annotated)</li><li>Fully documented (<a href="https://github.com/jsdoc3/jsdoc">jsdoc3</a>)</li><li>Tested through <a href="https://github.com/caolan/nodeunit">nodeunit</a> (TODO: heavily test UTF8 en-/decoding)</li><li>Zero dependencies</li><li>Small footprint</li></ul>
+
+<h2>Usage</h2>
+
+<h3>Node.js / CommonJS</h3>
+
+<ul><li>Install: npm install bytebuffer</li></ul>
+
+<p><code>javascript
+var ByteBuffer = require(&quot;bytebuffer&quot;);
+var bb = new ByteBuffer();
+bb.writeLString(&quot;Hello world!&quot;);
+bb.flip();
+console.log(bb.readLString()+&quot; from ByteBuffer.js&quot;);
+</code></p>
+
+<h3>Browser (shim)</h3>
+
+<p><code>html
+&lt;script src=&quot;//raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.min.js&quot;&gt;&lt;/script&gt;
+</code></p>
+
+<p><code>javascript
+var ByteBuffer = dcodeIO.ByteBuffer;
+var bb = new ByteBuffer();
+bb.writeLString(&quot;Hello world!&quot;);
+bb.flip();
+alert(bb.readLString()+&quot; from ByteBuffer.js&quot;);
+</code></p>
+
+<h3>Require.js / AMD</h3>
+
+<p><code>javascript
+var ByteBuffer = require(&quot;/path/to/ByteBuffer.js&quot;);
+var bb = new ByteBuffer();
+bb.writeLString(&quot;Hello world!&quot;);
+bb.flip();
+alert(bb.readLString()+&quot; from ByteBuffer.js&quot;);
+</code></p>
 
 <h2>Documentation</h2>
 

@@ -55,13 +55,17 @@ dcodeIO.ByteBuffer = function(capacity, littleEndian) {
     this.view = this.array != null ? new DataView(this.array) : null;
     
     /**
-     * Current read/write offset.
+     * Current read/write offset. Length- and capacity-independent index. Contents are the bytes between offset and
+     * length, which are both absolute indexes. There is no capacity property, use {@link dcodeIO.ByteBuffer#capacity}
+     * instead.
      * @type {number}
      */
     this.offset = 0;
 
     /**
-     * Length of the data contained in our ArrayBuffer.
+     * Length of the contained data. Offset- and capacity-independent index. Contents are the bytes between offset and
+     * length, which are both absolute indexes. There is no capacity property, use {@link dcodeIO.ByteBuffer#capacity}
+     * instead.
      * @type {number}
      */
     this.length = 0;
@@ -248,6 +252,24 @@ dcodeIO.ByteBuffer.prototype.copy = function() {
     b.offset = this.offset;
     b.length = this.length;
     return b;
+};
+
+/**
+ * Gets the number of remaining readable bytes. Contents are the bytes between offset and length, so this returns
+ * length-offset.
+ * @returns {number} Remaining readable bytes (may be negative if offset is larger than length)
+ */
+dcodeIO.ByteBuffer.prototype.remaining = function() {
+    return this.length - this.offset;
+};
+
+/**
+ * Gets the capacity of the backing buffer. May be larger but not less than the contents actual length. Contents are the
+ * bytes between offset and length, which is independent of the actual capacity.
+ * @returns {number} Capacity of the backing buffer or 0 if destroyed
+ */
+dcodeIO.ByteBuffer.prototype.capacity = function() {
+    return this.array != null ? this.array.byteLength : 0;
 };
 
 /**

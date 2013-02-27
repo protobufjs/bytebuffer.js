@@ -396,7 +396,9 @@ of 2 if required.</p>
 <dd>
     
     <div class="description">
-        <p>Length of the data contained in our ArrayBuffer.</p>
+        <p>Length of the contained data. Offset- and capacity-independent index. Contents are the bytes between offset and
+length, which are both absolute indexes. There is no capacity property, use <a href="dcodeIO.ByteBuffer.html#capacity">dcodeIO.ByteBuffer#capacity</a>
+instead.</p>
     </div>
     
     
@@ -486,7 +488,9 @@ of 2 if required.</p>
 <dd>
     
     <div class="description">
-        <p>Current read/write offset.</p>
+        <p>Current read/write offset. Length- and capacity-independent index. Contents are the bytes between offset and
+length, which are both absolute indexes. There is no capacity property, use <a href="dcodeIO.ByteBuffer.html#capacity">dcodeIO.ByteBuffer#capacity</a>
+instead.</p>
     </div>
     
     
@@ -1346,6 +1350,87 @@ of 2 if required.</p>
 	<dd>
 		
 <span class="param-type"><a href="dcodeIO.ByteBuffer.html">dcodeIO.ByteBuffer</a></span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="capacity"><span class="type-signature"></span>capacity<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Gets the capacity of the backing buffer. May be larger but not less than the contents actual length. Contents are the
+bytes between offset and length, which is independent of the actual capacity.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>Capacity of the backing buffer or 0 if destroyed</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">number</span>
 
 
 	</dd>
@@ -4272,6 +4357,87 @@ double the previous capacity is less than the required capacity, the required ca
 |
 
 <span class="param-type">{string: string, length: number}</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="remaining"><span class="type-signature"></span>remaining<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Gets the number of remaining readable bytes. Contents are the bytes between offset and length, so this returns
+length-offset.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>Remaining readable bytes (may be negative if offset is larger than length)</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">number</span>
 
 
 	</dd>
