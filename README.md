@@ -49,7 +49,7 @@ Features
 Usage
 -----
 ### Node.js / CommonJS ###
-* Install: npm install bytebuffer
+* Install: `npm install bytebuffer`
 
 ```javascript
 var ByteBuffer = require("bytebuffer");
@@ -85,11 +85,12 @@ alert(bb.readLString()+" from ByteBuffer.js");
 
 Documentation
 -------------
-* [View](http://htmlpreview.github.com/?http://github.com/dcodeIO/ByteBuffer.js/master/docs/dcodeIO.ByteBuffer.html)
+* [jsdoc3](https://github.com/jsdoc3/jsdoc): [View](http://htmlpreview.github.com/?http://github.com/dcodeIO/ByteBuffer.js/master/docs/dcodeIO.ByteBuffer.html)
 
 Tests (& Examples)
 ------------------
-* [View source](https://github.com/dcodeIO/ByteBuffer.js/blob/master/tests/suite.js)
+* [nodeunit](https://github.com/caolan/nodeunit): [View source](https://github.com/dcodeIO/ByteBuffer.js/blob/master/tests/suite.js)
+* Run: `nodeunit suite.js`
 
 Prerequisites to run it against IE<10, FF<15, Chrome<9 etc.
 -----------------------------------------------------------
