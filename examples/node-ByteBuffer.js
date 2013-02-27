@@ -40,12 +40,26 @@ console.log("Destroying");
 bb.destroy();
 bb.printDebug();
 
-console.log("Reinitializing with a string");
-bb.writeUTF8String("Hello world!");
+console.log("Reinitializing with a length-prepended string");
+bb.writeLString("Hello world!");
 bb.printDebug();
 
-console.log("Reading back string after flip");
+console.log("Reading back length-prepended string after flip");
 bb.flip();
-var s = bb.readUTF8String();
+var s = bb.readLString();
 bb.printDebug();
-console.log("Result: "+s);
+console.log("Result: <"+s+">\n");
+
+console.log("Resetting");
+bb.reset();
+bb.printDebug();
+
+console.log("Writing NULL-terminated string");
+bb.writeCString("World hello!");
+bb.printDebug();
+
+console.log("Reading back NULL-terminated string after flip");
+bb.flip();
+s = bb.readCString();
+bb.printDebug();
+console.log("Result: <"+s+">\n");

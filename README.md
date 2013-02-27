@@ -14,7 +14,7 @@ ByteBuffer
 ----------
 * Mimics [Java ByteBuffers](http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/ByteBuffer.html) as close as reasonable
 * Allocation through new ByteBuffer([capacity, [littleEndian]]) or ByteBuffer#allocate
-* Wrapping of plain ArrayBuffers through ByteBuffer.wrap(buffer[, littleEndian])
+* Wrapping of plain ArrayBuffers or any object with an "array" or "buffer" property which is an ArrayBuffer through ByteBuffer.wrap(buffer[, littleEndian])
 * Cloning by maintaining the reference to the underlying ArrayBuffer (ByteBuffer#clone)
 * Manual offset manipulation throught ByteBuffer#offset and ByteBuffer#length
 * Manual array manipulation through ByteBuffer#array
@@ -32,7 +32,9 @@ ByteBuffer
 * writeUint32, readUint32
 * writeFloat32, readFloat32 with aliases writeFloat, readFloat
 * writeFloat64, readFloat64 with aliases writeDouble, readDouble
-* writeUTF8String, readUTF8String with aliases writeString, readString (prepends the number of characters as Uint32)
+* writeUTF8String, readUTF8String
+* writeLString, readLString to write respectively read a length-prepended (Uint32) string
+* writeCString, readCString to write respectively read a NULL-terminated (Uint8) string
 * writeJSON, readJSON to stringify and write respectivly to read and parse JSON data. Allows overriding the default
   stringify (default: JSON.stringify) and parse (default: JSON.parse) implementations.
 * All with implicit offset advance if the offset parameter is omitted or without, if specified.
@@ -40,7 +42,7 @@ ByteBuffer
   bb.writeInt(1).writeString("Hello world!")...
 * Provides ByteBuffer#toString and ByteBuffer#printDebug (including hex encoded contents) for debugging
 * Includes an UTF8 encoder and decoder (full 1-6 bytes, [ref](http://en.wikipedia.org/wiki/UTF-8#Description)) available
-  through ByteBuffer.encodeUTF8 and ByteBuffer.decodeUTF8
+  through ByteBuffer.encodeUTF8Char and ByteBuffer.decodeUTF8Char
   
 Features
 --------
@@ -57,9 +59,9 @@ Examples & Tests
 ----------------
 * [View source](https://github.com/dcodeIO/ByteBuffer.js/blob/master/examples/node-ByteBuffer.js)
 
-Prerequisites to use it against IE9 etc. (i.e. browsers that do not support the typed array spec fully)
--------------------------------------------------------------------------------------------------------
-* Simply use a [polyfill](http://www.calormen.com/polyfill/#typedarray)
+Prerequisites to run it against IE<10, FF<15, Chrome<9 etc.
+-----------------------------------------------------------
+* Working ArrayBuffer, DataView & Uint8Array implementations (e.g. use a [polyfill](http://www.calormen.com/polyfill/#typedarray))
 
 License
 -------

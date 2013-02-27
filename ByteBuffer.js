@@ -34,10 +34,6 @@
  */
 var ByteBuffer = function(capacity, littleEndian) {
     
-    /**
-     * Buffer capacity.
-     * @type {number}
-     */
     capacity = typeof capacity != 'undefined' ? parseInt(capacity, 10) : ByteBuffer.DEFAULT_CAPACITY;
     if (capacity < 1) capacity = ByteBuffer.DEFAULT_CAPACITY;
 
@@ -76,8 +72,23 @@ var ByteBuffer = function(capacity, littleEndian) {
  * Default buffer capacity of 32 if nothing else is stated. The ByteBuffer will be automatically resized by a factor
  * of 2 if required.
  * @type {number}
+ * @const
  */
 ByteBuffer.DEFAULT_CAPACITY = 32;
+
+/**
+ * Little endian constant for usage in constructors instead of a boolean value. Evaluates to true.
+ * @type {boolean}
+ * @const
+ */
+ByteBuffer.LITTLE_ENDIAN = true;
+
+/**
+ * Big endian constant for usage in constructors instead of a boolean value. Evaluates to false.
+ * @type {boolean}
+ * @const
+ */
+ByteBuffer.BIG_ENDIAN = false;
 
 /**
  * Allocates a new ByteBuffer.
@@ -91,11 +102,19 @@ ByteBuffer.allocate = function(length, littleEndian) {
 
 /**
  * Wraps an ArrayBuffer. Sets the ByteBuffer's offset to 0 and its length to the specified ArrayBuffer's byte length.
- * @param {ArrayBuffer} buffer ArrayBuffer to wrap
+ * @param {ArrayBuffer|*} buffer ArrayBuffer or any object with an object#array or object#buffer property to wrap
  * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to true.
  * @return {dcodeIO.ByteBuffer}
  */
 ByteBuffer.wrap = function(buffer, littleEndian) {
+    if (!!buffer["array"]) {
+        buffer = buffer["array"];
+    } else if (!!buffer["buffer"]) {
+        buffer = buffer["buffer"];
+    }
+    if (!(buffer instanceof ArrayBuffer)) {
+        throw("Unable to wrap buffer of type "+typeof(buffer));
+    }
     var b = new ByteBuffer(0, littleEndian, /* shadow copy */ true);
     b.array = buffer;
     b.view = new DataView(b.array);
@@ -490,51 +509,128 @@ ByteBuffer.prototype.readDouble = ByteBuffer.prototype.readFloat64;
 ByteBuffer.prototype.writeUTF8String = function(s, offset) {
     var advance = typeof offset == 'undefined';
     offset = typeof offset != 'undefined' ? offset : this.offset;
-    this.ensureCapacity(offset+4+s.length*6); // 6 bytes per character in the worst case
-    this.writeUint32(s.length, offset); // Prepend the number of characters
-    var length = ByteBuffer.encodeUTF8(s, this, offset+4);
+    var start = offset;
+    this.ensureCapacity(offset+s.length*6); // 6 bytes per character in the worst case
+    for (var i=0; i<s.length; i++) {
+        offset += ByteBuffer.encodeUTF8Char(s.charCodeAt(i), this, offset);
+    }
     if (advance) {
-        this.offset += 4+length;
+        this.offset = offset;
         return this;
     } else {
-        return 4+length;
+        return offset-start;
     }
 };
 
 /**
  * Reads an UTF8 string.
+ * @param {number} chars Number of characters to read
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
  */
-ByteBuffer.prototype.readUTF8String = function(offset) {
+ByteBuffer.prototype.readUTF8String = function(chars, offset) {
     var advance = typeof offset == 'undefined';
     offset = typeof offset != 'undefined' ? offset : this.offset;
-    var chars = this.readUint32(offset); // Prepended number of characters
-    var result = ByteBuffer.decodeUTF8(this, offset+4, chars);
+    var dec, result = "", start = offset;
+    for (var i=0; i<chars; i++) {
+        dec = ByteBuffer.decodeUTF8Char(this, offset);
+        offset += dec["length"];
+        result += String.fromCharCode(dec["char"]);
+    }
     if (advance) {
-        this.offset += 4+result["length"];
-        return result["string"];
-    } else {
+        this.offset = offset;
         return result;
+    } else {
+        return {
+            "string": result,
+            "length": offset-start
+        }
     }
 };
 
 /**
- * Writes a string. This is an alias for {@link dcodeIO.ByteBuffer#writeUTF8String}.
- * @function
+ * Writes a string with prepended number of characters (Uint32).
  * @param {string} s String to write
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
- * @return {number} Actual number of bytes written
+ * @return {dcodeIO.ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
  */
-ByteBuffer.prototype.writeString = ByteBuffer.prototype.writeUTF8String;
+ByteBuffer.prototype.writeLString = function(s, offset) {
+    var advance = typeof offset == 'undefined';
+    offset = typeof offset != 'undefined' ? offset : this.offset;
+    this.writeUint32(s.length, offset);
+    var encLen = this.writeUTF8String(s, offset+4);
+    if (advance) {
+        this.offset += 4+encLen;
+        return this;
+    } else {
+        return 4+encLen;
+    }
+};
 
 /**
- * Reads a string. This is an alias for {@link dcodeIO.ByteBuffer#readUTF8String}.
- * @function
+ * Reads a string with a prepended number of characters (Uint32).
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
- * @return {string}
+ * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
  */
-ByteBuffer.prototype.readString = ByteBuffer.prototype.readUTF8String;
+ByteBuffer.prototype.readLString = function(offset) {
+    var advance = typeof offset == 'undefined';
+    offset = typeof offset != 'undefined' ? offset : this.offset;
+    var chars = this.readUint32(offset);
+    var dec = this.readUTF8String(chars, offset+4);
+    if (advance) {
+        this.offset += 4+dec["length"];
+        return dec["string"];
+    } else {
+        return {
+            "string": dec["string"],
+            "length": 4+dec["length"]
+        };
+    }
+};
+
+/**
+ * Writes a string followed by a NULL character (Uint8).
+ * @param {string} s String to write
+ * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
+ * @return {dcodeIO.ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
+ */
+ByteBuffer.prototype.writeCString = function(s, offset) {
+    var advance = typeof offset == 'undefined';
+    offset = typeof offset != 'undefined' ? offset : this.offset;
+    var encLen = this.writeUTF8String(s, offset);
+    this.writeUint8(s, offset+encLen);
+    if (advance) {
+        this.offset += encLen+1;
+        return this;
+    } else {
+        return encLen+1;
+    }
+};
+
+/**
+ * Reads a string followed by a NULL character (Uint8).
+ * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
+ * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
+ */
+ByteBuffer.prototype.readCString = function(offset) {
+    var advance = typeof offset == 'undefined';
+    offset = typeof offset != 'undefined' ? offset : this.offset;
+    var dec, result = "", start = offset;
+    do {
+        dec = ByteBuffer.decodeUTF8Char(this, offset);
+        offset += dec["length"];
+        if (dec["char"] != 0) result += String.fromCharCode(dec["char"]);
+    } while (dec["char"] != 0);
+    if (advance) {
+        this.offset = offset;
+        return result;
+    } else {
+        return {
+            "string": result,
+            "length": offset-start
+        };
+    }
+};
 
 /**
  * Serializes and writes a JSON payload.
@@ -616,110 +712,99 @@ ByteBuffer.prototype.toString = function() {
 };
 
 /**
- * Decodes the given ByteBuffer to an UTF8 string. The ByteBuffer's offsets are not modified.
- * @param {dcodeIO.ByteBuffer} src Source ByteBuffer to decode from
- * @param {number=} offset Offset to start at. Defaults to src#offset.
- * @param {number=} chars Number of characters to decode. Defaults to decode all the remaining bytes in src to characters.
- * @return {{string: string, length: number}} Encoded string and the actual number of bytes read
+ * Decodes a single UTF8 character from the specified ByteBuffer. The ByteBuffer's offsets are not modified.
+ * @param {dcodeIO.ByteBuffer} src
+ * @param {number} offset Offset to read from
+ * @return {{char: number, length: number}}
  */
-ByteBuffer.decodeUTF8 = function(src, offset, chars) {
-    offset = typeof offset != 'undefined' ? offset : src.offset;
-    chars = typeof chars != 'undefined' ? chars : -1;
-    var result = "";
-    var a, b, c, e, d, f, n= 0, start=offset;
+ByteBuffer.decodeUTF8Char = function(src, offset) {
+    var a = src.readUint8(offset), b, c, d, e, f, start = offset, charCode;
     // ref: http://en.wikipedia.org/wiki/UTF-8#Description
-    while (offset < src.length && (chars==-1 || n<chars)) {
-        a = src.readUint8(offset);
-        if ((a&0x80)==0) {
-            result += String.fromCharCode(a);
-            offset += 1; n++;
-        } else if ((a&0xE0)==0xC0) {
-            b = src.readUint8(offset+1);
-            result += String.fromCharCode(((a&0x1F)<<6) | (b&0x3F));
-            offset += 2; n++;
-        } else if ((a&0xF0)==0xE0) {
-            b = src.readUint8(offset+1);
-            c = src.readUint8(offset+2);
-            result += String.fromCharCode(((a&0x0F)<<12) | ((b&0x3F)<<6) | (c&0x3F));
-            offset += 3; n++;
-        } else if ((a&0xF8)==0xF0) {
-            b = src.readUint8(offset+1);
-            c = src.readUint8(offset+2);
-            d = src.readUint8(offset+3);
-            result += String.fromCharCode(((a&0x07)<<18) | ((b&0x3F)<<12) | ((c&0x3F)<<6) | (d&0x3F));
-            offset += 4; n++;
-        } else if ((a&0xFC)==0xF8) {
-            b = src.readUint8(offset+1);
-            c = src.readUint8(offset+2);
-            d = src.readUint8(offset+3);
-            e = src.readUint8(offset+4);
-            result += String.fromCharCode(((a&0x03)<<24) | ((b&0x3F)<<18) | ((c&0x3F)<<12) | ((d&0x3F)<<6) | (e&0x3F));
-            offset += 5; n++;
-        } else if ((a&0xFE)==0xFC) {
-            b = src.readUint8(offset+1);
-            c = src.readUint8(offset+2);
-            d = src.readUint8(offset+3);
-            e = src.readUint8(offset+4);
-            f = src.readUint8(offset+5);
-            result += String.fromCharCode(((a&0x01)<<30) | ((b&0x3F)<<24) | ((c&0x3F)<<18) | ((d&0x3F)<<12) | ((e&0x3F)<<6) | (f&0x3F));
-            offset += 6; n++;
-        } else {
-            throw("Invalid byte at offset "+offset+": 0x"+a.toString(16));
-        }
+    if ((a&0x80)==0) {
+        charCode = a;
+        offset += 1;
+    } else if ((a&0xE0)==0xC0) {
+        b = src.readUint8(offset+1);
+        charCode = ((a&0x1F)<<6) | (b&0x3F);
+        offset += 2;
+    } else if ((a&0xF0)==0xE0) {
+        b = src.readUint8(offset+1);
+        c = src.readUint8(offset+2);
+        charCode = ((a&0x0F)<<12) | ((b&0x3F)<<6) | (c&0x3F);
+        offset += 3;
+    } else if ((a&0xF8)==0xF0) {
+        b = src.readUint8(offset+1);
+        c = src.readUint8(offset+2);
+        d = src.readUint8(offset+3);
+        charCode = ((a&0x07)<<18) | ((b&0x3F)<<12) | ((c&0x3F)<<6) | (d&0x3F);
+        offset += 4;
+    } else if ((a&0xFC)==0xF8) {
+        b = src.readUint8(offset+1);
+        c = src.readUint8(offset+2);
+        d = src.readUint8(offset+3);
+        e = src.readUint8(offset+4);
+        charCode = ((a&0x03)<<24) | ((b&0x3F)<<18) | ((c&0x3F)<<12) | ((d&0x3F)<<6) | (e&0x3F);
+        offset += 5;
+    } else if ((a&0xFE)==0xFC) {
+        b = src.readUint8(offset+1);
+        c = src.readUint8(offset+2);
+        d = src.readUint8(offset+3);
+        e = src.readUint8(offset+4);
+        f = src.readUint8(offset+5);
+        charCode = ((a&0x01)<<30) | ((b&0x3F)<<24) | ((c&0x3F)<<18) | ((d&0x3F)<<12) | ((e&0x3F)<<6) | (f&0x3F);
+        offset += 6;
+    } else {
+        throw("Invalid byte at offset "+offset+": 0x"+a.toString(16));
     }
     return {
-        "string": result,
+        "char": charCode ,
         "length": offset-start
     };
 };
 
 /**
- * Encodes the given UTF8 string to the given ByteBuffer. The ByteBuffer's offsets are not modified. 
- * @param {string} s String to encode
- * @param {dcodeIO.ByteBuffer} dst Destination ByteBuffer to encode to
- * @param {number=} offset Offset to start at. Defaults to dst#offset.
- * @return {number} Number of bytes encoded
+ * Encodes a single UTF8 character to the specified ByteBuffer. The ByteBuffer's offsets are not modified.
+ * @param {number} charCode Character to encode as char code
+ * @param {ByteBuffer} dst ByteBuffer to encode to
+ * @param {number} offset Offset to write to
+ * @return {number} Actual number of bytes written
  */
-ByteBuffer.encodeUTF8 = function(s, dst, offset) {
-    offset = typeof offset != 'undefined' ? offset : dst.offset;
-    var start = offset;
+ByteBuffer.encodeUTF8Char = function(charCode, dst, offset) {
+    var a = charCode, start = offset;
     // ref: http://en.wikipedia.org/wiki/UTF-8#Description
-    for (var i=0; i<s.length; i++) {
-        var a = s.charCodeAt(i);
-        if (a < 0x80) {
-            dst.writeUint8(a&0x7F, offset);
-            offset += 1;
-        } else if (a < 0x800) {
-            dst.writeUint8(((a>>6)&0x1F)|0xC0, offset)
-               .writeUint8((a&0x3F)|0x80, offset+1);
-            offset += 2;
-        } else if (a < 0x10000) {
-            dst.writeUint8(((a>>12)&0x0F)|0xE0, offset)
-               .writeUint8(((a>>6)&0x3F)|0x80, offset+1)
-               .writeUint8((a&0x3F)|0x80, offset+2);
-            offset += 3;
-        } else if (a < 0x200000) {
-            dst.writeUint8(((a>>18)&0x07)|0xF0, offset)
-               .writeUint8(((a>>12)&0x3F)|0x80, offset+1)
-               .writeUint8(((a>>6)&0x3F)|0x80, offset+2)
-               .writeUint8((a&0x3F)|0x80, offset+3);
-            offset += 4;
-        } else if (a < 0x4000000) {
-            dst.writeUint8(((a>>24)&0x03)|0xF8, offset)
-               .writeUint8(((a>>18)&0x3F)|0x80, offset+1)
-               .writeUint8(((a>>12)&0x3F)|0x80, offset+2)
-               .writeUint8(((a>>6)&0x3F)|0x80, offset+3)
-               .writeUint8((a&0x3F)|0x80, offset+4);
-            offset += 5;
-        } else {
-            dst.writeUint8(((a>>30)&0x01)|0xFC, offset)
-               .writeUint8(((a>>24)&0x3F)|0x80, offset+1)
-               .writeUint8(((a>>18)&0x3F)|0x80, offset+2)
-               .writeUint8(((a>>12)&0x3F)|0x80, offset+3)
-               .writeUint8(((a>>6)&0x3F)|0x80, offset+4)
-               .writeUint8((a&0x3F)|0x80, offset+5);
-            offset += 6;
-        }
+    if (a < 0x80) {
+        dst.writeUint8(a&0x7F, offset);
+        offset += 1;
+    } else if (a < 0x800) {
+        dst.writeUint8(((a>>6)&0x1F)|0xC0, offset)
+            .writeUint8((a&0x3F)|0x80, offset+1);
+        offset += 2;
+    } else if (a < 0x10000) {
+        dst.writeUint8(((a>>12)&0x0F)|0xE0, offset)
+            .writeUint8(((a>>6)&0x3F)|0x80, offset+1)
+            .writeUint8((a&0x3F)|0x80, offset+2);
+        offset += 3;
+    } else if (a < 0x200000) {
+        dst.writeUint8(((a>>18)&0x07)|0xF0, offset)
+            .writeUint8(((a>>12)&0x3F)|0x80, offset+1)
+            .writeUint8(((a>>6)&0x3F)|0x80, offset+2)
+            .writeUint8((a&0x3F)|0x80, offset+3);
+        offset += 4;
+    } else if (a < 0x4000000) {
+        dst.writeUint8(((a>>24)&0x03)|0xF8, offset)
+            .writeUint8(((a>>18)&0x3F)|0x80, offset+1)
+            .writeUint8(((a>>12)&0x3F)|0x80, offset+2)
+            .writeUint8(((a>>6)&0x3F)|0x80, offset+3)
+            .writeUint8((a&0x3F)|0x80, offset+4);
+        offset += 5;
+    } else {
+        dst.writeUint8(((a>>30)&0x01)|0xFC, offset)
+            .writeUint8(((a>>24)&0x3F)|0x80, offset+1)
+            .writeUint8(((a>>18)&0x3F)|0x80, offset+2)
+            .writeUint8(((a>>12)&0x3F)|0x80, offset+3)
+            .writeUint8(((a>>6)&0x3F)|0x80, offset+4)
+            .writeUint8((a&0x3F)|0x80, offset+5);
+        offset += 6;
     }
     return offset-start;
 };
