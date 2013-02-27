@@ -8,31 +8,36 @@ a HTML5 game developed at [University of Applied Sciences Bonn](http://www.h-brs
 ByteBuffer
 ----------
 * Mimics [Java ByteBuffers](http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/ByteBuffer.html) as close as reasonable while using typed array terms
-* Simple allocation (new ByteBuffer or ByteBuffer#allocate)
-* Wrapping of quite everything which is or includes an ArrayBuffer (ByteBuffer.wrap)
-* Cloning using the same (ByteBuffer#clone) and copying using an independent backing buffer (ByteBuffer#copy)
-* Slicing using the same (ByteBuffer#slice) and using an indepentent backing buffer (ByteBuffer#sliceAndCompact)
-* Manual offset (ByteBuffer#offset and ByteBuffer#length) and array manipulation (ByteBuffer#array)
-* Remaining readable bytes (ByteBuffer#remaining) and backing buffer capacity getters (ByteBuffer#capacity)
-* Explicit (ByteBuffer#resize) and implicit resizing (ByteBuffer#ensureCapacity)
+* Simple allocation (`new ByteBuffer(capacity[, littleEndian])` or `ByteBuffer.allocate(capacity[, littleEndian])`)
+* Wrapping of quite everything which is or includes an ArrayBuffer (`ByteBuffer.wrap(buffer[, littleEndian])`)
+* Cloning using the same (`ByteBuffer#clone()`) and copying using an independent backing buffer (`ByteBuffer#copy()`)
+* Slicing using the same (`ByteBuffer#slice(begin, end)`) and using an indepentent backing buffer (`ByteBuffer#sliceAndCompact(begin, end)`)
+* Manual offset (`ByteBuffer#offset` and `ByteBuffer#length`) and array manipulation (`ByteBuffer#array`)
+* Remaining readable bytes (`ByteBuffer#remaining()`) and backing buffer capacity getters (`ByteBuffer#capacity()`)
+* Explicit (ByteBuffer#resize) and implicit resizing (`ByteBuffer#ensureCapacity(capacity)`)
 * Efficient implicit resizing by doubling the current capacity
-* Flipping (ByteBuffer#flip) and resetting (ByteBuffer#reset) like known from Java ByteBuffers
-* Compacting of the backing buffer (ByteBuffer#compact)
-* Conversion to ArrayBuffer (ByteBuffer#toArrayBuffer) (i.e. to send data over the wire, e.g. a WebSocket with
-  binaryType="arraybuffer")
-* Explicit destruction (ByteBuffer#destroy)
-* writeInt8/16/32, readInt8/16/32, writeUint8/16/32, readUint8/16/32
-* writeFloat32/64, readFloat32/64
-* write/readByte, write/readShort, write/readInt, write/readLong (all signed), write/readFloat, write/readDouble for convenience
-* write/readUTF8String using the included UTF8 en-/decoder (full 6 bytes, [ref](http://en.wikipedia.org/wiki/UTF-8#Description))
-* write/readLString to write respectively read a length-prepended (number of characters as UTF8 char) string
-* write/readCString to write respectively read a NULL-terminated (Uint8 0x00) string
-* write/readJSON to write respectively read arbitraty object data. Allows overriding the default stringify
-  (default: JSON.stringify) and parse (default: JSON.parse) implementations.
+* Flipping (`ByteBuffer#flip()`) and resetting (`ByteBuffer#reset()`) like known from Java ByteBuffers
+* Compacting of the backing buffer (`ByteBuffer#compact()`)
+* Conversion to ArrayBuffer (`ByteBuffer#toArrayBuffer()`) (i.e. to send data over the wire, e.g. a WebSocket with
+  `binaryType="arraybuffer"`)
+* Explicit destruction (`ByteBuffer#destroy()`)
+* Provides `ByteBuffer#writeUint/Int8/16/32([value[, offset]])` and `ByteBuffer#readUint/Int8/16/32([offset])` 
+* Provides `ByteBuffer#writeFloat32/64([value[, offset]])` and `ByteBuffer#readFloat32/64([offset])`
+* `ByteBuffer#write/readByte`, `ByteBuffer#write/readShort`, `ByteBuffer#write/readInt`, `ByteBuffer#write/readLong`
+  (all signed), `ByteBuffer#write/readFloat`, `ByteBuffer#write/readDouble` aliases for the above for convenience
+* `ByteBuffer#writeUTF8String([str[, offset]])` and `ByteBuffer#readUTF8String(chars[, offset])` using the included UTF8
+  en-/decoder (full 6 bytes, [ref](http://en.wikipedia.org/wiki/UTF-8#Description))
+* `ByteBuffer#writeLString(str[, offset]))` and `ByteBuffer#readLString([offset])` to write respectively read a
+  length-prepended (number of characters as UTF8 char) string
+* `ByteBuffer#writeCString(str[, offset])` and `ByteBuffer#readCString([offset])` to write respectively read a
+  NULL-terminated (Uint8 0x00) string
+* `ByteBuffer#writeJSON(data[, offset[, stringify]])` and `ByteBuffer#readJSON([offset[, parse]])` to write respectively
+  read arbitraty object data. Allows overriding the default stringify (default: JSON.stringify) and parse (default: 
+  JSON.parse) implementations.
 * All with implicit offset advance if the offset parameter is omitted or without, if specified
 * Chaining of all operations that allow this (i.e. do not return some specific value like in read operations), e.g.
-  bb.reset().writeInt(1).writeLString("Hello world!").flip().compact()...
-* Provides ByteBuffer#toString, ByteBuffer#toHex and ByteBuffer#printDebug for easy debugging
+  `bb.reset().writeInt(1).writeLString("Hello world!").flip().compact()...`
+* Provides `ByteBuffer#toString()`, `ByteBuffer#toHex([wrap])` and `ByteBuffer#printDebug` for easy debugging
   
 Features
 --------
@@ -90,7 +95,7 @@ Documentation
 Tests (& Examples)
 ------------------
 * [nodeunit](https://github.com/caolan/nodeunit): [View source](https://github.com/dcodeIO/ByteBuffer.js/blob/master/tests/suite.js)
-* Run: `nodeunit suite.js`
+* Run: `nodeunit tests/suite.js`
 
 Prerequisites to run it against IE<10, FF<15, Chrome<9 etc.
 -----------------------------------------------------------

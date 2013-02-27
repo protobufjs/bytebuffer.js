@@ -603,21 +603,21 @@ dcodeIO.ByteBuffer.prototype.readLong = function(offset) {
 
 /**
  * Writes an UTF8 string.
- * @param {string} s String to write
+ * @param {string} str String to write
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
  */
-dcodeIO.ByteBuffer.prototype.writeUTF8String = function(s, offset) {
+dcodeIO.ByteBuffer.prototype.writeUTF8String = function(str, offset) {
     var advance = typeof offset == 'undefined';
     offset = typeof offset != 'undefined' ? offset : this.offset;
     var start = offset;
     var encLen = 0, i;
-    for (i=0;i< s.length; i++) {
-        encLen += dcodeIO.ByteBuffer.calculateUTF8Char(s.charCodeAt(i));
+    for (i=0;i< str.length; i++) {
+        encLen += dcodeIO.ByteBuffer.calculateUTF8Char(str.charCodeAt(i));
     }
     this.ensureCapacity(offset+encLen);
-    for (i=0; i<s.length; i++) {
-        offset += dcodeIO.ByteBuffer.encodeUTF8Char(s.charCodeAt(i), this, offset);
+    for (i=0; i<str.length; i++) {
+        offset += dcodeIO.ByteBuffer.encodeUTF8Char(str.charCodeAt(i), this, offset);
     }
     if (advance) {
         this.offset = offset;
@@ -655,15 +655,15 @@ dcodeIO.ByteBuffer.prototype.readUTF8String = function(chars, offset) {
 
 /**
  * Writes a string with prepended number of characters, which is also encoded as an UTF8 character..
- * @param {string} s String to write
+ * @param {string} str String to write
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
  */
-dcodeIO.ByteBuffer.prototype.writeLString = function(s, offset) {
+dcodeIO.ByteBuffer.prototype.writeLString = function(str, offset) {
     var advance = typeof offset == 'undefined';
     offset = typeof offset != 'undefined' ? offset : this.offset;
-    var encLen = dcodeIO.ByteBuffer.encodeUTF8Char(s.length, this, offset);
-    encLen += this.writeUTF8String(s, offset+encLen);
+    var encLen = dcodeIO.ByteBuffer.encodeUTF8Char(str.length, this, offset);
+    encLen += this.writeUTF8String(str, offset+encLen);
     if (advance) {
         this.offset += encLen;
         return this;
@@ -695,14 +695,14 @@ dcodeIO.ByteBuffer.prototype.readLString = function(offset) {
 
 /**
  * Writes a string followed by a NULL character (Uint8).
- * @param {string} s String to write
+ * @param {string} str String to write
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
  */
-dcodeIO.ByteBuffer.prototype.writeCString = function(s, offset) {
+dcodeIO.ByteBuffer.prototype.writeCString = function(str, offset) {
     var advance = typeof offset == 'undefined';
     offset = typeof offset != 'undefined' ? offset : this.offset;
-    var encLen = this.writeUTF8String(s, offset);
+    var encLen = this.writeUTF8String(str, offset);
     this.writeUint8(0, offset+encLen);
     if (advance) {
         this.offset += encLen+1;
@@ -768,14 +768,17 @@ dcodeIO.ByteBuffer.prototype.readJSON = function(offset, parse) {
     }
 };
 
-dcodeIO.ByteBuffer.LINE = "--------------------------------------------------";
-
 /**
  * Prints debug information about this ByteBuffer's contents to console.
  */
 dcodeIO.ByteBuffer.prototype.printDebug = function() {
-    console.log(this.toString()+"\n"+dcodeIO.ByteBuffer.LINE);
-    console.log(this.toHex()+"\n");
+    if (typeof console != "undefined" && console["log"]) {
+        console.log(
+            this.toString()+"\n"+
+            "--------------------------------------------------\n"+
+            this.toHex()+"\n"
+        );
+    }
 };
 
 /**
