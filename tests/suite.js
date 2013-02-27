@@ -246,6 +246,25 @@ var suite = {
         test.done();
     },
     
+    "write/readLong": function(test) {
+        var bb = new ByteBuffer(8);
+        test.strictEqual(bb.writeFloat64, bb.writeLong);
+        var max = Math.pow(2,52)-0.5;
+        bb.writeLong(max);
+        test.notEqual(max, bb.readLong(0));
+        test.equal(Math.round(max), bb.readLong(0));
+        max = Math.pow(2,53)-1;
+        bb.reset();
+        bb.writeLong(max);
+        bb.flip();
+        test.equal(max, bb.readLong());
+        bb.reset();
+        bb.writeLong(max+2);
+        bb.flip();
+        test.equal(max+2, bb.readLong());
+        test.done();
+    },
+    
     "write/readLString": function(test) {
         var bb = new ByteBuffer(2);
         bb.writeLString("ab"); // resizes to 4

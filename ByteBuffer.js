@@ -583,6 +583,25 @@ dcodeIO.ByteBuffer.prototype.writeDouble = dcodeIO.ByteBuffer.prototype.writeFlo
 dcodeIO.ByteBuffer.prototype.readDouble = dcodeIO.ByteBuffer.prototype.readFloat64;
 
 /**
+ * Writes a long. This is an alias of {@link dcodeIO.ByteBuffer#writeFloat64}.
+ * @function
+ * @param {number} value Value to write
+ * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
+ * @return {dcodeIO.ByteBuffer} this
+ */
+dcodeIO.ByteBuffer.prototype.writeLong = dcodeIO.ByteBuffer.prototype.writeFloat64;
+
+/**
+ * Reads a long. This makes use of {@link dcodeIO.ByteBuffer#readFloat64} by additionally clamping the returned value to a natural number.
+ * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
+ * @return {number}
+ */
+dcodeIO.ByteBuffer.prototype.readLong = function(offset) {
+    // Assuming it's +- a fraction -> round, not parseInt or something
+    return Math.round(this.readFloat64(offset));
+};
+
+/**
  * Writes an UTF8 string.
  * @param {string} s String to write
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.

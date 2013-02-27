@@ -23,7 +23,7 @@ ByteBuffer
 * Explicit destruction (ByteBuffer#destroy)
 * writeInt8/16/32, readInt8/16/32, writeUint8/16/32, readUint8/16/32
 * writeFloat32/64, readFloat32/64
-* write/readByte, write/readShort, write/readInt (all signed), write/readFloat, write/readDouble for convenience
+* write/readByte, write/readShort, write/readInt, write/readLong (all signed), write/readFloat, write/readDouble for convenience
 * write/readUTF8String using the included UTF8 en-/decoder (full 6 bytes, [ref](http://en.wikipedia.org/wiki/UTF-8#Description))
 * write/readLString to write respectively read a length-prepended (number of characters as UTF8 char) string
 * write/readCString to write respectively read a NULL-terminated (Uint8 0x00) string
