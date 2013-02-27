@@ -13,8 +13,14 @@
     },
     "keywords": ["net", "buffer"],
     "dependencies": {},
+    "devDependencies": {
+        "nodeunit": ">=0.7"
+    },
     "license": "Apache License, Version 2.0",
     "engines": {
         "node": ">=0.6"
+    },
+    "scripts": {
+        "test": "nodeunit tests/suite.js"
     }
 }
