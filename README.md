@@ -28,9 +28,9 @@ ByteBuffer
 * write/readCString to write respectively read a NULL-terminated (Uint8 0x00) string
 * write/readJSON to write respectively read arbitraty object data. Allows overriding the default stringify
   (default: JSON.stringify) and parse (default: JSON.parse) implementations.
-* All with implicit offset advance if the offset parameter is omitted or without, if specified.
-* Chaining for all operations that allow this (i.e. do not return some specific value like in read operations), e.g.
-  bb.writeInt(1).writeString("Hello world!")...
+* All with implicit offset advance if the offset parameter is omitted or without, if specified
+* Chaining of all operations that allow this (i.e. do not return some specific value like in read operations), e.g.
+  bb.reset().writeInt(1).writeLString("Hello world!").flip().compact()...
 * Provides ByteBuffer#toString, ByteBuffer#toHex and ByteBuffer#printDebug for easy debugging
   
 Features
@@ -47,7 +47,7 @@ Features
 
 Usage
 -----
-### Node / CommonJS ###
+### Node.js / CommonJS ###
 * Install: npm install bytebuffer
 
 ```javascript
@@ -60,7 +60,7 @@ console.log(bb.readLString()+" from ByteBuffer.js");
 
 ### Browser (shim) ###
 
-```
+```html
 <script src="https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.min.js"></script>
 ```
 
