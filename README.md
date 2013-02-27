@@ -14,18 +14,18 @@ ByteBuffer
 * Slicing using the same (`ByteBuffer#slice(begin, end)`) and using an indepentent backing buffer (`ByteBuffer#sliceAndCompact(begin, end)`)
 * Manual offset (`ByteBuffer#offset` and `ByteBuffer#length`) and array manipulation (`ByteBuffer#array`)
 * Remaining readable bytes (`ByteBuffer#remaining()`) and backing buffer capacity getters (`ByteBuffer#capacity()`)
-* Explicit (ByteBuffer#resize) and implicit resizing (`ByteBuffer#ensureCapacity(capacity)`)
+* Explicit (`ByteBuffer#resize(capacity)`) and implicit resizing (`ByteBuffer#ensureCapacity(capacity)`)
 * Efficient implicit resizing by doubling the current capacity
 * Flipping (`ByteBuffer#flip()`) and resetting (`ByteBuffer#reset()`) like known from Java ByteBuffers
 * Compacting of the backing buffer (`ByteBuffer#compact()`)
-* Conversion to ArrayBuffer (`ByteBuffer#toArrayBuffer()`) (i.e. to send data over the wire, e.g. a WebSocket with
-  `binaryType="arraybuffer"`)
+* Conversion to ArrayBuffer (`ByteBuffer#toArrayBuffer([forceCopy])`) (i.e. to send data over the wire, e.g. a WebSocket
+  with `binaryType="arraybuffer"`)
 * Explicit destruction (`ByteBuffer#destroy()`)
-* Provides `ByteBuffer#writeUint/Int8/16/32([value[, offset]])` and `ByteBuffer#readUint/Int8/16/32([offset])` 
-* Provides `ByteBuffer#writeFloat32/64([value[, offset]])` and `ByteBuffer#readFloat32/64([offset])`
+* Provides `ByteBuffer#writeUint/Int8/16/32(value[, offset])` and `ByteBuffer#readUint/Int8/16/32([offset])` 
+* Provides `ByteBuffer#writeFloat32/64(value[, offset])` and `ByteBuffer#readFloat32/64([offset])`
 * `ByteBuffer#write/readByte`, `ByteBuffer#write/readShort`, `ByteBuffer#write/readInt`, `ByteBuffer#write/readLong`
   (all signed), `ByteBuffer#write/readFloat`, `ByteBuffer#write/readDouble` aliases for the above for convenience
-* `ByteBuffer#writeUTF8String([str[, offset]])` and `ByteBuffer#readUTF8String(chars[, offset])` using the included UTF8
+* `ByteBuffer#writeUTF8String(str[, offset])` and `ByteBuffer#readUTF8String(chars[, offset])` using the included UTF8
   en-/decoder (full 6 bytes, [ref](http://en.wikipedia.org/wiki/UTF-8#Description))
 * `ByteBuffer#writeLString(str[, offset]))` and `ByteBuffer#readLString([offset])` to write respectively read a
   length-prepended (number of characters as UTF8 char) string
@@ -37,7 +37,7 @@ ByteBuffer
 * All with implicit offset advance if the offset parameter is omitted or without, if specified
 * Chaining of all operations that allow this (i.e. do not return some specific value like in read operations), e.g.
   `bb.reset().writeInt(1).writeLString("Hello world!").flip().compact()...`
-* Provides `ByteBuffer#toString()`, `ByteBuffer#toHex([wrap])` and `ByteBuffer#printDebug` for easy debugging
+* Provides `ByteBuffer#toString()`, `ByteBuffer#toHex([wrap])` and `ByteBuffer#printDebug()` for easy debugging
   
 Features
 --------
