@@ -20,7 +20,8 @@ ByteBuffer [![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.png?bran
 * Compacting of the backing buffer (`ByteBuffer#compact()`)
 * Conversion to ArrayBuffer (`ByteBuffer#toArrayBuffer([forceCopy])`) (i.e. to send data over the wire, e.g. a WebSocket
   with `binaryType="arraybuffer"`)
-* Reversing (`ByteBuffer#reverse()`), appending (`ByteBuffer#append([offset])`) and prepending (`ByteBuffer#prepend([offset])`)
+* Reversing (`ByteBuffer#reverse()`), appending (`ByteBuffer#append(src[, offset])`) and prepending
+  (`ByteBuffer#prepend(src[, offset])`) of other ByteBuffers with implicit capacity management
 * Explicit destruction (`ByteBuffer#destroy()`)
 * `ByteBuffer#writeUint/Int8/16/32(value[, offset])` and `ByteBuffer#readUint/Int8/16/32([offset])` 
 * `ByteBuffer#writeFloat32/64(value[, offset])` and `ByteBuffer#readFloat32/64([offset])`
