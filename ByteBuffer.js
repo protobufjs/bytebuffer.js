@@ -23,6 +23,11 @@
 "use strict";
 
 /**
+ * @namespace
+ */
+var dcodeIO = typeof dcodeIO != 'undefined' ? dcodeIO : {};
+
+/**
  * Constructs a new ByteBuffer.
  * @exports dcodeIO.ByteBuffer
  * @class Provides a Java-like ByteBuffer implementation using typed arrays. It also tries to abstract the complexity
@@ -32,10 +37,10 @@
  * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to false.
  * @constructor
  */
-var ByteBuffer = function(capacity, littleEndian) {
+dcodeIO.ByteBuffer = function(capacity, littleEndian) {
     
-    capacity = typeof capacity != 'undefined' ? parseInt(capacity, 10) : ByteBuffer.DEFAULT_CAPACITY;
-    if (capacity < 1) capacity = ByteBuffer.DEFAULT_CAPACITY;
+    capacity = typeof capacity != 'undefined' ? parseInt(capacity, 10) : dcodeIO.ByteBuffer.DEFAULT_CAPACITY;
+    if (capacity < 1) capacity = dcodeIO.ByteBuffer.DEFAULT_CAPACITY;
 
     /**
      * Underlying ArrayBuffer.
@@ -74,30 +79,30 @@ var ByteBuffer = function(capacity, littleEndian) {
  * @type {number}
  * @const
  */
-ByteBuffer.DEFAULT_CAPACITY = 32;
+dcodeIO.ByteBuffer.DEFAULT_CAPACITY = 32;
 
 /**
  * Little endian constant for usage in constructors instead of a boolean value. Evaluates to true.
  * @type {boolean}
  * @const
  */
-ByteBuffer.LITTLE_ENDIAN = true;
+dcodeIO.ByteBuffer.LITTLE_ENDIAN = true;
 
 /**
  * Big endian constant for usage in constructors instead of a boolean value. Evaluates to false.
  * @type {boolean}
  * @const
  */
-ByteBuffer.BIG_ENDIAN = false;
+dcodeIO.ByteBuffer.BIG_ENDIAN = false;
 
 /**
  * Allocates a new ByteBuffer.
- * @param {number=} capacity Initial capacity. Defaults to {@link ByteBuffer.DEFAULT_CAPACITY}.
+ * @param {number=} capacity Initial capacity. Defaults to {@link dcodeIO.ByteBuffer.DEFAULT_CAPACITY}.
  * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to true.
  * @return {dcodeIO.ByteBuffer}
  */
-ByteBuffer.allocate = function(capacity, littleEndian) {
-    return new ByteBuffer(capacity, littleEndian);
+dcodeIO.ByteBuffer.allocate = function(capacity, littleEndian) {
+    return new dcodeIO.ByteBuffer(capacity, littleEndian);
 };
 
 /**
@@ -106,7 +111,7 @@ ByteBuffer.allocate = function(capacity, littleEndian) {
  * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to true.
  * @return {dcodeIO.ByteBuffer}
  */
-ByteBuffer.wrap = function(buffer, littleEndian) {
+dcodeIO.ByteBuffer.wrap = function(buffer, littleEndian) {
     if (!!buffer["array"]) {
         buffer = buffer["array"];
     } else if (!!buffer["buffer"]) {
@@ -115,7 +120,7 @@ ByteBuffer.wrap = function(buffer, littleEndian) {
     if (!(buffer instanceof ArrayBuffer)) {
         throw("Cannot wrap buffer of type "+typeof(buffer));
     }
-    var b = new ByteBuffer(0, littleEndian, /* shadow copy */ true);
+    var b = new dcodeIO.ByteBuffer(0, littleEndian, /* shadow copy */ true);
     b.array = buffer;
     b.view = new DataView(b.array);
     b.offset = 0;
@@ -128,7 +133,7 @@ ByteBuffer.wrap = function(buffer, littleEndian) {
  * @param {number} capacity New capacity
  * @return {boolean} true if actually resized, false if already that large or larger
  */
-ByteBuffer.prototype.resize = function(capacity) {
+dcodeIO.ByteBuffer.prototype.resize = function(capacity) {
     if (this.array == null && capacity > 0) { // Silently recreate
         this.array = new ArrayBuffer(capacity);
         this.view = new DataView(this.array);
@@ -153,7 +158,7 @@ ByteBuffer.prototype.resize = function(capacity) {
  * @param {number} end End offset
  * @return {dcodeIO.ByteBuffer} Clone of this ByteBuffer with the specified slicing applied, backed by the same ArrayBuffer
  */
-ByteBuffer.prototype.slice = function(begin, end) {
+dcodeIO.ByteBuffer.prototype.slice = function(begin, end) {
     if (this.array == null) {
         throw(this+" cannot be sliced: Already destroyed");
     }
@@ -176,27 +181,29 @@ ByteBuffer.prototype.slice = function(begin, end) {
  * @param {number} end End offset
  * @returns {dcodeIO.ByteBuffer}
  */
-ByteBuffer.prototype.sliceAndCompact = function(begin, end) {
-    return ByteBuffer.wrap(this.slice(begin,end).toArrayBuffer(true));
+dcodeIO.ByteBuffer.prototype.sliceAndCompact = function(begin, end) {
+    return dcodeIO.ByteBuffer.wrap(this.slice(begin,end).toArrayBuffer(true));
 };
 
 /**
  * Makes sure that the specified capacity is available. If the current capacity is exceeded, it will be doubled. If
  * double the previous capacity is less than the required capacity, the required capacity will be used.
  * @param {number} capacity Required capacity
+ * @return {boolean} true if actually resized, false if already that large or larger
  */
-ByteBuffer.prototype.ensureCapacity = function(capacity) {
+dcodeIO.ByteBuffer.prototype.ensureCapacity = function(capacity) {
     if (this.array == null) {
         return this.resize(capacity);
     }
-    if (this.array.byteLength < capacity) this.resize(this.array.byteLength*2 >= capacity ? this.array.byteLength*2 : capacity);
+    if (this.array.byteLength < capacity) return this.resize(this.array.byteLength*2 >= capacity ? this.array.byteLength*2 : capacity);
+    return false;
 };
 
 /**
  * Flips the ByteBuffer. Sets length=offset and offset=0.
  * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.flip = function() {
+dcodeIO.ByteBuffer.prototype.flip = function() {
     if (this.array == null) {
         throw(this+" cannot be flipped: Already destroyed");
     }
@@ -209,7 +216,7 @@ ByteBuffer.prototype.flip = function() {
  * Resets the ByteBuffer. Sets offset=0 and length=0.
  * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.reset = function() {
+dcodeIO.ByteBuffer.prototype.reset = function() {
     this.offset = 0;
     this.length = 0;
     return this;
@@ -219,9 +226,9 @@ ByteBuffer.prototype.reset = function() {
  * Clones this ByteBuffer. The returned cloned ByteBuffer shares the same ArrayBuffer but will have its own offsets.
  * @return {dcodeIO.ByteBuffer}
  */
-ByteBuffer.prototype.clone = function() {
+dcodeIO.ByteBuffer.prototype.clone = function() {
     // When cloning, an undocumented third parameter is used to set array and view manually.
-    var b = new ByteBuffer(-1, this.littleEndian, /* shadow copy */ true);
+    var b = new dcodeIO.ByteBuffer(-1, this.littleEndian, /* shadow copy */ true);
     b.array = this.array;
     b.view = this.view;
     b.offset = this.offset;
@@ -233,8 +240,8 @@ ByteBuffer.prototype.clone = function() {
  * Copies this ByteBuffer. The returned copied ByteBuffer has its own ArrayBuffer and uses the same offsets as this one.
  * @return {dcodeIO.ByteBuffer}
  */
-ByteBuffer.prototype.copy = function() {
-    var b = new ByteBuffer(this.array.byteLength, this.littleEndian);
+dcodeIO.ByteBuffer.prototype.copy = function() {
+    var b = new dcodeIO.ByteBuffer(this.array.byteLength, this.littleEndian);
     var src = new Uint8Array(this.array);
     var dst = new Uint8Array(b.array);
     dst.set(src);
@@ -244,17 +251,16 @@ ByteBuffer.prototype.copy = function() {
 };
 
 /**
- * Compacts the ByteBuffer to be backed by an ArrayBuffer of its actual length. Will {@link ByteBuffer#flip} the 
+ * Compacts the ByteBuffer to be backed by an ArrayBuffer of its actual length. Will {@link dcodeIO.ByteBuffer#flip} the 
  * ByteBuffer if its offset is larger than its length. If the ByteBuffer's offset is less than its length, only the
  * portion between its offset and length will be contained in the compacted backing buffer. Will set offset=0 and
  * length=capacity. Will do nothing but flipping, if required, if already compacted.
- * @return {ByteBuffer} this
+ * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.compact = function() {
+dcodeIO.ByteBuffer.prototype.compact = function() {
     if (this.array == null) {
         throw(this+" cannot be compacted: Already destroyed");
     }
-    var b;
     if (this.offset > this.length) {
         this.flip();
     }
@@ -277,13 +283,13 @@ ByteBuffer.prototype.compact = function() {
 /**
  * Destroys the ByteBuffer, releasing all references to the backing array.
  */
-ByteBuffer.prototype.destroy = function() {
+dcodeIO.ByteBuffer.prototype.destroy = function() {
     if (this.array == null) return; // Already destroyed
     this.array = null;
     this.view = null;
     this.offset = 0;
     this.length = 0;
-}
+};
 
 /**
  * Writes an 8bit singed integer.
@@ -291,7 +297,7 @@ ByteBuffer.prototype.destroy = function() {
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.writeInt8 = function(value, offset) {
+dcodeIO.ByteBuffer.prototype.writeInt8 = function(value, offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
     this.ensureCapacity(offset+1);
     this.view.setInt8(offset, value, this.littleEndian);
@@ -303,7 +309,7 @@ ByteBuffer.prototype.writeInt8 = function(value, offset) {
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {number}
  */
-ByteBuffer.prototype.readInt8 = function(offset) {
+dcodeIO.ByteBuffer.prototype.readInt8 = function(offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
     return this.view.getInt8(offset, this.littleEndian);
 };
@@ -315,7 +321,7 @@ ByteBuffer.prototype.readInt8 = function(offset) {
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.writeByte = ByteBuffer.prototype.writeInt8;
+dcodeIO.ByteBuffer.prototype.writeByte = dcodeIO.ByteBuffer.prototype.writeInt8;
 
 /**
  * Reads a byte. This is an alias of {@link dcodeIO.ByteBuffer#readInt8}.
@@ -323,7 +329,7 @@ ByteBuffer.prototype.writeByte = ByteBuffer.prototype.writeInt8;
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {number}
  */
-ByteBuffer.prototype.readByte = ByteBuffer.prototype.readInt8;
+dcodeIO.ByteBuffer.prototype.readByte = dcodeIO.ByteBuffer.prototype.readInt8;
 
 /**
  * Writes an 8bit unsinged integer.
@@ -331,7 +337,7 @@ ByteBuffer.prototype.readByte = ByteBuffer.prototype.readInt8;
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.writeUint8 = function(value, offset) {
+dcodeIO.ByteBuffer.prototype.writeUint8 = function(value, offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
     this.ensureCapacity(offset+1);
     this.view.setUint8(offset, value, this.littleEndian);
@@ -343,7 +349,7 @@ ByteBuffer.prototype.writeUint8 = function(value, offset) {
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {number}
  */
-ByteBuffer.prototype.readUint8 = function(offset) {
+dcodeIO.ByteBuffer.prototype.readUint8 = function(offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
     return this.view.getUint8(offset, this.littleEndian);
 };
@@ -354,7 +360,7 @@ ByteBuffer.prototype.readUint8 = function(offset) {
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.writeInt16 = function(value, offset) {
+dcodeIO.ByteBuffer.prototype.writeInt16 = function(value, offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=2)-2;
     this.ensureCapacity(offset+2);
     this.view.setInt16(offset, value, this.littleEndian);
@@ -366,7 +372,7 @@ ByteBuffer.prototype.writeInt16 = function(value, offset) {
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {number}
  */
-ByteBuffer.prototype.readInt16 = function(offset) {
+dcodeIO.ByteBuffer.prototype.readInt16 = function(offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=2)-2;
     return this.view.getInt16(offset, this.littleEndian);
 };
@@ -378,7 +384,7 @@ ByteBuffer.prototype.readInt16 = function(offset) {
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.writeShort = ByteBuffer.prototype.writeInt16;
+dcodeIO.ByteBuffer.prototype.writeShort = dcodeIO.ByteBuffer.prototype.writeInt16;
 
 /**
  * Reads a short value. This is an alias of {@link dcodeIO.ByteBuffer#readInt16}.
@@ -386,7 +392,7 @@ ByteBuffer.prototype.writeShort = ByteBuffer.prototype.writeInt16;
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {number}
  */
-ByteBuffer.prototype.readShort = ByteBuffer.prototype.readInt16;
+dcodeIO.ByteBuffer.prototype.readShort = dcodeIO.ByteBuffer.prototype.readInt16;
 
 /**
  * Writes a 16bit unsigned integer.
@@ -394,7 +400,7 @@ ByteBuffer.prototype.readShort = ByteBuffer.prototype.readInt16;
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.writeUint16 = function(value, offset) {
+dcodeIO.ByteBuffer.prototype.writeUint16 = function(value, offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=2)-2;
     this.ensureCapacity(offset+2);
     this.view.setUint16(offset, value, this.littleEndian);
@@ -406,7 +412,7 @@ ByteBuffer.prototype.writeUint16 = function(value, offset) {
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {number}
  */
-ByteBuffer.prototype.readUint16 = function(offset) {
+dcodeIO.ByteBuffer.prototype.readUint16 = function(offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=2)-2;
     return this.view.getUint16(offset, this.littleEndian);
 };
@@ -417,7 +423,7 @@ ByteBuffer.prototype.readUint16 = function(offset) {
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.writeInt32 = function(value, offset) {
+dcodeIO.ByteBuffer.prototype.writeInt32 = function(value, offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
     this.ensureCapacity(offset+4);
     this.view.setInt32(offset, value, this.littleEndian);
@@ -429,27 +435,27 @@ ByteBuffer.prototype.writeInt32 = function(value, offset) {
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {number}
  */
-ByteBuffer.prototype.readInt32 = function(offset) {
+dcodeIO.ByteBuffer.prototype.readInt32 = function(offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
     return this.view.getInt32(offset, this.littleEndian);
 };
 
 /**
- * Writes an integer. This is an alias of {@link ByteBuffer#writeInt32}.
+ * Writes an integer. This is an alias of {@link dcodeIO.ByteBuffer#writeInt32}.
  * @function
  * @param {number} value Value to write
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.writeInt = ByteBuffer.prototype.writeInt32;
+dcodeIO.ByteBuffer.prototype.writeInt = dcodeIO.ByteBuffer.prototype.writeInt32;
 
 /**
- * Reads an integer. This is an alias of {@link ByteBuffer#readInt32}.
+ * Reads an integer. This is an alias of {@link dcodeIO.ByteBuffer#readInt32}.
  * @function
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {number}
  */
-ByteBuffer.prototype.readInt = ByteBuffer.prototype.readInt32;
+dcodeIO.ByteBuffer.prototype.readInt = dcodeIO.ByteBuffer.prototype.readInt32;
 
 /**
  * Writes a 32bit unsigned integer.
@@ -457,7 +463,7 @@ ByteBuffer.prototype.readInt = ByteBuffer.prototype.readInt32;
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.writeUint32 = function(value, offset) {
+dcodeIO.ByteBuffer.prototype.writeUint32 = function(value, offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
     this.ensureCapacity(offset+4);
     this.view.setUint32(offset, value, this.littleEndian);
@@ -469,7 +475,7 @@ ByteBuffer.prototype.writeUint32 = function(value, offset) {
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {number}
  */
-ByteBuffer.prototype.readUint32 = function(offset) {
+dcodeIO.ByteBuffer.prototype.readUint32 = function(offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
     return this.view.getUint32(offset, this.littleEndian);
 };
@@ -480,7 +486,7 @@ ByteBuffer.prototype.readUint32 = function(offset) {
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.writeFloat32 = function(value, offset) {
+dcodeIO.ByteBuffer.prototype.writeFloat32 = function(value, offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
     this.ensureCapacity(offset+4);
     this.view.setFloat32(offset, value, this.littleEndian);
@@ -492,7 +498,7 @@ ByteBuffer.prototype.writeFloat32 = function(value, offset) {
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {number}
  */
-ByteBuffer.prototype.readFloat32 = function(offset) {
+dcodeIO.ByteBuffer.prototype.readFloat32 = function(offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
     return this.view.getFloat32(offset, this.littleEndian);
 };
@@ -504,7 +510,7 @@ ByteBuffer.prototype.readFloat32 = function(offset) {
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.writeFloat = ByteBuffer.prototype.writeFloat32;
+dcodeIO.ByteBuffer.prototype.writeFloat = dcodeIO.ByteBuffer.prototype.writeFloat32;
 
 /**
  * Reads a float. This is an alias of {@link dcodeIO.ByteBuffer#readFloat32}.
@@ -512,7 +518,7 @@ ByteBuffer.prototype.writeFloat = ByteBuffer.prototype.writeFloat32;
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {number}
  */
-ByteBuffer.prototype.readFloat = ByteBuffer.prototype.readFloat32;
+dcodeIO.ByteBuffer.prototype.readFloat = dcodeIO.ByteBuffer.prototype.readFloat32;
 
 /**
  * Writes a 64bit float.
@@ -520,7 +526,7 @@ ByteBuffer.prototype.readFloat = ByteBuffer.prototype.readFloat32;
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.writeFloat64 = function(value, offset) {
+dcodeIO.ByteBuffer.prototype.writeFloat64 = function(value, offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=8)-8;
     this.ensureCapacity(offset+8);
     this.view.setFloat64(offset, value, this.littleEndian);
@@ -532,7 +538,7 @@ ByteBuffer.prototype.writeFloat64 = function(value, offset) {
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {number}
  */
-ByteBuffer.prototype.readFloat64 = function(offset) {
+dcodeIO.ByteBuffer.prototype.readFloat64 = function(offset) {
     offset = typeof offset != 'undefined' ? offset : (this.offset+=8)-8;
     return this.view.getFloat64(offset, this.littleEndian);
 };
@@ -544,7 +550,7 @@ ByteBuffer.prototype.readFloat64 = function(offset) {
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer} this
  */
-ByteBuffer.prototype.writeDouble = ByteBuffer.prototype.writeFloat64;
+dcodeIO.ByteBuffer.prototype.writeDouble = dcodeIO.ByteBuffer.prototype.writeFloat64;
 
 /**
  * Reads a double. This is an alias of {@link ByteBuffer#readFloat64}.
@@ -552,7 +558,7 @@ ByteBuffer.prototype.writeDouble = ByteBuffer.prototype.writeFloat64;
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {number}
  */
-ByteBuffer.prototype.readDouble = ByteBuffer.prototype.readFloat64;
+dcodeIO.ByteBuffer.prototype.readDouble = dcodeIO.ByteBuffer.prototype.readFloat64;
 
 /**
  * Writes an UTF8 string.
@@ -560,13 +566,13 @@ ByteBuffer.prototype.readDouble = ByteBuffer.prototype.readFloat64;
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
  */
-ByteBuffer.prototype.writeUTF8String = function(s, offset) {
+dcodeIO.ByteBuffer.prototype.writeUTF8String = function(s, offset) {
     var advance = typeof offset == 'undefined';
     offset = typeof offset != 'undefined' ? offset : this.offset;
     var start = offset;
     this.ensureCapacity(offset+s.length*6); // 6 bytes per character in the worst case
     for (var i=0; i<s.length; i++) {
-        offset += ByteBuffer.encodeUTF8Char(s.charCodeAt(i), this, offset);
+        offset += dcodeIO.ByteBuffer.encodeUTF8Char(s.charCodeAt(i), this, offset);
     }
     if (advance) {
         this.offset = offset;
@@ -582,12 +588,12 @@ ByteBuffer.prototype.writeUTF8String = function(s, offset) {
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
  */
-ByteBuffer.prototype.readUTF8String = function(chars, offset) {
+dcodeIO.ByteBuffer.prototype.readUTF8String = function(chars, offset) {
     var advance = typeof offset == 'undefined';
     offset = typeof offset != 'undefined' ? offset : this.offset;
     var dec, result = "", start = offset;
     for (var i=0; i<chars; i++) {
-        dec = ByteBuffer.decodeUTF8Char(this, offset);
+        dec = dcodeIO.ByteBuffer.decodeUTF8Char(this, offset);
         offset += dec["length"];
         result += String.fromCharCode(dec["char"]);
     }
@@ -608,10 +614,10 @@ ByteBuffer.prototype.readUTF8String = function(chars, offset) {
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
  */
-ByteBuffer.prototype.writeLString = function(s, offset) {
+dcodeIO.ByteBuffer.prototype.writeLString = function(s, offset) {
     var advance = typeof offset == 'undefined';
     offset = typeof offset != 'undefined' ? offset : this.offset;
-    var encLen = ByteBuffer.encodeUTF8Char(s.length, this, offset);
+    var encLen = dcodeIO.ByteBuffer.encodeUTF8Char(s.length, this, offset);
     encLen += this.writeUTF8String(s, offset+encLen);
     if (advance) {
         this.offset += encLen;
@@ -626,10 +632,10 @@ ByteBuffer.prototype.writeLString = function(s, offset) {
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
  */
-ByteBuffer.prototype.readLString = function(offset) {
+dcodeIO.ByteBuffer.prototype.readLString = function(offset) {
     var advance = typeof offset == 'undefined';
     offset = typeof offset != 'undefined' ? offset : this.offset;
-    var lenDec = ByteBuffer.decodeUTF8Char(this, offset);
+    var lenDec = dcodeIO.ByteBuffer.decodeUTF8Char(this, offset);
     var dec = this.readUTF8String(lenDec["char"], offset+lenDec["length"]);
     if (advance) {
         this.offset += lenDec["length"]+dec["length"];
@@ -648,11 +654,11 @@ ByteBuffer.prototype.readLString = function(offset) {
  * @param {number=} offset Offset to write to. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {dcodeIO.ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
  */
-ByteBuffer.prototype.writeCString = function(s, offset) {
+dcodeIO.ByteBuffer.prototype.writeCString = function(s, offset) {
     var advance = typeof offset == 'undefined';
     offset = typeof offset != 'undefined' ? offset : this.offset;
     var encLen = this.writeUTF8String(s, offset);
-    this.writeUint8(s, offset+encLen);
+    this.writeUint8(0, offset+encLen);
     if (advance) {
         this.offset += encLen+1;
         return this;
@@ -666,12 +672,12 @@ ByteBuffer.prototype.writeCString = function(s, offset) {
  * @param {number=} offset Offset to read from. Defaults to {@link dcodeIO.ByteBuffer#offset} which will be modified only if omitted.
  * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
  */
-ByteBuffer.prototype.readCString = function(offset) {
+dcodeIO.ByteBuffer.prototype.readCString = function(offset) {
     var advance = typeof offset == 'undefined';
     offset = typeof offset != 'undefined' ? offset : this.offset;
     var dec, result = "", start = offset;
     do {
-        dec = ByteBuffer.decodeUTF8Char(this, offset);
+        dec = dcodeIO.ByteBuffer.decodeUTF8Char(this, offset);
         offset += dec["length"];
         if (dec["char"] != 0) result += String.fromCharCode(dec["char"]);
     } while (dec["char"] != 0);
@@ -693,7 +699,7 @@ ByteBuffer.prototype.readCString = function(offset) {
  * @param {function=} stringify Stringify implementation to use. Defaults to {@link JSON.stringify}.
  * @return {dcodeIO.ByteBuffer|number} this if offset is omitted, else the actual number if bytes written,
  */
-ByteBuffer.prototype.writeJSON = function(data, offset, stringify) {
+dcodeIO.ByteBuffer.prototype.writeJSON = function(data, offset, stringify) {
     stringify = stringify || JSON.stringify.bind(JSON);
     return this.writeLString(stringify(data), offset);
 };
@@ -704,7 +710,7 @@ ByteBuffer.prototype.writeJSON = function(data, offset, stringify) {
  * @param {function=} parse Parse implementation to use. Defaults to {@link JSON.parse}.
  * @return {*|{data: *, length: number}} Data payload if offset is omitted, else the data payload and the actual number of bytes read.
  */
-ByteBuffer.prototype.readJSON = function(offset, parse) {
+dcodeIO.ByteBuffer.prototype.readJSON = function(offset, parse) {
     parse = parse || JSON.parse.bind(JSON);
     var result = this.readLString(offset);
     if (typeof result == "string") {
@@ -717,13 +723,13 @@ ByteBuffer.prototype.readJSON = function(offset, parse) {
     }
 };
 
-ByteBuffer.LINE = "--------------------------------------------------";
+dcodeIO.ByteBuffer.LINE = "--------------------------------------------------";
 
 /**
  * Prints debug information about this ByteBuffer's contents to console.
  */
-ByteBuffer.prototype.printDebug = function() {
-    console.log(this.toString()+"\n"+ByteBuffer.LINE);
+dcodeIO.ByteBuffer.prototype.printDebug = function() {
+    console.log(this.toString()+"\n"+dcodeIO.ByteBuffer.LINE);
     console.log(this.toHex()+"\n");
 };
 
@@ -732,7 +738,7 @@ ByteBuffer.prototype.printDebug = function() {
  * @param {number=} wrap Wrap length. Defaults to 16.
  * @return {string} Hex representation as of " 00<01 02>03..." with marked offsets
  */
-ByteBuffer.prototype.toHex = function(wrap) {
+dcodeIO.ByteBuffer.prototype.toHex = function(wrap) {
     if (this.array == null) return "DESTROYED";
     wrap = typeof wrap != 'undefined' ? parseInt(wrap, 10) : 16;
     if (wrap < 1) wrap = 16;
@@ -767,7 +773,7 @@ ByteBuffer.prototype.toHex = function(wrap) {
  * Returns a string representation of this object.
  * @return {string} String representation as of "ByteBuffer(offset,length,capacity)"
  */
-ByteBuffer.prototype.toString = function() {
+dcodeIO.ByteBuffer.prototype.toString = function() {
     if (this.array == null) {
         return "ByteBuffer(DESTROYED)";
     }
@@ -781,7 +787,7 @@ ByteBuffer.prototype.toString = function() {
  * @param {boolean=} forceCopy Forces the creation of a copy if set to true. Defaults to false.
  * @return {ArrayBuffer} Compacted ArrayBuffer
  */
-ByteBuffer.prototype.toArrayBuffer = function(forceCopy) {
+dcodeIO.ByteBuffer.prototype.toArrayBuffer = function(forceCopy) {
     var b = this.clone();
     if (b.offset > b.length) {
         b.flip();
@@ -800,7 +806,7 @@ ByteBuffer.prototype.toArrayBuffer = function(forceCopy) {
  * @param {number} offset Offset to read from
  * @return {{char: number, length: number}} Decoded char code and the actual number of bytes read 
  */
-ByteBuffer.decodeUTF8Char = function(src, offset) {
+dcodeIO.ByteBuffer.decodeUTF8Char = function(src, offset) {
     var a = src.readUint8(offset), b, c, d, e, f, start = offset, charCode;
     // ref: http://en.wikipedia.org/wiki/UTF-8#Description
     // It's quite huge but should be pretty fast.
@@ -849,46 +855,46 @@ ByteBuffer.decodeUTF8Char = function(src, offset) {
 /**
  * Encodes a single UTF8 character to the specified ByteBuffer. The ByteBuffer's offsets are not modified.
  * @param {number} charCode Character to encode as char code
- * @param {ByteBuffer} dst ByteBuffer to encode to
+ * @param {dcodeIO.ByteBuffer} dst ByteBuffer to encode to
  * @param {number} offset Offset to write to
  * @return {number} Actual number of bytes written
  */
-ByteBuffer.encodeUTF8Char = function(charCode, dst, offset) {
-    var a = charCode, start = offset;
+dcodeIO.ByteBuffer.encodeUTF8Char = function(charCode, dst, offset) {
+    var start = offset;
     // ref: http://en.wikipedia.org/wiki/UTF-8#Description
     // It's quite huge but should be pretty fast.
-    if (a < 0x80) {
-        dst.writeUint8(a&0x7F, offset);
+    if (charCode < 0x80) {
+        dst.writeUint8(charCode&0x7F, offset);
         offset += 1;
-    } else if (a < 0x800) {
-        dst.writeUint8(((a>>6)&0x1F)|0xC0, offset)
-            .writeUint8((a&0x3F)|0x80, offset+1);
+    } else if (charCode < 0x800) {
+        dst.writeUint8(((charCode>>6)&0x1F)|0xC0, offset)
+            .writeUint8((charCode&0x3F)|0x80, offset+1);
         offset += 2;
-    } else if (a < 0x10000) {
-        dst.writeUint8(((a>>12)&0x0F)|0xE0, offset)
-            .writeUint8(((a>>6)&0x3F)|0x80, offset+1)
-            .writeUint8((a&0x3F)|0x80, offset+2);
+    } else if (charCode < 0x10000) {
+        dst.writeUint8(((charCode>>12)&0x0F)|0xE0, offset)
+            .writeUint8(((charCode>>6)&0x3F)|0x80, offset+1)
+            .writeUint8((charCode&0x3F)|0x80, offset+2);
         offset += 3;
-    } else if (a < 0x200000) {
-        dst.writeUint8(((a>>18)&0x07)|0xF0, offset)
-            .writeUint8(((a>>12)&0x3F)|0x80, offset+1)
-            .writeUint8(((a>>6)&0x3F)|0x80, offset+2)
-            .writeUint8((a&0x3F)|0x80, offset+3);
+    } else if (charCode < 0x200000) {
+        dst.writeUint8(((charCode>>18)&0x07)|0xF0, offset)
+            .writeUint8(((charCode>>12)&0x3F)|0x80, offset+1)
+            .writeUint8(((charCode>>6)&0x3F)|0x80, offset+2)
+            .writeUint8((charCode&0x3F)|0x80, offset+3);
         offset += 4;
-    } else if (a < 0x4000000) {
-        dst.writeUint8(((a>>24)&0x03)|0xF8, offset)
-            .writeUint8(((a>>18)&0x3F)|0x80, offset+1)
-            .writeUint8(((a>>12)&0x3F)|0x80, offset+2)
-            .writeUint8(((a>>6)&0x3F)|0x80, offset+3)
-            .writeUint8((a&0x3F)|0x80, offset+4);
+    } else if (charCode < 0x4000000) {
+        dst.writeUint8(((charCode>>24)&0x03)|0xF8, offset)
+            .writeUint8(((charCode>>18)&0x3F)|0x80, offset+1)
+            .writeUint8(((charCode>>12)&0x3F)|0x80, offset+2)
+            .writeUint8(((charCode>>6)&0x3F)|0x80, offset+3)
+            .writeUint8((charCode&0x3F)|0x80, offset+4);
         offset += 5;
     } else {
-        dst.writeUint8(((a>>30)&0x01)|0xFC, offset)
-            .writeUint8(((a>>24)&0x3F)|0x80, offset+1)
-            .writeUint8(((a>>18)&0x3F)|0x80, offset+2)
-            .writeUint8(((a>>12)&0x3F)|0x80, offset+3)
-            .writeUint8(((a>>6)&0x3F)|0x80, offset+4)
-            .writeUint8((a&0x3F)|0x80, offset+5);
+        dst.writeUint8(((charCode>>30)&0x01)|0xFC, offset)
+            .writeUint8(((charCode>>24)&0x3F)|0x80, offset+1)
+            .writeUint8(((charCode>>18)&0x3F)|0x80, offset+2)
+            .writeUint8(((charCode>>12)&0x3F)|0x80, offset+3)
+            .writeUint8(((charCode>>6)&0x3F)|0x80, offset+4)
+            .writeUint8((charCode&0x3F)|0x80, offset+5);
         offset += 6;
     }
     return offset-start;
@@ -896,13 +902,7 @@ ByteBuffer.encodeUTF8Char = function(charCode, dst, offset) {
 
 // Enable module loading if available
 if (typeof module != 'undefined' && module["exports"]) {
-    module["exports"] = ByteBuffer;
+    module["exports"] = dcodeIO.ByteBuffer;
 } else if (typeof require != 'undefined' && typeof define != 'undefined') {
-    define([], function() { return ByteBuffer; });
-} else if (typeof window != "undefined") {
-    if (typeof window["dcodeIO"] == "undefined") {
-       window["dcodeIO"] = {};
-    }
-    window["dcodeIO"]["ByteBuffer"] = ByteBuffer;
-    delete window["ByteBuffer"];
+    define([], function() { return dcodeIO.ByteBuffer; });
 }

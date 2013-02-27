@@ -643,7 +643,7 @@ of 2 if required.</p>
             
             
             
-            <td class="description last"><p>Initial capacity. Defaults to ByteBuffer.DEFAULT_CAPACITY.</p></td>
+            <td class="description last"><p>Initial capacity. Defaults to <a href="dcodeIO.ByteBuffer.html#DEFAULT_CAPACITY">dcodeIO.ByteBuffer.DEFAULT_CAPACITY</a>.</p></td>
         </tr>
 	
 	
@@ -962,7 +962,7 @@ of 2 if required.</p>
             <td class="type">
             
                 
-<span class="param-type">ByteBuffer</span>
+<span class="param-type"><a href="dcodeIO.ByteBuffer.html">dcodeIO.ByteBuffer</a></span>
 
 
             
@@ -1307,7 +1307,7 @@ of 2 if required.</p>
         
             
 <dt>
-    <h4 class="name" id="compact"><span class="type-signature"></span>compact<span class="signature">()</span><span class="type-signature"> &rarr; {ByteBuffer}</span></h4>
+    <h4 class="name" id="compact"><span class="type-signature"></span>compact<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="dcodeIO.ByteBuffer.html">dcodeIO.ByteBuffer</a>}</span></h4>
     
     
 </dt>
@@ -1315,7 +1315,7 @@ of 2 if required.</p>
     
     
     <div class="description">
-        <p>Compacts the ByteBuffer to be backed by an ArrayBuffer of its actual length. Will ByteBuffer#flip the 
+        <p>Compacts the ByteBuffer to be backed by an ArrayBuffer of its actual length. Will <a href="dcodeIO.ByteBuffer.html#flip">dcodeIO.ByteBuffer#flip</a> the 
 ByteBuffer if its offset is larger than its length. If the ByteBuffer&#39;s offset is less than its length, only the
 portion between its offset and length will be contained in the compacted backing buffer. Will set offset=0 and
 length=capacity. Will do nothing but flipping, if required, if already compacted.</p>
@@ -1376,7 +1376,7 @@ length=capacity. Will do nothing but flipping, if required, if already compacted
 	</dt>
 	<dd>
 		
-<span class="param-type">ByteBuffer</span>
+<span class="param-type"><a href="dcodeIO.ByteBuffer.html">dcodeIO.ByteBuffer</a></span>
 
 
 	</dd>
@@ -1524,7 +1524,7 @@ length=capacity. Will do nothing but flipping, if required, if already compacted
         
             
 <dt>
-    <h4 class="name" id="ensureCapacity"><span class="type-signature"></span>ensureCapacity<span class="signature">(capacity)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="ensureCapacity"><span class="type-signature"></span>ensureCapacity<span class="signature">(capacity)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
     
     
 </dt>
@@ -1624,6 +1624,28 @@ double the previous capacity is less than the required capacity, the required ca
     
     
     
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>true if actually resized, false if already that large or larger</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">boolean</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
 </dd>
@@ -2588,7 +2610,7 @@ double the previous capacity is less than the required capacity, the required ca
     
     
     <div class="description">
-        <p>Reads an integer. This is an alias of ByteBuffer#readInt32.</p>
+        <p>Reads an integer. This is an alias of <a href="dcodeIO.ByteBuffer.html#readInt32">dcodeIO.ByteBuffer#readInt32</a>.</p>
     </div>
     
 
@@ -6014,7 +6036,7 @@ the unmodified backing buffer if offset=0 and length=capacity unless forceCopy i
     
     
     <div class="description">
-        <p>Writes an integer. This is an alias of ByteBuffer#writeInt32.</p>
+        <p>Writes an integer. This is an alias of <a href="dcodeIO.ByteBuffer.html#writeInt32">dcodeIO.ByteBuffer#writeInt32</a>.</p>
     </div>
     
 
@@ -7897,7 +7919,7 @@ the unmodified backing buffer if offset=0 and length=capacity unless forceCopy i
 
 <nav>
     <nav-inner>
-        <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-dcodeIO.html">dcodeIO</a></li></ul><h3>Classes</h3><ul><li><a href="dcodeIO.ByteBuffer.html">ByteBuffer</a></li></ul><h3>Namespaces</h3><ul><li><a href="dcodeIO.html">dcodeIO</a></li></ul>
+        <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="dcodeIO.ByteBuffer.html">ByteBuffer</a></li></ul><h3>Namespaces</h3><ul><li><a href="dcodeIO.html">dcodeIO</a></li></ul>
     </nav-inner>
 </nav>
 
