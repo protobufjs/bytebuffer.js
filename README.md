@@ -63,7 +63,7 @@ Usage
 -----
 ### Node / CommonJS ###
 * Install: npm install bytebuffer
-```js
+``` js
 var ByteBuffer = require("bytebuffer");
 var bb = new ByteBuffer();
 bb.writeLString("Hello world!");
@@ -71,10 +71,10 @@ bb.flip();
 console.log(bb.readLString()+" from ByteBuffer.js");
 ```
 ### Browser (shim) ###
-```html
+``` html
 <script src="https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.min.js"></script>
 ```
-```js
+``` js
 var ByteBuffer = dcodeIO.ByteBuffer;
 var bb = new ByteBuffer();
 bb.writeLString("Hello world!");
@@ -82,7 +82,7 @@ bb.flip();
 alert(bb.readLString()+" from ByteBuffer.js");
 ```
 ### Require.js / AMD ###
-```js
+``` js
 var ByteBuffer = require("/path/to/ByteBuffer.js");
 var bb = new ByteBuffer();
 bb.writeLString("Hello world!");
