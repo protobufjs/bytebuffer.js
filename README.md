@@ -36,7 +36,7 @@ ByteBuffer
 * writeFloat32, readFloat32 with aliases writeFloat, readFloat
 * writeFloat64, readFloat64 with aliases writeDouble, readDouble
 * writeUTF8String, readUTF8String
-* writeLString, readLString to write respectively read a length-prepended (Uint32) string
+* writeLString, readLString to write respectively read a length-prepended (as UTF8 character) string
 * writeCString, readCString to write respectively read a NULL-terminated (Uint8) string
 * writeJSON, readJSON to stringify and write respectivly to read and parse JSON data. Allows overriding the default
   stringify (default: JSON.stringify) and parse (default: JSON.parse) implementations.
