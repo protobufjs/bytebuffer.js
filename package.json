@@ -23,9 +23,9 @@
         "node": ">=0.6"
     },
     "scripts": {
-        "prepublish": "npm run-script minify && npm test && npm run-script jsdoc",
+        "prepublish": "npm run-script minify && npm test",
         "minify": "uglifyjs ByteBuffer.js -o ByteBuffer.min.js --comments",
-        "jsdoc": "jsdoc -c jsdoc.conf README.md",
+        "jsdoc": "jsdoc.cmd -c jsdoc.json README.md",
         "pretest": "npm run-script minify",
         "test": "nodeunit tests/suite.js"
     }

@@ -973,9 +973,9 @@
     };
 
     // Enable module loading if available
-    if (typeof module != 'undefined' && module.exports) { // CommonJS
-        module.exports = ByteBuffer;
-    } else if (typeof define != 'undefined' && define.amd) { // AMD
+    if (typeof module != 'undefined' && module["exports"]) { // CommonJS
+        module["exports"] = ByteBuffer;
+    } else if (typeof define != 'undefined' && define["amd"]) { // AMD
         define([], function() { return ByteBuffer; });
     } else { // Shim
         if (!window["dcodeIO"]) {
