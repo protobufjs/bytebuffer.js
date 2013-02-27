@@ -25,9 +25,9 @@
     /**
      * Constructs a new ByteBuffer.
      * @exports ByteBuffer
-     * @class Provides a Java-like ByteBuffer implementation using typed arrays. It also tries to abstract a bit of the
-     * complexity away by providing convenience methods for those who just want to write stuff without caring about
-     * signed, unsigned and the actual bit sizes.
+     * @class Provides a Java-like, Netty-inspired ByteBuffer implementation using typed arrays. It also tries to
+     * abstract a bit of the complexity away by providing convenience methods for those who just want to write stuff
+     * without caring about signed, unsigned and the actual bit sizes.
      * @param {number=} capacity Initial capacity. Defaults to {@link ByteBuffer.DEFAULT_CAPACITY}.
      * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to false.
      * @constructor

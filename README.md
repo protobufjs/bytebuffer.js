@@ -1,9 +1,9 @@
 ByteBuffer.js - A Java-like ByteBuffer
 ======================================
-Provides a Java-like ByteBuffer implementation using typed arrays. It also tries to abstract a bit of the complexity
-away by providing convenience methods for those who just want to write stuff without caring about signed, unsigned and
-the actual bit sizes. It's also used for the cross-platform multiplayer component in [eSoccer](http://www.esoccer.me),
-a HTML5 game developed at [University of Applied Sciences Bonn](http://www.h-brs.de).
+Provides a Java-like, Netty-inspired ByteBuffer implementation using typed arrays. It also tries to abstract a bit of
+the complexity away by providing convenience methods for those who just want to write stuff without caring about signed,
+unsigned and the actual bit sizes. It's also used for the cross-platform multiplayer component in
+[eSoccer](http://www.esoccer.me), a HTML5 game developed at [University of Applied Sciences Bonn](http://www.h-brs.de).
 
 ByteBuffer [![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.png?branch=master)](https://travis-ci.org/dcodeIO/ByteBuffer.js)
 ----------
