@@ -3,7 +3,7 @@
         "allowUnknownTags": true
     },
     "source": {
-        "include": ["ByteBuffer.js", "README.md"]
+        "include": ["ByteBuffer.js", "../dcodeIO.js"]
     },
     "opts": {
         "template": "templates/esoccer",
