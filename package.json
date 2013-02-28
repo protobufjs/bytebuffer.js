@@ -25,8 +25,9 @@
         "prepublish": "npm test",
         "test": "nodeunit tests/suite.js",
 
-        "make": "npm run-script compile && npm test && npm run-script jsdoc",
+        "make": "npm run-script compile && npm run-script noexpose && npm test && npm run-script jsdoc",
         "compile": "java -jar closure-compiler/compiler.jar --create_source_map ByteBuffer.min.map --compilation_level ADVANCED_OPTIMIZATIONS --js ByteBuffer.js --js_output_file ByteBuffer.min.js",
+        "noexpose": "closure-compiler\\cat ByteBuffer.js | closure-compiler\\grep -v @expose > ByteBuffer.noexpose.js",
         "jsdoc": "jsdoc -c jsdoc.json"
     }
 }
