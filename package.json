@@ -1,6 +1,6 @@
 {
     "name": "bytebuffer",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "description": "A Java-like ByteBuffer implementation using typed arrays.",
     "contributors": [
@@ -25,7 +25,7 @@
     "scripts": {
         "prepublish": "npm test",
         "minify": "uglifyjs ByteBuffer.js -o ByteBuffer.min.js --comments",
-        "jsdoc": "jsdoc.cmd -c jsdoc.json",
+        "jsdoc": "jsdoc -c jsdoc.json",
         "pretest": "npm run-script minify",
         "test": "nodeunit tests/suite.js"
     }

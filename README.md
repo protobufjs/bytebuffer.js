@@ -1,9 +1,9 @@
-ByteBuffer.js - A Java-like ByteBuffer           [![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.png?branch=master)](https://travis-ci.org/dcodeIO/ByteBuffer.js)
+ByteBuffer.js - A Java-like ByteBuffer [![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.png?branch=master)](https://travis-ci.org/dcodeIO/ByteBuffer.js)
 ======================================
 Provides a Java-like, Netty-inspired ByteBuffer implementation using typed arrays. It also tries to abstract a bit of
 the complexity away by providing convenience methods for those who just want to write stuff without caring about signed,
 unsigned and the actual bit sizes. It's also used for the cross-platform multiplayer component in
-[eSoccer](http://www.esoccer.me), a HTML5 game developed at [University of Applied Sciences Bonn](http://www.h-brs.de).
+[eSoccer](http://www.esoccer.me), an HTML5 game developed at [University of Applied Sciences Bonn](http://www.h-brs.de).
 
 ByteBuffer
 ----------
@@ -24,14 +24,18 @@ ByteBuffer
   (`ByteBuffer#prepend(src[, offset])`) of other ByteBuffers with implicit capacity management
 * Explicit destruction (`ByteBuffer#destroy()`)
 * `ByteBuffer#writeUint/Int8/16/32(value[, offset])` and `ByteBuffer#readUint/Int8/16/32([offset])` 
+* `ByteBuffer#writeVarint32(value[, offset])` and `ByteBuffer#readVarint32([offset])` to write a base 128 variable-length
+  integer as used in [protobuf](https://developers.google.com/protocol-buffers/docs/encoding#varints)
 * `ByteBuffer#writeFloat32/64(value[, offset])` and `ByteBuffer#readFloat32/64([offset])`
 * `ByteBuffer#write/readByte`, `ByteBuffer#write/readShort`, `ByteBuffer#write/readInt`, `ByteBuffer#write/readLong`
-  (all signed), `ByteBuffer#write/readFloat`, `ByteBuffer#write/readDouble` aliases for the above for convenience
+  (all signed), `ByteBuffer#write/readVarint`, `ByteBuffer#write/readFloat`, `ByteBuffer#write/readDouble` aliases for
+  the above for convenience
 * `ByteBuffer#writeUTF8String(str[, offset])` and `ByteBuffer#readUTF8String(chars[, offset])` using the included UTF8
   en-/decoder (full 6 bytes, [ref](http://en.wikipedia.org/wiki/UTF-8#Description))
 * `ByteBuffer#writeLString(str[, offset]))` and `ByteBuffer#readLString([offset])` to write respectively read a
-  length-prepended (number of characters as UTF8 char) string (recommended over `ByteBuffer#write/readCString`, which
-  would break in the case of contained NULL characters)
+  length-prepended (number of characters as UTF8 char) string
+* `ByteBuffer#writeVString(str[, offset]))` and `ByteBuffer#readVString([offset])` to write respectively read a
+  length-prepended (number of characters as base 128 variable-length 32bit integer) string
 * `ByteBuffer#writeCString(str[, offset])` and `ByteBuffer#readCString([offset])` to write respectively read a
   NULL-terminated (Uint8 0x00) string
 * `ByteBuffer#writeJSON(data[, offset[, stringify]])` and `ByteBuffer#readJSON([offset[, parse]])` to write respectively

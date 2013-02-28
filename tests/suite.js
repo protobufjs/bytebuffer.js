@@ -1,6 +1,64 @@
+/*
+ Copyright 2013 Daniel Wirtz <dcode@dcode.io>
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
+
+/**
+ * ByteBuffer.js Test Suite.
+ * @author Daniel Wirtz <dcode@dcode.io>
+ */
+
+/**
+ * File to use.
+ * @type {string}
+ */
 var BYTEBUFFER_FILE = "../ByteBuffer.min.js";
+
+/**
+ * ByteBuffer.
+ * @type {ByteBuffer}
+ */
 var ByteBuffer = require(BYTEBUFFER_FILE);
 
+/**
+ * Constructs a new Sandbox for module loaders and shim testing.
+ * @param {Object.<string,*>} properties Additional properties to set
+ * @constructor
+ */
+var Sandbox = function(properties) {
+    this.Int8Array = function() {};
+    this.Uint8Array = function() {};
+    this.Int16Array = function() {};
+    this.Uint16Array = function() {};
+    this.Int32Array = function() {};
+    this.Uint32Array = function() {};
+    this.Float32Array = function() {};
+    this.Float64Array = function() {};
+    for (var i in properties) {
+        this[i] = properties[i];
+    }
+    this.console = {
+        log: function(s) {
+            console.log(s);
+        }
+    };
+};
+
+/**
+ * Test suite.
+ * @type {Object.<string,function>}
+ */
 var suite = {
 
     setUp: function (callback) {
@@ -305,6 +363,33 @@ var suite = {
         test.done();
     },
     
+    "write/readVarint32": function(test) {
+        var values = [
+            [1,1],
+            [300,300],
+            [0x7FFFFFFF, 0x7FFFFFFF],
+            [0xFFFFFFFF, -1],
+            [0x80000000, -2147483648]
+        ];
+        var bb = new ByteBuffer(10);
+        for (var i=0; i<values.length; i++) {
+            var calcLen = ByteBuffer.calculateVarint32(values[i][0]);
+            var encLen = bb.writeVarint32(values[i][0], 0);
+            var dec = bb.readVarint(0);
+            // console.log("  Testing Varint32: "+values[i][0]+" == "+values[i][1]+"\n    calc: length="+calcLen+"\n    enc:  length="+encLen+"\n    dec:  length="+dec['length']+", value="+dec['value']);
+            test.equal(values[i][1], dec['value']);
+            test.equal(encLen, dec['length']);
+        }
+        test.done();
+    },
+    
+    "write/readVarint": function(test) {
+        var bb = new ByteBuffer(1);
+        test.strictEqual(bb.readVarint32, bb.readVarint);
+        test.strictEqual(bb.writeVarint32, bb.writeVarint);
+        test.done();
+    },
+    
     "write/readLString": function(test) {
         var bb = new ByteBuffer(2);
         bb.writeLString("ab"); // resizes to 4
@@ -314,6 +399,21 @@ var suite = {
         bb.flip();
         test.equal(bb.toHex(), "<02 61 62>00 ");
         test.deepEqual({"string": "ab", "length": 3}, bb.readLString(0));
+        test.equal(bb.toHex(), "<02 61 62>00 ");
+        test.equal("ab", bb.readLString());
+        test.equal(bb.toHex(), " 02 61 62|00 ");
+        test.done();
+    },
+
+    "write/readVString": function(test) {
+        var bb = new ByteBuffer(2);
+        bb.writeVString("ab"); // resizes to 4
+        test.equal(bb.array.byteLength, 4);
+        test.equal(bb.offset, 3);
+        test.equals(bb.length, 0);
+        bb.flip();
+        test.equal(bb.toHex(), "<02 61 62>00 ");
+        test.deepEqual({"string": "ab", "length": 3}, bb.readVString(0));
         test.equal(bb.toHex(), "<02 61 62>00 ");
         test.equal("ab", bb.readLString());
         test.equal(bb.toHex(), " 02 61 62|00 ");
@@ -403,11 +503,11 @@ var suite = {
           , util = require('util');
         
         var code = fs.readFileSync(__dirname+"/"+BYTEBUFFER_FILE);
-        var sandbox = {
+        var sandbox = new Sandbox({
             module: {
                 exports: {}
             }
-        };
+        });
         vm.runInNewContext(code, sandbox, "ByteBuffer.js in CommonJS-VM");
         // console.log(util.inspect(sandbox));
         test.ok(typeof sandbox.module.exports == 'function');
@@ -420,7 +520,7 @@ var suite = {
           , util = require('util');
 
         var code = fs.readFileSync(__dirname+"/"+BYTEBUFFER_FILE);
-        var sandbox = {
+        var sandbox = new Sandbox({
             require: function() {},
             define: (function() {
                 function define() {
@@ -430,7 +530,7 @@ var suite = {
                 define.called = false;
                 return define;
             })()
-        };
+        });
         vm.runInNewContext(code, sandbox, "ByteBuffer.js in AMD-VM");
         // console.log(util.inspect(sandbox));
         test.ok(sandbox.define.called == true);
@@ -443,19 +543,18 @@ var suite = {
             , util = require('util');
 
         var code = fs.readFileSync(__dirname+"/"+BYTEBUFFER_FILE);
-        var sandbox = {
-            window: {}
-        };
+        var sandbox = new Sandbox();
         vm.runInNewContext(code, sandbox, "ByteBuffer.js in AMD-VM");
         // console.log(util.inspect(sandbox));
-        test.ok(typeof sandbox.window.dcodeIO != 'undefined' && typeof sandbox.window.dcodeIO.ByteBuffer != 'undefined');
+        test.ok(typeof sandbox.dcodeIO != 'undefined' && typeof sandbox.dcodeIO.ByteBuffer != 'undefined');
         test.done();
     },
     
     "helloworld": function(test) {
         var bb = new ByteBuffer();
-        bb.writeUTF8String("Hello world! from ByteBuffer.js. This is just a visual test of ByteBuffer#printDebug.");
+        bb.writeUTF8String("Hello world! from ByteBuffer.js. This is just a last visual test of ByteBuffer#printDebug.");
         bb.flip();
+        console.log("");
         bb.printDebug();
         test.done();
     }

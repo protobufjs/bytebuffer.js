@@ -19,8 +19,64 @@
  * Released under the Apache License, Version 2.0
  * see: https://github.com/ByteBuffer.js for details
  */
-(function(window) {
+(function(global) {
     "use strict";
+
+    /**
+     * Int8.
+     * @type {Int8Array}
+     * @const
+     */
+    var INT8 = new Int8Array(1);
+
+    /**
+     * Uint7.
+     * @type {Uint8Array}
+     * @const
+     */
+    var UINT8 = new Uint8Array(1);
+
+    /**
+     * Int16.
+     * @type {Int16Array}
+     * @const
+     */
+    var INT16 = new Int16Array(1);
+
+    /**
+     * Uint16.
+     * @type {Uint16Array}
+     * @const
+     */
+    var UINT16 = new Uint16Array(1);
+
+    /**
+     * Int32.
+     * @type {Int32Array}
+     * @const
+     */
+    var INT32 = new Int32Array(1);
+
+    /**
+     * Uint32.
+     * @type {Uint32Array}
+     * @const
+     */
+    var UINT32 = new Uint32Array(1);
+
+    /**
+     * Float32.
+     * @type {Float32Array}
+     * @const
+     */
+    var FLOAT32 = new Float32Array(1);
+
+    /**
+     * Float64.
+     * @type {Float64Array}
+     * @const
+     */
+    var FLOAT64 = new Float64Array(1);
     
     /**
      * Constructs a new ByteBuffer.
@@ -677,6 +733,139 @@
         // Assuming it's +- a fraction -> round, not parseInt or something
         return Math.round(this.readFloat64(offset));
     };
+
+    /**
+     * Casts a value from one to another type. Expects two typed arrays of the desired types to write to for conversion.
+     * @param {Int8Array|Uint8Array|Int16Array|Uint16Array|Int32Array|Uint32Array|Float32Array|Float64Array} fromType Type to convert from
+     * @param {Int8Array|Uint8Array|Int16Array|Uint16Array|Int32Array|Uint32Array|Float32Array|Float64Array} toType Type to convert to
+     * @param {number} value Value to convert
+     * @return {number}
+     */
+    ByteBuffer.cast = function(fromType, toType, value) {
+        fromType[0] = value;
+        toType.set(fromType);
+        return toType[0];
+    };
+
+    /**
+     * Writes a base 128 variable-length 32bit integer as used in protobuf.
+     * @param {number} value Value to write
+     * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+     * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
+     */
+    ByteBuffer.prototype.writeVarint32 = function(value, offset) {
+        var advance = typeof offset == 'undefined';
+        offset = typeof offset != 'undefined' ? offset : this.offset;
+        // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
+        this.ensureCapacity(offset+ByteBuffer.calculateVarint32(value));
+        var dst = new Uint8Array(this.array),
+            size = 0;
+        dst[offset] = (value | 0x80);
+        if (value >= (1 << 7)) {
+            dst[offset+1] = ((value >>  7) | 0x80);
+            if (value >= (1 << 14)) {
+                dst[offset+2] = ((value >> 14) | 0x80);
+                if (value >= (1 << 21)) {
+                    dst[offset+3] = ((value >> 21) | 0x80);
+                    if (value >= (1 << 28)) {
+                        dst[offset+4] = (value >> 28) & 0x7F;
+                        size = 5;
+                    } else {
+                        dst[offset+3] &= 0x7F;
+                        size = 4;
+                    }
+                } else {
+                    dst[offset+2] &= 0x7F;
+                    size = 3;
+                }
+            } else {
+                dst[offset+1] &= 0x7F;
+                size = 2;
+            }
+        } else {
+            dst[offset] &= 0x7F;
+            size = 1;
+        }
+        if (advance) {
+            this.offset += size;
+            return this;
+        } else {
+            return size;
+        }
+    };
+
+    /**
+     * Reads a base 128 variable-length 32bit integer as used in protobuf.
+     * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+     * @return {number|{value: number, length: number}} The value read if offset is omitted, else the value read and the actual number of bytes read.
+     */
+    ByteBuffer.prototype.readVarint32 = function(offset) {
+        var advance = typeof offset == 'undefined';
+        offset = typeof offset != 'undefined' ? offset : this.offset;
+        // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
+        var src = new Uint8Array(this.array),
+            count = 0,
+            result = 0,
+            b;
+        do {
+            if (count == ByteBuffer.MAX_VARINT32_BYTES) {
+                throw("Cannot read Varint32 from "+this+"@"+offset+": Number of bytes is larger than "+ByteBuffer.MAX_VARINT32_BYTES);
+            }
+            b = src[offset+count];
+            result |= (b & 0x7F) << (7 * count);
+            ++count;
+        } while (b & 0x80);
+        if (result > 0xFFFFFFFF) {
+            throw("Cannot read Varint32 from "+this+"@"+offset+": Value ("+result+") is out of bounds");
+        }
+        result = ByteBuffer.cast(UINT32, INT32, result);
+        if (advance) {
+            this.offset += count;
+            return result;
+        } else {
+            return {
+                "value": result,
+                "length": count
+            };
+        }
+    };
+
+    /**
+     * Writes a base 128 variable-length integer as used in protobuf. This is an alias of {@link ByteBuffer#writeVarint32}.
+     * @function
+     * @param {number} value Value to write
+     * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+     * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
+     */
+    ByteBuffer.prototype.writeVarint = ByteBuffer.prototype.writeVarint32;
+
+    /**
+     * Reads a base 128 variable-length integer as used in protobuf. This is an alias of {@link ByteBuffer#readVarint32}.
+     * @function
+     * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+     * @return {number|{value: number, length: number}} The value read if offset is omitted, else the value read and the actual number of bytes read.
+     */
+    ByteBuffer.prototype.readVarint = ByteBuffer.prototype.readVarint32;
+
+    /**
+     * Calculates the actual number of bytes required to encode a base 128 variable.length 32bit integer.
+     * @param {number} value Value to encode
+     * @return {number} Number of bytes required
+     */
+    ByteBuffer.calculateVarint32 = function(value) {
+        // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
+        if (value < 0x80) {
+            return 1;
+        } else if (value < 0x4000) {
+            return 2;
+        } else if (value < 0x200000) {
+            return 3;
+        } else if (value < 0x10000000) {
+            return 4;
+        } else {
+            return 5;
+        }
+    };
     
     /**
      * Writes an UTF8 string.
@@ -769,9 +958,51 @@
             };
         }
     };
+
+    /**
+     * Writes a string with prepended number of characters, which is encoded as a base 128 variable-length 32bit integer.
+     * @param {string} str String to write
+     * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+     * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
+     */
+    ByteBuffer.prototype.writeVString = function(str, offset) {
+        var advance = typeof offset == 'undefined';
+        offset = typeof offset != 'undefined' ? offset : this.offset;
+        var encLen = this.writeVarint32(str.length, offset);
+        encLen += this.writeUTF8String(str, offset+encLen);
+        if (advance) {
+            this.offset += encLen;
+            return this;
+        } else {
+            return encLen;
+        }
+    };
+
+    /**
+     * Reads a string with a prepended number of characters, which is also encoded as a base 128 variable-length 32bit integer.
+     * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+     * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
+     */
+    ByteBuffer.prototype.readVString = function(offset) {
+        var advance = typeof offset == 'undefined';
+        offset = typeof offset != 'undefined' ? offset : this.offset;
+        var lenDec = this.readVarint32(offset);
+        var dec = this.readUTF8String(lenDec["value"], offset+lenDec["length"]);
+        if (advance) {
+            this.offset += lenDec["length"]+dec["length"];
+            return dec["string"];
+        } else {
+            return {
+                "string": dec["string"],
+                "length": lenDec["length"]+dec["length"]
+            };
+        }
+    };
     
     /**
-     * Writes a string followed by a NULL character (Uint8).
+     * Writes a string followed by a NULL character (Uint8). Beware: The source string must not contain NULL characters
+     * unless this is actually intended. This is not checked. If you have the option it is recommended to use
+     * {@link ByteBuffer#writeLString} or {@link ByteBuffer#writeVString} with the corresponding reading methods instead.
      * @param {string} str String to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
@@ -1099,20 +1330,23 @@
         }
     };
 
+    /**
+     * Maximum number of bytes of a variable-length integer storing 32bit values.
+     * @type {number}
+     * @const
+     */
+    ByteBuffer.MAX_VARINT32_BYTES = 5;
+
     // Enable module loading if available
     if (typeof module != 'undefined' && module["exports"]) { // CommonJS
         module["exports"] = ByteBuffer;
     } else if (typeof define != 'undefined' && define["amd"]) { // AMD
         define([], function() { return ByteBuffer; });
     } else { // Shim
-        if (window) {
-            if (!window["dcodeIO"]) {
-                window["dcodeIO"] = {};
-            }
-            window["dcodeIO"]["ByteBuffer"] = ByteBuffer;
-        } else {
-            throw("Cannot load ByteBuffer.js: Neigher a CommonJS or AMD loader nor a global window is available");
+        if (!global["dcodeIO"]) {
+            global["dcodeIO"] = {};
         }
+        global["dcodeIO"]["ByteBuffer"] = ByteBuffer;
     }
     
-})(typeof window != 'undefined' ? window : null);
+})(this);
