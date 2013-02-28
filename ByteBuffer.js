@@ -17,7 +17,7 @@
 /**
  * @license ByteBuffer.js (c) 2013 Daniel Wirtz <dcode@dcode.io>
  * Released under the Apache License, Version 2.0
- * see: https://github.com/ByteBuffer.js for details
+ * see: https://github.com/dcodeIO/ByteBuffer.js for details
  */
 (function(global) {
     "use strict";

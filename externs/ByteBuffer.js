@@ -18,7 +18,6 @@
  * @fileoverview Externs for ByteBuffer.js.
  * @see https://github.com/dcodeIO/ByteBuffer.js
  * @externs
- * @author Daniel Wirtz <dcode@dcode.io>
  */
 
 /**
