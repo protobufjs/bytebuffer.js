@@ -67,6 +67,12 @@ var suite = {
     tearDown: function (callback) {
         callback();
     },
+    
+    "init": function(test) {
+        test.ok(typeof ByteBuffer == "function");
+        test.ok(typeof ByteBuffer.encodeUTF8Char == "function");
+        test.done();
+    },
 
     "construct/allocate": function(test) {
         var bb = new ByteBuffer();

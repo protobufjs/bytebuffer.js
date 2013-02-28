@@ -27,28 +27,28 @@
      * @type {Int8Array}
      * @const
      */
-    var INT8 = new Int8Array(1);
+    // var INT8 = new Int8Array(1);
 
     /**
      * Uint7.
      * @type {Uint8Array}
      * @const
      */
-    var UINT8 = new Uint8Array(1);
+    // var UINT8 = new Uint8Array(1);
 
     /**
      * Int16.
      * @type {Int16Array}
      * @const
      */
-    var INT16 = new Int16Array(1);
+    // var INT16 = new Int16Array(1);
 
     /**
      * Uint16.
      * @type {Uint16Array}
      * @const
      */
-    var UINT16 = new Uint16Array(1);
+    // var UINT16 = new Uint16Array(1);
 
     /**
      * Int32.
@@ -69,14 +69,14 @@
      * @type {Float32Array}
      * @const
      */
-    var FLOAT32 = new Float32Array(1);
+    // var FLOAT32 = new Float32Array(1);
 
     /**
      * Float64.
      * @type {Float64Array}
      * @const
      */
-    var FLOAT64 = new Float64Array(1);
+    // var FLOAT64 = new Float64Array(1);
     
     /**
      * Constructs a new ByteBuffer.
@@ -87,6 +87,7 @@
      * @param {number=} capacity Initial capacity. Defaults to {@link ByteBuffer.DEFAULT_CAPACITY}.
      * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to false.
      * @constructor
+     * @expose
      */
     var ByteBuffer = function(capacity, littleEndian) {
         
@@ -96,12 +97,14 @@
         /**
          * Underlying ArrayBuffer.
          * @type {ArrayBuffer}
+         * @expose
          */
         this.array = arguments.length == 3 && arguments[2] === true ? null : new ArrayBuffer(capacity);
         
         /**
          * DataView to mess with the ArrayBuffer.
          * @type {DataView}
+         * @expose
          */
         this.view = this.array != null ? new DataView(this.array) : null;
         
@@ -110,6 +113,7 @@
          * length, which are both absolute indexes. There is no capacity property, use {@link ByteBuffer#capacity}
          * instead.
          * @type {number}
+         * @expose
          */
         this.offset = 0;
     
@@ -118,12 +122,14 @@
          * length, which are both absolute indexes. There is no capacity property, use {@link ByteBuffer#capacity}
          * instead.
          * @type {number}
+         * @expose
          */
         this.length = 0;
     
         /**
          * Whether to use little endian multi byte values.
          * @type {boolean}
+         * @expose
          */
         this.littleEndian = typeof littleEndian != 'undefined' ? !!littleEndian : false;
     };
@@ -133,6 +139,7 @@
      * of 2 if required.
      * @type {number}
      * @const
+     * @expose
      */
     ByteBuffer.DEFAULT_CAPACITY = 32;
     
@@ -140,6 +147,7 @@
      * Little endian constant for usage in constructors instead of a boolean value. Evaluates to true.
      * @type {boolean}
      * @const
+     * @expose
      */
     ByteBuffer.LITTLE_ENDIAN = true;
     
@@ -147,6 +155,7 @@
      * Big endian constant for usage in constructors instead of a boolean value. Evaluates to false.
      * @type {boolean}
      * @const
+     * @expose
      */
     ByteBuffer.BIG_ENDIAN = false;
     
@@ -155,6 +164,7 @@
      * @param {number=} capacity Initial capacity. Defaults to {@link ByteBuffer.DEFAULT_CAPACITY}.
      * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to true.
      * @return {ByteBuffer}
+     * @expose
      */
     ByteBuffer.allocate = function(capacity, littleEndian) {
         return new ByteBuffer(capacity, littleEndian);
@@ -165,6 +175,7 @@
      * @param {ArrayBuffer|*} buffer ArrayBuffer or any object with an object#array or object#buffer property to wrap
      * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to true.
      * @return {ByteBuffer}
+     * @expose
      */
     ByteBuffer.wrap = function(buffer, littleEndian) {
         if (!!buffer["array"]) {
@@ -187,6 +198,7 @@
      * Resizes the ByteBuffer to the given capacity.
      * @param {number} capacity New capacity
      * @return {boolean} true if actually resized, false if already that large or larger
+     * @expose
      */
     ByteBuffer.prototype.resize = function(capacity) {
         if (this.array == null && capacity > 0) { // Silently recreate
@@ -212,6 +224,7 @@
      * @param {number} begin Begin offset
      * @param {number} end End offset
      * @return {ByteBuffer} Clone of this ByteBuffer with the specified slicing applied, backed by the same ArrayBuffer
+     * @expose
      */
     ByteBuffer.prototype.slice = function(begin, end) {
         if (this.array == null) {
@@ -235,6 +248,7 @@
      * @param {number} begin Begin offset
      * @param {number} end End offset
      * @returns {ByteBuffer}
+     * @expose
      */
     ByteBuffer.prototype.sliceAndCompact = function(begin, end) {
         return ByteBuffer.wrap(this.slice(begin,end).toArrayBuffer(true));
@@ -245,6 +259,7 @@
      * double the previous capacity is less than the required capacity, the required capacity will be used.
      * @param {number} capacity Required capacity
      * @return {boolean} true if actually resized, false if already that large or larger
+     * @expose
      */
     ByteBuffer.prototype.ensureCapacity = function(capacity) {
         if (this.array == null) {
@@ -257,6 +272,7 @@
     /**
      * Flips the ByteBuffer. Sets length=offset and offset=0.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.flip = function() {
         if (this.array == null) {
@@ -270,6 +286,7 @@
     /**
      * Resets the ByteBuffer. Sets offset=0 and length=0.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.reset = function() {
         this.offset = 0;
@@ -280,6 +297,7 @@
     /**
      * Clones this ByteBuffer. The returned cloned ByteBuffer shares the same ArrayBuffer but will have its own offsets.
      * @return {ByteBuffer}
+     * @expose
      */
     ByteBuffer.prototype.clone = function() {
         // When cloning, an undocumented third parameter is used to set array and view manually.
@@ -294,6 +312,7 @@
     /**
      * Copies this ByteBuffer. The returned copied ByteBuffer has its own ArrayBuffer and uses the same offsets as this one.
      * @return {ByteBuffer}
+     * @expose
      */
     ByteBuffer.prototype.copy = function() {
         var b = new ByteBuffer(this.array.byteLength, this.littleEndian);
@@ -309,6 +328,7 @@
      * Gets the number of remaining readable bytes. Contents are the bytes between offset and length, so this returns
      * length-offset.
      * @returns {number} Remaining readable bytes (may be negative if offset is larger than length)
+     * @expose
      */
     ByteBuffer.prototype.remaining = function() {
         return this.length - this.offset;
@@ -318,6 +338,7 @@
      * Gets the capacity of the backing buffer. May be larger but not less than the contents actual length. Contents are the
      * bytes between offset and length, which is independent of the actual capacity.
      * @returns {number} Capacity of the backing buffer or 0 if destroyed
+     * @expose
      */
     ByteBuffer.prototype.capacity = function() {
         return this.array != null ? this.array.byteLength : 0;
@@ -329,6 +350,7 @@
      * portion between its offset and length will be contained in the compacted backing buffer. Will set offset=0 and
      * length=capacity. Will do nothing but flipping, if required, if already compacted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.compact = function() {
         if (this.array == null) {
@@ -355,6 +377,7 @@
     
     /**
      * Destroys the ByteBuffer, releasing all references to the backing array.
+     * @expose
      */
     ByteBuffer.prototype.destroy = function() {
         if (this.array == null) return; // Already destroyed
@@ -368,6 +391,7 @@
      * Reverses the underlying back buffer and adapts offset and length to retain the same relative position on the
      * reversed data in inverse order. Example: "00<01 02>03 04".reverse() = "04 03<02 01>00".
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.reverse = function() {
         if (this.array == null) {
@@ -388,7 +412,8 @@
      * larger than its length (its offsets remain untouched through cloning).
      * @param {ByteBuffer} src ByteBuffer to append
      * @param {number=} offset Offset to append behind. Defaults to {@link ByteBuffer#length} which will be modified only if omitted. 
-     * @retirm {ByteBuffer} this
+     * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.append = function(src, offset) {
         if (src.array == null) {
@@ -416,6 +441,7 @@
      * @param {ByteBuffer} src ByteBuffer to prepend
      * @param {number=} offset Offset to prepend before. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.prepend = function(src, offset) {
         if (src.array == null) {
@@ -451,6 +477,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.writeInt8 = function(value, offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
@@ -463,6 +490,7 @@
      * Reads an 8bit singed integer.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @expose
      */
     ByteBuffer.prototype.readInt8 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
@@ -475,6 +503,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.writeByte = ByteBuffer.prototype.writeInt8;
     
@@ -483,6 +512,7 @@
      * @function
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @expose
      */
     ByteBuffer.prototype.readByte = ByteBuffer.prototype.readInt8;
     
@@ -491,6 +521,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.writeUint8 = function(value, offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
@@ -503,6 +534,7 @@
      * Reads an 8bit unsinged integer.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @expose
      */
     ByteBuffer.prototype.readUint8 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
@@ -514,6 +546,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.writeInt16 = function(value, offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=2)-2;
@@ -526,6 +559,7 @@
      * Reads a 16bit signed integer.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @expose
      */
     ByteBuffer.prototype.readInt16 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=2)-2;
@@ -538,6 +572,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.writeShort = ByteBuffer.prototype.writeInt16;
     
@@ -546,6 +581,7 @@
      * @function
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @expose
      */
     ByteBuffer.prototype.readShort = ByteBuffer.prototype.readInt16;
     
@@ -554,6 +590,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.writeUint16 = function(value, offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=2)-2;
@@ -566,6 +603,7 @@
      * Reads a 16bit unsigned integer.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @expose
      */
     ByteBuffer.prototype.readUint16 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=2)-2;
@@ -577,6 +615,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.writeInt32 = function(value, offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
@@ -589,6 +628,7 @@
      * Reads a 32bit signed integer.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @expose
      */
     ByteBuffer.prototype.readInt32 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
@@ -601,6 +641,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.writeInt = ByteBuffer.prototype.writeInt32;
     
@@ -609,6 +650,7 @@
      * @function
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @expose
      */
     ByteBuffer.prototype.readInt = ByteBuffer.prototype.readInt32;
     
@@ -617,6 +659,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.writeUint32 = function(value, offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
@@ -629,6 +672,7 @@
      * Reads a 32bit unsigned integer.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @expose
      */
     ByteBuffer.prototype.readUint32 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
@@ -640,6 +684,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.writeFloat32 = function(value, offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
@@ -652,6 +697,7 @@
      * Reads a 32bit float.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @expose
      */
     ByteBuffer.prototype.readFloat32 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
@@ -664,6 +710,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.writeFloat = ByteBuffer.prototype.writeFloat32;
     
@@ -672,6 +719,7 @@
      * @function
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @expose
      */
     ByteBuffer.prototype.readFloat = ByteBuffer.prototype.readFloat32;
     
@@ -680,6 +728,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.writeFloat64 = function(value, offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=8)-8;
@@ -692,6 +741,7 @@
      * Reads a 64bit float.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @expose
      */
     ByteBuffer.prototype.readFloat64 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=8)-8;
@@ -704,6 +754,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.writeDouble = ByteBuffer.prototype.writeFloat64;
     
@@ -712,6 +763,7 @@
      * @function
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @expose
      */
     ByteBuffer.prototype.readDouble = ByteBuffer.prototype.readFloat64;
     
@@ -721,6 +773,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @expose
      */
     ByteBuffer.prototype.writeLong = ByteBuffer.prototype.writeFloat64;
     
@@ -728,6 +781,7 @@
      * Reads a long. This makes use of {@link ByteBuffer#readFloat64} by additionally clamping the returned value to a natural number.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @expose
      */
     ByteBuffer.prototype.readLong = function(offset) {
         // Assuming it's +- a fraction -> round, not parseInt or something
@@ -740,6 +794,7 @@
      * @param {Int8Array|Uint8Array|Int16Array|Uint16Array|Int32Array|Uint32Array|Float32Array|Float64Array} toType Type to convert to
      * @param {number} value Value to convert
      * @return {number}
+     * @inline
      */
     ByteBuffer.cast = function(fromType, toType, value) {
         fromType[0] = value;
@@ -752,6 +807,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
+     * @expose
      */
     ByteBuffer.prototype.writeVarint32 = function(value, offset) {
         var advance = typeof offset == 'undefined';
@@ -798,6 +854,7 @@
      * Reads a base 128 variable-length 32bit integer as used in protobuf.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number|{value: number, length: number}} The value read if offset is omitted, else the value read and the actual number of bytes read.
+     * @expose
      */
     ByteBuffer.prototype.readVarint32 = function(offset) {
         var advance = typeof offset == 'undefined';
@@ -836,6 +893,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
+     * @expose
      */
     ByteBuffer.prototype.writeVarint = ByteBuffer.prototype.writeVarint32;
 
@@ -844,6 +902,7 @@
      * @function
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number|{value: number, length: number}} The value read if offset is omitted, else the value read and the actual number of bytes read.
+     * @expose
      */
     ByteBuffer.prototype.readVarint = ByteBuffer.prototype.readVarint32;
 
@@ -851,6 +910,7 @@
      * Calculates the actual number of bytes required to encode a base 128 variable.length 32bit integer.
      * @param {number} value Value to encode
      * @return {number} Number of bytes required
+     * @expose
      */
     ByteBuffer.calculateVarint32 = function(value) {
         // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
@@ -872,6 +932,7 @@
      * @param {string} str String to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
+     * @expose
      */
     ByteBuffer.prototype.writeUTF8String = function(str, offset) {
         var advance = typeof offset == 'undefined';
@@ -898,6 +959,7 @@
      * @param {number} chars Number of characters to read
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
+     * @expose
      */
     ByteBuffer.prototype.readUTF8String = function(chars, offset) {
         var advance = typeof offset == 'undefined';
@@ -924,6 +986,7 @@
      * @param {string} str String to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
+     * @expose
      */
     ByteBuffer.prototype.writeLString = function(str, offset) {
         var advance = typeof offset == 'undefined';
@@ -942,6 +1005,7 @@
      * Reads a string with a prepended number of characters, which is also encoded as an UTF8 character.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
+     * @expose
      */
     ByteBuffer.prototype.readLString = function(offset) {
         var advance = typeof offset == 'undefined';
@@ -964,6 +1028,7 @@
      * @param {string} str String to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
+     * @expose
      */
     ByteBuffer.prototype.writeVString = function(str, offset) {
         var advance = typeof offset == 'undefined';
@@ -982,6 +1047,7 @@
      * Reads a string with a prepended number of characters, which is also encoded as a base 128 variable-length 32bit integer.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
+     * @expose
      */
     ByteBuffer.prototype.readVString = function(offset) {
         var advance = typeof offset == 'undefined';
@@ -1006,6 +1072,7 @@
      * @param {string} str String to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
+     * @expose
      */
     ByteBuffer.prototype.writeCString = function(str, offset) {
         var advance = typeof offset == 'undefined';
@@ -1024,6 +1091,7 @@
      * Reads a string followed by a NULL character (Uint8).
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
+     * @expose
      */
     ByteBuffer.prototype.readCString = function(offset) {
         var advance = typeof offset == 'undefined';
@@ -1051,6 +1119,7 @@
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted,
      * @param {function=} stringify Stringify implementation to use. Defaults to {@link JSON.stringify}.
      * @return {ByteBuffer|number} this if offset is omitted, else the actual number if bytes written,
+     * @expose
      */
     ByteBuffer.prototype.writeJSON = function(data, offset, stringify) {
         stringify = stringify || JSON.stringify.bind(JSON);
@@ -1062,6 +1131,7 @@
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @param {function=} parse Parse implementation to use. Defaults to {@link JSON.parse}.
      * @return {*|{data: *, length: number}} Data payload if offset is omitted, else the data payload and the actual number of bytes read.
+     * @expose
      */
     ByteBuffer.prototype.readJSON = function(offset, parse) {
         parse = parse || JSON.parse.bind(JSON);
@@ -1078,6 +1148,7 @@
     
     /**
      * Prints debug information about this ByteBuffer's contents to console.
+     * @expose
      */
     ByteBuffer.prototype.printDebug = function() {
         if (typeof console != "undefined" && console["log"]) {
@@ -1097,6 +1168,7 @@
      * @param {number=} wrap Wrap length. Defaults to 16.
      * @param {boolean=} asArray Set to true to return an array of lines. Defaults to false.
      * @return {string|Array.<string>} Hex representation as of " 00<01 02>03..." with marked offsets
+     * @expose
      */
     ByteBuffer.prototype.toHex = function(wrap, asArray) {
         if (this.array == null) return "DESTROYED";
@@ -1144,6 +1216,7 @@
      * @param {number=} wrap Wrap length. Defaults to 16.
      * @param {boolean=} asArray Set to true to return an array of lines. Defaults to false.
      * @return {string|Array.<string>} ASCII representation as of "abcdef..." (33-126, else ".", no marked offsets)
+     * @expose
      */
     ByteBuffer.prototype.toASCII = function(wrap, asArray) {
         if (this.array == null) return "";
@@ -1171,6 +1244,7 @@
     /**
      * Returns a string representation of this object.
      * @return {string} String representation as of "ByteBuffer(offset,length,capacity)"
+     * @expose
      */
     ByteBuffer.prototype.toString = function() {
         if (this.array == null) {
@@ -1185,6 +1259,7 @@
      * the unmodified backing buffer if offset=0 and length=capacity unless forceCopy is set to true.
      * @param {boolean=} forceCopy Forces the creation of a copy if set to true. Defaults to false.
      * @return {ArrayBuffer} Compacted ArrayBuffer
+     * @expose
      */
     ByteBuffer.prototype.toArrayBuffer = function(forceCopy) {
         var b = this.clone();
@@ -1204,6 +1279,7 @@
      * @param {ByteBuffer} src
      * @param {number} offset Offset to read from
      * @return {{char: number, length: number}} Decoded char code and the actual number of bytes read 
+     * @expose
      */
     ByteBuffer.decodeUTF8Char = function(src, offset) {
         var a = src.readUint8(offset), b, c, d, e, f, start = offset, charCode;
@@ -1257,6 +1333,7 @@
      * @param {ByteBuffer} dst ByteBuffer to encode to
      * @param {number} offset Offset to write to
      * @return {number} Actual number of bytes written
+     * @expose
      */
     ByteBuffer.encodeUTF8Char = function(charCode, dst, offset) {
         var start = offset;
@@ -1308,6 +1385,7 @@
      * Calculates the actual number of bytes required to encode the specified char code.
      * @param {number} charCode Character to encode as char code
      * @return {number} Number of bytes required to encode the specified char code
+     * @expose
      */
     ByteBuffer.calculateUTF8Char = function(charCode) {
         if (charCode < 0) {
@@ -1334,6 +1412,7 @@
      * Maximum number of bytes of a variable-length integer storing 32bit values.
      * @type {number}
      * @const
+     * @inline
      */
     ByteBuffer.MAX_VARINT32_BYTES = 5;
 
