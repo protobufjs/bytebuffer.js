@@ -122,17 +122,24 @@ Prerequisites to run it against IE<10, FF<15, Chrome<9 etc.
 * Working ArrayBuffer, DataView & Uint8Array implementations (i.e. use a [polyfill](http://www.calormen.com/polyfill/#typedarray), [2](https://github.com/davidflanagan/DataView.js))
 
 Usage with Closure Compiler set to `ADVANCED_OPTIMIZATIONS`
--------------------------------------------------------------------------------
-You basically have two options:
+-----------------------------------------------------------
+You basically have the following three options:
 
-* Use `ByteBuffer.js` if you want the ByteBuffer class to be exposed so it can be called by external scripts. This also
-  removes the requirement of using externs but the compiler will also keep possibly unused code.
-* Use `ByteBuffer.noexpose.js` if you want the ByteBuffer class to be fully integrated into your (single file) project.
-  Of course no external scripts will be able to call it or its method (trivially) because quite everything will become
-  renamed, some parts inlined and moved around. This will also allow the compiler to actually remove unused code.
+### ByteBuffer.js as external dependency ###
+If you compile your code but want to use ByteBuffer.js as an external dependency that's not actually compiled "into"
+your project, add the provided [externs file](https://github.com/dcodeIO/ByteBuffer.js/blob/master/externs/ByteBuffer.js)
+to your compilation step (which usually excludes compilation of ByteBuffer.js).
+  
+### ByteBuffer.js compiled into your project and exposed ###
+Use [ByteBuffer.js](https://github.com/dcodeIO/ByteBuffer.js/blob/master/ByteBuffer.js) if you want the ByteBuffer class
+to be exposed to the outside world (of JavaScript) so it can be called by external scripts. This also removes the
+requirement of using externs but the compiler will also keep possibly unused code.
 
-If you have set the compiler to ``--compilation_level SIMPLE_OPTIMIZATIONS`, you do not have to care about that. You can
-use whatever file you like. This also applies if you do not compile your code at all. Best option: `ByteBuffer.min.js`.
+### ByteBuffer.js fully compiled into your project ###
+Use [ByteBuffer.noexpose.js](https://github.com/dcodeIO/ByteBuffer.js/blob/master/ByteBuffer.noexpose.js) if you want
+the ByteBuffer class to be fully integrated into your (single file) project. Of course no external scripts will be able
+to call it or its method (trivially) because quite everything will become renamed, some parts inlined and moved around.
+This will also allow the compiler to actually remove unused code.
 
 License
 -------

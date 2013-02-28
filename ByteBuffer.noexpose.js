@@ -162,7 +162,7 @@
     
     /**
      * Wraps an ArrayBuffer. Sets the ByteBuffer's offset to 0 and its length to the specified ArrayBuffer's byte length.
-     * @param {ArrayBuffer|*} buffer ArrayBuffer or any object with an object#array or object#buffer property to wrap
+     * @param {ArrayBuffer|{array: ArrayBuffer}|{buffer: ArrayBuffer}} buffer ArrayBuffer or any object with an .array or .buffer property to wrap
      * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to true.
      * @return {ByteBuffer}
      */
@@ -234,7 +234,7 @@
      * of this ByteBuffer's contents.
      * @param {number} begin Begin offset
      * @param {number} end End offset
-     * @returns {ByteBuffer}
+     * @return {ByteBuffer}
      */
     ByteBuffer.prototype.sliceAndCompact = function(begin, end) {
         return ByteBuffer.wrap(this.slice(begin,end).toArrayBuffer(true));
@@ -308,7 +308,7 @@
     /**
      * Gets the number of remaining readable bytes. Contents are the bytes between offset and length, so this returns
      * length-offset.
-     * @returns {number} Remaining readable bytes (may be negative if offset is larger than length)
+     * @return {number} Remaining readable bytes (may be negative if offset is larger than length)
      */
     ByteBuffer.prototype.remaining = function() {
         return this.length - this.offset;
@@ -317,7 +317,7 @@
     /**
      * Gets the capacity of the backing buffer. May be larger but not less than the contents actual length. Contents are the
      * bytes between offset and length, which is independent of the actual capacity.
-     * @returns {number} Capacity of the backing buffer or 0 if destroyed
+     * @return {number} Capacity of the backing buffer or 0 if destroyed
      */
     ByteBuffer.prototype.capacity = function() {
         return this.array != null ? this.array.byteLength : 0;
@@ -355,6 +355,7 @@
     
     /**
      * Destroys the ByteBuffer, releasing all references to the backing array.
+     * @return {ByteBuffer} this
      */
     ByteBuffer.prototype.destroy = function() {
         if (this.array == null) return; // Already destroyed
@@ -362,6 +363,7 @@
         this.view = null;
         this.offset = 0;
         this.length = 0;
+        return this;
     };
 
     /**
