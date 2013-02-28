@@ -59,7 +59,8 @@ Features
 * [RequireJS](http://requirejs.org/)/AMD compatible
 * Shim compatible (include the script, then use var ByteBuffer = dcodeIO.ByteBuffer;)
 * [node.js](http://nodejs.org) compatible, also available via [npm](https://npmjs.org/package/bytebuffer)
-* [Closure Compiler](https://developers.google.com/closure/compiler/) ADVANCED_OPTIMIZATIONS compatible (fully annotated)
+* [Closure Compiler](https://developers.google.com/closure/compiler/) ADVANCED_OPTIMIZATIONS compatible (fully annotated,
+  ByteBuffer.min.js has been compiled this way, ByteBuffer.min.map is the source map)
 * Fully documented ([jsdoc3](https://github.com/jsdoc3/jsdoc))
 * Well tested through [nodeunit](https://github.com/caolan/nodeunit)
 * Zero production dependencies

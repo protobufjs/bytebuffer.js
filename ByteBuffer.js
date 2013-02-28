@@ -794,7 +794,6 @@
      * @param {Int8Array|Uint8Array|Int16Array|Uint16Array|Int32Array|Uint32Array|Float32Array|Float64Array} toType Type to convert to
      * @param {number} value Value to convert
      * @return {number}
-     * @inline
      */
     ByteBuffer.cast = function(fromType, toType, value) {
         fromType[0] = value;
@@ -1412,7 +1411,6 @@
      * Maximum number of bytes of a variable-length integer storing 32bit values.
      * @type {number}
      * @const
-     * @inline
      */
     ByteBuffer.MAX_VARINT32_BYTES = 5;
 
