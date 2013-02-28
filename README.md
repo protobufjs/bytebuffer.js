@@ -121,7 +121,7 @@ Prerequisites to run it against IE<10, FF<15, Chrome<9 etc.
 -----------------------------------------------------------
 * Working ArrayBuffer, DataView & Uint8Array implementations (i.e. use a [polyfill](http://www.calormen.com/polyfill/#typedarray), [2](https://github.com/davidflanagan/DataView.js))
 
-Usage with Closure Compiler set to `--compilation_level ADVANCED_OPTIMIZATIONS`
+Usage with Closure Compiler set to `ADVANCED_OPTIMIZATIONS`
 -------------------------------------------------------------------------------
 You basically have two options:
 
