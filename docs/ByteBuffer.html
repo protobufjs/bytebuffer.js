@@ -349,7 +349,7 @@ of 2 if required.</p>
 <dd>
     
     <div class="description">
-        <p>Maximum number of bytes of a variable-length integer storing 32bit values.</p>
+        <p>Required number of bytes to store a base 128 variable-length 32bit integer.</p>
     </div>
     
     
@@ -1573,6 +1573,135 @@ instead.</p>
 </dl>
 
         
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="extend"><span class="type-signature">&lt;static> </span>extend<span class="signature">(name, func)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Extends the ByteBuffer prototype with additional methods.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"><p>Method name</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>func</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"><p>Prototype function</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
     
     
 </dd>
@@ -5542,7 +5671,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
     
     <div class="description">
-        <p>Reads a string with a prepended number of characters, which is also encoded as a base 128 variable-length 32bit integer.</p>
+        <p>Reads a string with a prepended number of characters, which is encoded as a base 128 variable-length 32bit integer.</p>
     </div>
     
 

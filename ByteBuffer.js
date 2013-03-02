@@ -804,6 +804,13 @@
     };
 
     /**
+     * Required number of bytes to store a base 128 variable-length 32bit integer.
+     * @type {number}
+     * @const
+     */
+    ByteBuffer.MAX_VARINT32_BYTES = 5;
+
+    /**
      * Writes a base 128 variable-length 32bit integer as used in protobuf.
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
@@ -1045,7 +1052,7 @@
     };
 
     /**
-     * Reads a string with a prepended number of characters, which is also encoded as a base 128 variable-length 32bit integer.
+     * Reads a string with a prepended number of characters, which is encoded as a base 128 variable-length 32bit integer.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
      * @expose
@@ -1348,33 +1355,33 @@
             offset += 1;
         } else if (charCode < 0x800) {
             dst.writeUint8(((charCode>>6)&0x1F)|0xC0, offset)
-                .writeUint8((charCode&0x3F)|0x80, offset+1);
+               .writeUint8((charCode&0x3F)|0x80, offset+1);
             offset += 2;
         } else if (charCode < 0x10000) {
             dst.writeUint8(((charCode>>12)&0x0F)|0xE0, offset)
-                .writeUint8(((charCode>>6)&0x3F)|0x80, offset+1)
-                .writeUint8((charCode&0x3F)|0x80, offset+2);
+               .writeUint8(((charCode>>6)&0x3F)|0x80, offset+1)
+               .writeUint8((charCode&0x3F)|0x80, offset+2);
             offset += 3;
         } else if (charCode < 0x200000) {
             dst.writeUint8(((charCode>>18)&0x07)|0xF0, offset)
-                .writeUint8(((charCode>>12)&0x3F)|0x80, offset+1)
-                .writeUint8(((charCode>>6)&0x3F)|0x80, offset+2)
-                .writeUint8((charCode&0x3F)|0x80, offset+3);
+               .writeUint8(((charCode>>12)&0x3F)|0x80, offset+1)
+               .writeUint8(((charCode>>6)&0x3F)|0x80, offset+2)
+               .writeUint8((charCode&0x3F)|0x80, offset+3);
             offset += 4;
         } else if (charCode < 0x4000000) {
             dst.writeUint8(((charCode>>24)&0x03)|0xF8, offset)
-                .writeUint8(((charCode>>18)&0x3F)|0x80, offset+1)
-                .writeUint8(((charCode>>12)&0x3F)|0x80, offset+2)
-                .writeUint8(((charCode>>6)&0x3F)|0x80, offset+3)
-                .writeUint8((charCode&0x3F)|0x80, offset+4);
+               .writeUint8(((charCode>>18)&0x3F)|0x80, offset+1)
+               .writeUint8(((charCode>>12)&0x3F)|0x80, offset+2)
+               .writeUint8(((charCode>>6)&0x3F)|0x80, offset+3)
+               .writeUint8((charCode&0x3F)|0x80, offset+4);
             offset += 5;
         } else if (charCode < 0x80000000) {
             dst.writeUint8(((charCode>>30)&0x01)|0xFC, offset)
-                .writeUint8(((charCode>>24)&0x3F)|0x80, offset+1)
-                .writeUint8(((charCode>>18)&0x3F)|0x80, offset+2)
-                .writeUint8(((charCode>>12)&0x3F)|0x80, offset+3)
-                .writeUint8(((charCode>>6)&0x3F)|0x80, offset+4)
-                .writeUint8((charCode&0x3F)|0x80, offset+5);
+               .writeUint8(((charCode>>24)&0x3F)|0x80, offset+1)
+               .writeUint8(((charCode>>18)&0x3F)|0x80, offset+2)
+               .writeUint8(((charCode>>12)&0x3F)|0x80, offset+3)
+               .writeUint8(((charCode>>6)&0x3F)|0x80, offset+4)
+               .writeUint8((charCode&0x3F)|0x80, offset+5);
             offset += 6;
         } else {
             throw("Cannot encode UTF8 character: charCode (0x"+charCode.toString(16)+") is too large (>= 0x80000000)");
@@ -1410,21 +1417,31 @@
     };
 
     /**
-     * Maximum number of bytes of a variable-length integer storing 32bit values.
-     * @type {number}
-     * @const
+     * Extends the ByteBuffer prototype with additional methods.
+     * @param {string} name Method name
+     * @param {!Function} func Prototype function
+     * @expose
      */
-    ByteBuffer.MAX_VARINT32_BYTES = 5;
+    ByteBuffer.extend = function(name, func) {
+        if (typeof name == "string" && typeof func == "function") {
+            ByteBuffer.prototype[name] = func;
+        } else {
+            throw("Cannot extend prototype with "+name+"="+func+" (exptected string and function)")
+        }
+    };
 
     // Enable module loading if available
     if (typeof module != 'undefined' && module["exports"]) { // CommonJS
+        /** @expose */
         module["exports"] = ByteBuffer;
     } else if (typeof define != 'undefined' && define["amd"]) { // AMD
-        define([], function() { return ByteBuffer; });
+        define("ByteBuffer", [], function() { return ByteBuffer; });
     } else { // Shim
         if (!global["dcodeIO"]) {
+            /** @expose */
             global["dcodeIO"] = {};
         }
+        /** @expose */
         global["dcodeIO"]["ByteBuffer"] = ByteBuffer;
     }
     

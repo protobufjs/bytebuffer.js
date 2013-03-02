@@ -23,7 +23,7 @@
  * File to use.
  * @type {string}
  */
-var BYTEBUFFER_FILE = "../ByteBuffer.min.js";
+var BYTEBUFFER_FILE = "../ByteBuffer.js";
 
 /**
  * ByteBuffer.
@@ -550,7 +550,7 @@ var suite = {
 
         var code = fs.readFileSync(__dirname+"/"+BYTEBUFFER_FILE);
         var sandbox = new Sandbox();
-        vm.runInNewContext(code, sandbox, "ByteBuffer.js in AMD-VM");
+        vm.runInNewContext(code, sandbox, "ByteBuffer.js in shim-VM");
         // console.log(util.inspect(sandbox));
         test.ok(typeof sandbox.dcodeIO != 'undefined' && typeof sandbox.dcodeIO.ByteBuffer != 'undefined');
         test.done();

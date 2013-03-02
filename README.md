@@ -60,8 +60,8 @@ Features
 * Shim compatible (include the script, then use var ByteBuffer = dcodeIO.ByteBuffer;)
 * [node.js](http://nodejs.org) compatible, also available via [npm](https://npmjs.org/package/bytebuffer)
 * [Closure Compiler](https://developers.google.com/closure/compiler/) ADVANCED_OPTIMIZATIONS compatible (fully annotated,
-  ByteBuffer.min.js has been compiled this way, ByteBuffer.min.map is the source map)
-* Fully documented ([jsdoc3](https://github.com/jsdoc3/jsdoc))
+  `ByteBuffer.min.js` has been compiled this way, `ByteBuffer.min.map` is the source map)
+* Fully documented using [jsdoc3](https://github.com/jsdoc3/jsdoc)
 * Well tested through [nodeunit](https://github.com/caolan/nodeunit)
 * Zero production dependencies
 * Small footprint
@@ -125,17 +125,17 @@ Usage with Closure Compiler set to `ADVANCED_OPTIMIZATIONS`
 -----------------------------------------------------------
 You basically have the following three options:
 
-### ByteBuffer.js as external dependency ###
+#### ByteBuffer.js as external dependency ####
 If you compile your code but want to use ByteBuffer.js as an external dependency that's not actually compiled "into"
 your project, add the provided [externs file](https://github.com/dcodeIO/ByteBuffer.js/blob/master/externs/ByteBuffer.js)
 to your compilation step (which usually excludes compilation of ByteBuffer.js).
   
-### ByteBuffer.js compiled into your project and exposed ###
+#### ByteBuffer.js compiled into your project and exposed ####
 Use [ByteBuffer.js](https://github.com/dcodeIO/ByteBuffer.js/blob/master/ByteBuffer.js) if you want the ByteBuffer class
 to be exposed to the outside world (of JavaScript) so it can be called by external scripts. This also removes the
 requirement of using externs but the compiler will also keep possibly unused code.
 
-### ByteBuffer.js fully compiled into your project ###
+#### ByteBuffer.js fully compiled into your project ####
 Use [ByteBuffer.noexpose.js](https://github.com/dcodeIO/ByteBuffer.js/blob/master/ByteBuffer.noexpose.js) if you want
 the ByteBuffer class to be fully integrated into your (single file) project. Of course no external scripts will be able
 to call it or its method (trivially) because quite everything will become renamed, some parts inlined and moved around.
