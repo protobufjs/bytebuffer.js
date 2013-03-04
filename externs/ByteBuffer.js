@@ -382,6 +382,19 @@ ByteBuffer.prototype.readVarint32 = function(offset) {};
  * @param {number=} offset
  * @return {!ByteBuffer|number}
  */
+ByteBuffer.prototype.writeZigZagVarint32 = function(value, offset) {};
+
+/**
+ * @param {number=} offset
+ * @return {number|!{value: number, length: number}}
+ */
+ByteBuffer.prototype.readZigZagVarint32 = function(offset) {};
+
+/**
+ * @param {number} value
+ * @param {number=} offset
+ * @return {!ByteBuffer|number}
+ */
 ByteBuffer.prototype.writeVarint = function(value, offset) {};
 
 /**
