@@ -233,15 +233,13 @@ var suite = {
     "append": function(test) {
         var bb = new ByteBuffer(2);
         bb.writeUint16(0x1234);
-        bb.flip();
         var bb2 = new ByteBuffer(2);
         bb2.writeUint16(0x5678);
         bb2.flip();
         bb.append(bb2);
-        test.equal(bb.toHex(), "<12 34 56 78>");
-        bb.length = 0;
+        test.equal(bb.toHex(), ">12 34 56 78<");
         bb.append(bb2, 1);
-        test.equal(bb.toHex(), "|12 56 78 78 ");
+        test.equal(bb.toHex(), ">12 56 78 78<");
         test.done();
     },
     

@@ -415,11 +415,11 @@
 
     /**
      * Appends another ByteBuffer to this one. Appends only the portion between offset and length of the specified
-     * ByteBuffer and overwrites any contents  behind the specified offset up to the number of bytes appended from
+     * ByteBuffer and overwrites any contents behind the specified offset up to the number of bytes appended from
      * the specified ByteBuffer in this ByteBuffer. Will clone and flip the specified ByteBuffer if its offset is
      * larger than its length (its offsets remain untouched through cloning).
      * @param {ByteBuffer} src ByteBuffer to append
-     * @param {number=} offset Offset to append behind. Defaults to {@link ByteBuffer#length} which will be modified only if omitted.
+     * @param {number=} offset Offset to append behind. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
      * @expose
      */
@@ -433,7 +433,7 @@
             src = src.clone().flip();
             n = src.length - src.offset;
         }
-        offset = typeof offset != 'undefined' ? offset : (this.length+=n)-n;
+        offset = typeof offset != 'undefined' ? offset : (this.offset+=n)-n;
         this.ensureCapacity(offset+n);
         var srcView = new Uint8Array(src.array);
         var dstView = new Uint8Array(this.array);

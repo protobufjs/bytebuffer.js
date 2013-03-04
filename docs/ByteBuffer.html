@@ -1935,7 +1935,7 @@ and its length to the wrapped objects byte length.</p>
     
     <div class="description">
         <p>Appends another ByteBuffer to this one. Appends only the portion between offset and length of the specified
-ByteBuffer and overwrites any contents  behind the specified offset up to the number of bytes appended from
+ByteBuffer and overwrites any contents behind the specified offset up to the number of bytes appended from
 the specified ByteBuffer in this ByteBuffer. Will clone and flip the specified ByteBuffer if its offset is
 larger than its length (its offsets remain untouched through cloning).</p>
     </div>
@@ -2026,7 +2026,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to append behind. Defaults to <a href="ByteBuffer.html#length">ByteBuffer#length</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to append behind. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
         </tr>
 	
 	
