@@ -23,13 +23,13 @@
  * File to use.
  * @type {string}
  */
-var BYTEBUFFER_FILE = "../ByteBuffer.min.js";
+var FILE = "ByteBuffer.min.js";
 
 /**
  * ByteBuffer.
  * @type {ByteBuffer}
  */
-var ByteBuffer = require(BYTEBUFFER_FILE);
+var ByteBuffer = require(__dirname+"/../"+FILE);
 
 /**
  * Constructs a new Sandbox for module loaders and shim testing.
@@ -407,10 +407,27 @@ var suite = {
         ];
         var bb = new ByteBuffer(10);
         for (var i=0; i<values.length; i++) {
-            var calcLen = ByteBuffer.calculateVarint32(values[i][0]);
             var encLen = bb.writeVarint32(values[i][0], 0);
-            var dec = bb.readVarint(0);
-            // console.log("  Testing Varint32: "+values[i][0]+" == "+values[i][1]+"\n    calc: length="+calcLen+"\n    enc:  length="+encLen+"\n    dec:  length="+dec['length']+", value="+dec['value']);
+            var dec = bb.readVarint32(0);
+            test.equal(values[i][1], dec['value']);
+            test.equal(encLen, dec['length']);
+        }
+        test.done();
+    },
+    
+    "write/readZigZagVarint32": function(test) {
+        var values = [
+            [0,0],
+            [1,1],
+            [ 300, 300],
+            [-300,-300],
+            [ 2147483647,  2147483647],
+            [-2147483648, -2147483648]
+        ];
+        var bb = new ByteBuffer(10);
+        for (var i=0; i<values.length; i++) {
+            var encLen = bb.writeZigZagVarint32(values[i][0], 0);
+            var dec = bb.readZigZagVarint32(0);
             test.equal(values[i][1], dec['value']);
             test.equal(encLen, dec['length']);
         }
@@ -545,7 +562,7 @@ var suite = {
           , vm = require("vm")
           , util = require('util');
         
-        var code = fs.readFileSync(__dirname+"/"+BYTEBUFFER_FILE);
+        var code = fs.readFileSync(__dirname+"/../"+FILE);
         var sandbox = new Sandbox({
             module: {
                 exports: {}
@@ -562,7 +579,7 @@ var suite = {
           , vm = require("vm")
           , util = require('util');
 
-        var code = fs.readFileSync(__dirname+"/"+BYTEBUFFER_FILE);
+        var code = fs.readFileSync(__dirname+"/../"+FILE);
         var sandbox = new Sandbox({
             require: function() {},
             define: (function() {
@@ -585,7 +602,7 @@ var suite = {
             , vm = require("vm")
             , util = require('util');
 
-        var code = fs.readFileSync(__dirname+"/"+BYTEBUFFER_FILE);
+        var code = fs.readFileSync(__dirname+"/../"+FILE);
         var sandbox = new Sandbox();
         vm.runInNewContext(code, sandbox, "ByteBuffer.js in shim-VM");
         // console.log(util.inspect(sandbox));
