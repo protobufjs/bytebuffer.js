@@ -105,6 +105,14 @@ var suite = {
         test.strictEqual(bb.array, bb2.array);
         test.done();
     },
+    
+    "wrap(String)": function(test) {
+        var bb = ByteBuffer.wrap("test");
+        test.equal(bb.offset, 0);
+        test.equal(bb.length, 4);
+        test.equal(bb.readUTF8String(4), "test");
+        test.done();
+    },
 
     "resize": function(test) {
         var bb = new ByteBuffer(1);

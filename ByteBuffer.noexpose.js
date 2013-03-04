@@ -161,7 +161,8 @@
     };
     
     /**
-     * Wraps an ArrayBuffer. Sets the ByteBuffer's offset to 0 and its length to the specified ArrayBuffer's byte length.
+     * Wraps an ArrayBuffer, any object containing an ArrayBuffer or a string. Sets the created ByteBuffer's offset to 0
+     * and its length to the wrapped objects byte length.
      * @param {ArrayBuffer|{array: ArrayBuffer}|{buffer: ArrayBuffer}|string} buffer ArrayBuffer, any object with an .array or .buffer property or a string to wrap
      * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to true.
      * @return {ByteBuffer}
@@ -169,7 +170,7 @@
     ByteBuffer.wrap = function(buffer, littleEndian) {
         // Wrap a string
         if (typeof buffer == 'string') {
-            return new ByteBuffer().writeUTF8String(buffer);
+            return new ByteBuffer().writeUTF8String(buffer).flip();
         }
         // Wrap anything that is or contains an ArrayBuffer
         if (!!buffer["array"]) {
