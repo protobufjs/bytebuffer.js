@@ -23,7 +23,7 @@
  * File to use.
  * @type {string}
  */
-var BYTEBUFFER_FILE = "../ByteBuffer.js";
+var BYTEBUFFER_FILE = "../ByteBuffer.min.js";
 
 /**
  * ByteBuffer.
@@ -64,6 +64,7 @@ var suite = {
     setUp: function (callback) {
         callback();
     },
+    
     tearDown: function (callback) {
         callback();
     },
@@ -369,6 +370,25 @@ var suite = {
         test.done();
     },
     
+    "zigZagEncode/Decode32": function(test) {
+        var values = [
+            [ 0, 0],
+            [-1, 1],
+            [ 1, 2],
+            [-2, 3],
+            [ 2, 4],
+            [-3, 5],
+            [ 3, 6],
+            [ 2147483647, 4294967294],
+            [-2147483648, 4294967295]
+        ];
+        for (var i=0; i<values.length; i++) {
+            test.equal(ByteBuffer.zigZagEncode32(values[i][0]), values[i][1]);
+            test.equal(ByteBuffer.zigZagDecode32(values[i][1]), values[i][0]);
+        }
+        test.done();
+    },
+    
     "write/readVarint32": function(test) {
         var values = [
             [1,1],
@@ -477,6 +497,15 @@ var suite = {
         test.done();
     },
     
+    "printDebug": function(test) {
+        var bb = new ByteBuffer(3);
+        test.ok(typeof bb.printDebug(true) == 'string');
+        function callMe() { callMe.called = true; };
+        bb.printDebug(callMe);
+        test.ok(callMe.called);
+        test.done();
+    },
+    
     "encode/decode/calculateUTF8Char": function(test) {
         var bb = new ByteBuffer(6)
           , chars = [0x00, 0x7F, 0x80, 0x7FF, 0x800, 0xFFFF, 0x10000, 0x1FFFFF, 0x200000, 0x3FFFFFF, 0x4000000, 0x7FFFFFFF]
@@ -561,7 +590,7 @@ var suite = {
         bb.writeUTF8String("Hello world! from ByteBuffer.js. This is just a last visual test of ByteBuffer#printDebug.");
         bb.flip();
         console.log("");
-        bb.printDebug();
+        bb.printDebug(console.log);
         test.done();
     }
 };

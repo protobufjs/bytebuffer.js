@@ -162,11 +162,16 @@
     
     /**
      * Wraps an ArrayBuffer. Sets the ByteBuffer's offset to 0 and its length to the specified ArrayBuffer's byte length.
-     * @param {ArrayBuffer|{array: ArrayBuffer}|{buffer: ArrayBuffer}} buffer ArrayBuffer or any object with an .array or .buffer property to wrap
+     * @param {ArrayBuffer|{array: ArrayBuffer}|{buffer: ArrayBuffer}|string} buffer ArrayBuffer, any object with an .array or .buffer property or a string to wrap
      * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to true.
      * @return {ByteBuffer}
      */
     ByteBuffer.wrap = function(buffer, littleEndian) {
+        // Wrap a string
+        if (typeof buffer == 'string') {
+            return new ByteBuffer().writeUTF8String(buffer);
+        }
+        // Wrap anything that is or contains an ArrayBuffer
         if (!!buffer["array"]) {
             buffer = buffer["array"];
         } else if (!!buffer["buffer"]) {
@@ -1062,7 +1067,7 @@
      * @return {ByteBuffer|number} this if offset is omitted, else the actual number if bytes written,
      */
     ByteBuffer.prototype.writeJSON = function(data, offset, stringify) {
-        stringify = stringify || JSON.stringify.bind(JSON);
+        stringify = stringify || JSON.stringify;
         return this.writeLString(stringify(data), offset);
     };
     
@@ -1073,7 +1078,7 @@
      * @return {*|{data: *, length: number}} Data payload if offset is omitted, else the data payload and the actual number of bytes read.
      */
     ByteBuffer.prototype.readJSON = function(offset, parse) {
-        parse = parse || JSON.parse.bind(JSON);
+        parse = parse || JSON.parse;
         var result = this.readLString(offset);
         if (typeof result == "string") {
             return parse(result);
@@ -1087,16 +1092,21 @@
     
     /**
      * Prints debug information about this ByteBuffer's contents to console.
+     * @param {!Function=|boolean} out Output function to call with the result or true to return the data as a string.
+     * Defaults to call console.log.
      */
-    ByteBuffer.prototype.printDebug = function() {
-        if (typeof console != "undefined" && console["log"]) {
-            var s = this.toString()+"\n"+
-                    "-------------------------------------------------------------------\n";
-            var h = this.toHex(16, true);
-            var a = this.toASCII(16, true);
-            for (var i=0; i<h.length; i++) {
-                s += h[i]+"  "+a[i]+"\n";
-            }
+    ByteBuffer.prototype.printDebug = function(out) {
+        var s = (this.array != null ? "ByteBuffer(offset="+this.offset+",length="+this.length+",capacity="+this.array.byteLength+")" : "ByteBuffer(DESTROYED)")+"\n"+
+                "-------------------------------------------------------------------\n";
+        var h = this.toHex(16, true);
+        var a = this.toASCII(16, true);
+        for (var i=0; i<h.length; i++) {
+            s += h[i]+"  "+a[i]+"\n";
+        }
+        if (out === true) return s;
+        if (typeof out == 'function') {
+            out(s);
+        } else {
             console.log(s);
         }
     };
@@ -1178,8 +1188,8 @@
     };
     
     /**
-     * Returns a string representation of this object.
-     * @return {string} String representation as of "ByteBuffer(offset,length,capacity)"
+     * Returns a string representation.
+     * @return {string} String representation as of "ByteBuffer(offset=...,length=...,capacity=...)"
      */
     ByteBuffer.prototype.toString = function() {
         if (this.array == null) {
@@ -1337,6 +1347,27 @@
         } else {
             throw("Cannot calculate length of UTF8 character: charCode (0x"+charCode.toString(16)+") is too large (>= 0x80000000)");
         }
+    };
+
+
+    /**
+     * Encodes a signed integer so that it can be effectively used with varint encoding.
+     * @param {number} n Signed integer
+     * @return {number} Unsigned, zigzag encoded integer
+     */
+    ByteBuffer.zigZagEncode32 = function(n) {
+        n = parseInt(n, 10);
+        return (n>=0) ? n*2 : -n*2-1; // If we'd have real 32bit arithmetic: (n << 1) ^ (n >> 31);
+    };
+
+    /**
+     * Decodes a zigzag encoded integer.
+     * @param {number} n Unsigned zigzag encoded integer
+     * @return {number} Signed integer
+     */
+    ByteBuffer.zigZagDecode32 = function(n) {
+        n = parseInt(n, 10);
+        return ((n&1)==0) ? n/2 : -(n+1)/2; // If we'd have real 32bit arithmetic: (n >> 1) ^ -(n & 1);
     };
 
     /**

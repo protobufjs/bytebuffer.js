@@ -1766,6 +1766,9 @@ instead.</p>
 |
 
 <span class="param-type">{buffer: ArrayBuffer}</span>
+|
+
+<span class="param-type">string</span>
 
 
             
@@ -1781,7 +1784,7 @@ instead.</p>
             
             
             
-            <td class="description last"><p>ArrayBuffer or any object with an .array or .buffer property to wrap</p></td>
+            <td class="description last"><p>ArrayBuffer, any object with an .array or .buffer property or a string to wrap</p></td>
         </tr>
 	
 	
@@ -1865,6 +1868,262 @@ instead.</p>
 	<dd>
 		
 <span class="param-type"><a href="ByteBuffer.html">ByteBuffer</a></span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="zigZagDecode32"><span class="type-signature">&lt;static> </span>zigZagDecode32<span class="signature">(n)</span><span class="type-signature"> &rarr; {number}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Decodes a zigzag encoded integer.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>n</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"><p>Unsigned zigzag encoded integer</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>Signed integer</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">number</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="zigZagEncode32"><span class="type-signature">&lt;static> </span>zigZagEncode32<span class="signature">(n)</span><span class="type-signature"> &rarr; {number}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Encodes a signed integer so that it can be effectively used with varint encoding.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>n</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"><p>Signed integer</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>Unsigned, zigzag encoded integer</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">number</span>
 
 
 	</dd>
@@ -2823,7 +3082,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
         
             
 <dt>
-    <h4 class="name" id="printDebug"><span class="type-signature"></span>printDebug<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="printDebug"><span class="type-signature"></span>printDebug<span class="signature">(out)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -2839,6 +3098,58 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>out</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function=</span>
+|
+
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"><p>Output function to call with the result or true to return the data as a string.
+Defaults to call console.log.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
     
     
     
@@ -6966,7 +7277,7 @@ the unmodified backing buffer if offset=0 and length=capacity unless forceCopy i
     
     
     <div class="description">
-        <p>Returns a string representation of this object.</p>
+        <p>Returns a string representation.</p>
     </div>
     
 
@@ -7013,7 +7324,7 @@ the unmodified backing buffer if offset=0 and length=capacity unless forceCopy i
     
             
 <div class="param-desc">
-    <p>String representation as of &quot;ByteBuffer(offset,length,capacity)&quot;</p>
+    <p>String representation as of &quot;ByteBuffer(offset=...,length=...,capacity=...)&quot;</p>
 </div>
 
 

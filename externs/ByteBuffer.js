@@ -81,7 +81,7 @@ ByteBuffer.BIG_ENDIAN = false;
 ByteBuffer.allocate = function(capacity, littleEndian) {};
 
 /**
- * @param {!ArrayBuffer|!{array: ArrayBuffer}|!{buffer: ArrayBuffer}} buffer
+ * @param {!ArrayBuffer|!{array: ArrayBuffer}|!{buffer: ArrayBuffer}|string} buffer
  * @param {boolean=} littleEndian
  * @return {!ByteBuffer}
  * @nosideeffects
@@ -520,6 +520,20 @@ ByteBuffer.encodeUTF8Char = function(charCode, dst, offset) {};
  * @nosideeffects
  */
 ByteBuffer.calculateUTF8Char = function(charCode) {};
+
+/**
+ * @param {number} n
+ * @return {number}
+ * @nosideeffects
+ */
+ByteBuffer.zigZagEncode32 = function(n) {};
+
+/**
+ * @param {number} n
+ * @return {number}
+ * @nosideeffects
+ */
+ByteBuffer.zigZagDecode32 = function(n) {};
 
 /**
  * @type {number}
