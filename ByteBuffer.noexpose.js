@@ -129,12 +129,12 @@
     };
 
     /**
-     * Default buffer capacity of 32 if nothing else is stated. The ByteBuffer will be automatically resized by a factor
+     * Default buffer capacity of 16 if nothing else is stated. The ByteBuffer will be automatically resized by a factor
      * of 2 if required.
      * @type {number}
      * @const
      */
-    ByteBuffer.DEFAULT_CAPACITY = 32;
+    ByteBuffer.DEFAULT_CAPACITY = 16;
 
     /**
      * Little endian constant for usage in constructors instead of a boolean value. Evaluates to true.
@@ -166,6 +166,7 @@
      * @param {ArrayBuffer|{array: ArrayBuffer}|{buffer: ArrayBuffer}|string} buffer ArrayBuffer, any object with an .array or .buffer property or a string to wrap
      * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to true.
      * @return {ByteBuffer}
+     * @throws {Error} If the specified object cannot be wrapped
      */
     ByteBuffer.wrap = function(buffer, littleEndian) {
         // Wrap a string
@@ -179,7 +180,7 @@
             buffer = buffer["buffer"];
         }
         if (!(buffer instanceof ArrayBuffer)) {
-            throw("Cannot wrap buffer of type "+typeof(buffer));
+            throw(new Error("Cannot wrap buffer of type "+typeof(buffer)));
         }
         var b = new ByteBuffer(0, littleEndian, /* shadow copy */ true);
         b.array = buffer;
@@ -195,7 +196,8 @@
      * @return {boolean} true if actually resized, false if already that large or larger
      */
     ByteBuffer.prototype.resize = function(capacity) {
-        if (this.array == null && capacity > 0) { // Silently recreate
+        if (capacity < 1) return false;
+        if (this.array == null) { // Silently recreate
             this.array = new ArrayBuffer(capacity);
             this.view = new DataView(this.array);
         }
@@ -218,16 +220,17 @@
      * @param {number} begin Begin offset
      * @param {number} end End offset
      * @return {ByteBuffer} Clone of this ByteBuffer with the specified slicing applied, backed by the same ArrayBuffer
+     * @throws {Error} If the buffer cannot be sliced
      */
     ByteBuffer.prototype.slice = function(begin, end) {
         if (this.array == null) {
-            throw(this+" cannot be sliced: Already destroyed");
+            throw(new Error(this+" cannot be sliced: Already destroyed"));
         }
         if (end <= begin) {
-            throw(this+" cannot be sliced: End ("+end+") is less than begin ("+begin+")");
+            throw(new Error(this+" cannot be sliced: End ("+end+") is less than begin ("+begin+")"));
         }
         if (begin < 0 || begin > this.array.byteLength || end < 1 || end > this.array.byteLength) {
-            throw(this+" cannot be sliced: Index out of bounds (0-"+this.array.byteLength+" -> "+begin+"-"+end+")");
+            throw(new Error(this+" cannot be sliced: Index out of bounds (0-"+this.array.byteLength+" -> "+begin+"-"+end+")"));
         }
         var b = this.clone();
         b.offset = begin;
@@ -241,6 +244,7 @@
      * @param {number} begin Begin offset
      * @param {number} end End offset
      * @return {ByteBuffer}
+     * @throws {Error} If the buffer cannot be sliced
      */
     ByteBuffer.prototype.sliceAndCompact = function(begin, end) {
         return ByteBuffer.wrap(this.slice(begin,end).toArrayBuffer(true));
@@ -265,10 +269,7 @@
      * @return {ByteBuffer} this
      */
     ByteBuffer.prototype.flip = function() {
-        if (this.array == null) {
-            throw(this+" cannot be flipped: Already destroyed");
-        }
-        this.length = this.offset;
+        this.length = this.array == null ? 0 : this.offset;
         this.offset = 0;
         return this;
     };
@@ -302,6 +303,9 @@
      * @return {ByteBuffer}
      */
     ByteBuffer.prototype.copy = function() {
+        if (this.array == null) {
+            return this.clone();
+        }
         var b = new ByteBuffer(this.array.byteLength, this.littleEndian);
         var src = new Uint8Array(this.array);
         var dst = new Uint8Array(b.array);
@@ -317,6 +321,7 @@
      * @return {number} Remaining readable bytes (may be negative if offset is larger than length)
      */
     ByteBuffer.prototype.remaining = function() {
+        if (this.array == null) return 0;
         return this.length - this.offset;
     };
 
@@ -335,16 +340,17 @@
      * portion between its offset and length will be contained in the compacted backing buffer. Will set offset=0 and
      * length=capacity. Will do nothing but flipping, if required, if already compacted.
      * @return {ByteBuffer} this
+     * @throws {Error} If the buffer cannot be compacted
      */
     ByteBuffer.prototype.compact = function() {
         if (this.array == null) {
-            throw(this+" cannot be compacted: Already destroyed");
+            throw(new Error(this+" cannot be compacted: Already destroyed"));
         }
         if (this.offset > this.length) {
             this.flip();
         }
         if (this.offset == this.length) {
-            throw(this+" cannot be compacted: Offset ("+this.offset+") is equal to its length ("+this.length+")");
+            throw(new Error(this+" cannot be compacted: Offset ("+this.offset+") is equal to its length ("+this.length+")"));
         }
         if (this.offset == 0 && this.length == this.array.byteLength) {
             return this; // Already compacted
@@ -376,10 +382,11 @@
      * Reverses the underlying back buffer and adapts offset and length to retain the same relative position on the
      * reversed data in inverse order. Example: "00<01 02>03 04".reverse() = "04 03<02 01>00".
      * @return {ByteBuffer} this
+     * @throws {Error} If the buffer is already destroyed
      */
     ByteBuffer.prototype.reverse = function() {
         if (this.array == null) {
-            throw(this+" cannot be reversed: Already destroyed");
+            throw(new Error(this+" cannot be reversed: Already destroyed"));
         }
         // Not sure what for, but other implementations seem to have it :-)
         Array.prototype.reverse.call(new Uint8Array(this.array));
@@ -397,10 +404,11 @@
      * @param {ByteBuffer} src ByteBuffer to append
      * @param {number=} offset Offset to append behind. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @throws {Error} If the specified buffer is already destroyed
      */
     ByteBuffer.prototype.append = function(src, offset) {
         if (src.array == null) {
-            throw(src+" cannot be appended to "+this+": Already destroyed");
+            throw(new Error(src+" cannot be appended to "+this+": Already destroyed"));
         }
         var n = src.length - src.offset;
         if (n == 0) return this; // Nothing to append
@@ -424,6 +432,7 @@
      * @param {ByteBuffer} src ByteBuffer to prepend
      * @param {number=} offset Offset to prepend before. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @throws {Error} If the specified buffer is already destroyed
      */
     ByteBuffer.prototype.prepend = function(src, offset) {
         if (src.array == null) {
@@ -471,9 +480,13 @@
      * Reads an 8bit singed integer.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @throws {Error} If offset+1 is larger than the capacity
      */
     ByteBuffer.prototype.readInt8 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
+        if (offset >= this.array.byteLength) {
+            throw(new Error("Cannot read int8 from "+this+": Capacity overflow"));
+        }
         return this.view.getInt8(offset, this.littleEndian);
     };
 
@@ -491,6 +504,7 @@
      * @function
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @throws {Error} If offset+1 is larger than the capacity
      */
     ByteBuffer.prototype.readByte = ByteBuffer.prototype.readInt8;
 
@@ -499,6 +513,7 @@
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
+     * @throws {Error} If the offset is equal to or larger than the capacity
      */
     ByteBuffer.prototype.writeUint8 = function(value, offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
@@ -511,9 +526,13 @@
      * Reads an 8bit unsinged integer.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @throws {Error} If offset+1 is larger than the capacity
      */
     ByteBuffer.prototype.readUint8 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
+        if (offset >= this.array.byteLength) {
+            throw("Cannot read uint8 from "+this+": Capacity overflow");
+        }
         return this.view.getUint8(offset, this.littleEndian);
     };
 
@@ -534,9 +553,13 @@
      * Reads a 16bit signed integer.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @throws {Error} If offset+2 is larger than the capacity
      */
     ByteBuffer.prototype.readInt16 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=2)-2;
+        if (offset+2 > this.array.byteLength) {
+            throw(new Error("Cannot read int16 from "+this+": Capacity overflow"));
+        }
         return this.view.getInt16(offset, this.littleEndian);
     };
 
@@ -554,6 +577,7 @@
      * @function
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @throws {Error} If offset+2 is larger than the capacity
      */
     ByteBuffer.prototype.readShort = ByteBuffer.prototype.readInt16;
 
@@ -574,9 +598,13 @@
      * Reads a 16bit unsigned integer.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @throws {Error} If offset+2 is larger than the capacity
      */
     ByteBuffer.prototype.readUint16 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=2)-2;
+        if (offset+2 > this.array.byteLEngth) {
+            throw(new Error("Cannot read int16 from "+this+": Capacity overflow"));
+        }
         return this.view.getUint16(offset, this.littleEndian);
     };
 
@@ -597,9 +625,13 @@
      * Reads a 32bit signed integer.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @throws {Error} If offset+4 is larger than the capacity
      */
     ByteBuffer.prototype.readInt32 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
+        if (offset+4 > this.array.byteLength) {
+            throw(new Error("Cannot read int32 from "+this+": Capacity overflow"));
+        }
         return this.view.getInt32(offset, this.littleEndian);
     };
 
@@ -617,6 +649,7 @@
      * @function
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @throws {Error} If offset+4 is larger than the capacity
      */
     ByteBuffer.prototype.readInt = ByteBuffer.prototype.readInt32;
 
@@ -637,9 +670,13 @@
      * Reads a 32bit unsigned integer.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @throws {Error} If offset+4 is larger than the capacity
      */
     ByteBuffer.prototype.readUint32 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
+        if (offset+4 > this.array.byteLength) {
+            throw(new Error("Cannot read uint32 from "+this+": Capacity overflow"));
+        }
         return this.view.getUint32(offset, this.littleEndian);
     };
 
@@ -660,9 +697,13 @@
      * Reads a 32bit float.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @throws {Error} If offset+4 is larger than the capacity
      */
     ByteBuffer.prototype.readFloat32 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
+        if (this.array == null || offset+4 > this.array.byteLength) {
+            throw(new Error("Cannot read float32 from "+this+": Capacity overflow"));
+        }
         return this.view.getFloat32(offset, this.littleEndian);
     };
 
@@ -680,6 +721,7 @@
      * @function
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @throws {Error} If offset+4 is larger than the capacity
      */
     ByteBuffer.prototype.readFloat = ByteBuffer.prototype.readFloat32;
 
@@ -700,9 +742,13 @@
      * Reads a 64bit float.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @throws {Error} If offset+8 is larger than the capacity
      */
     ByteBuffer.prototype.readFloat64 = function(offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=8)-8;
+        if (this.array == null || offset+8 > this.array.byteLength) {
+            throw(new Error("Cannot read float64 from "+this+": Capacity overflow"));
+        }
         return this.view.getFloat64(offset, this.littleEndian);
     };
 
@@ -720,6 +766,7 @@
      * @function
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @throws {Error} If offset+8 is larger than the capacity
      */
     ByteBuffer.prototype.readDouble = ByteBuffer.prototype.readFloat64;
 
@@ -736,6 +783,7 @@
      * Reads a long. This makes use of {@link ByteBuffer#readFloat64} by additionally clamping the returned value to a natural number.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number}
+     * @throws {Error} If offset+8 is larger than the capacity
      */
     ByteBuffer.prototype.readLong = function(offset) {
         // Assuming it's +- a fraction -> round, not parseInt or something
@@ -750,7 +798,7 @@
     ByteBuffer.MAX_VARINT32_BYTES = 5;
 
     /**
-     * Writes a 32bit base 128 variable-length  integer as used in protobuf.
+     * Writes a 32bit base 128 variable-length integer as used in protobuf.
      * @param {number} value Value to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
@@ -801,18 +849,20 @@
      * Reads a 32bit base 128 variable-length integer as used in protobuf.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number|{value: number, length: number}} The value read if offset is omitted, else the value read and the actual number of bytes read.
+     * @throws {Error} If it's not a valid varint
      */
     ByteBuffer.prototype.readVarint32 = function(offset) {
         var advance = typeof offset == 'undefined';
         offset = typeof offset != 'undefined' ? offset : this.offset;
         // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
+        
         var src = new Uint8Array(this.array),
             count = 0,
             b;
         UINT32[0] = 0;
         do {
             if (count == ByteBuffer.MAX_VARINT32_BYTES) {
-                throw("Cannot read Varint32 from "+this+"@"+offset+": Number of bytes is larger than "+ByteBuffer.MAX_VARINT32_BYTES);
+                throw(new Error("Cannot read Varint32 from "+this+"@"+offset+": Number of bytes is larger than "+ByteBuffer.MAX_VARINT32_BYTES));
             }
             b = src[offset+count];
             UINT32[0] |= (b&0x7F)<<(7*count);
@@ -844,6 +894,7 @@
      * Reads a zigzag encoded 32bit base 128 variable-length integer as used in protobuf.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {number|{value: number, length: number}} The value read if offset is omitted, else the value read and the actual number of bytes read.
+     * @throws {Error} If it's not a valid varint
      */
     ByteBuffer.prototype.readZigZagVarint32 = function(offset) {
         var dec = this.readVarint32(offset);
@@ -874,21 +925,22 @@
     /**
      * Calculates the actual number of bytes required to encode a 32bit base 128 variable-length integer.
      * @param {number} value Value to encode
-     * @return {number} Number of bytes required
+     * @return {number} Number of bytes required. Capped to {@link ByteBuffer.MAX_VARINT32_BYTES} (35bit), no overflow errors.
      */
     ByteBuffer.calculateVarint32 = function(value) {
         // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
-        if (value < 0x80) {
+        UINT32[0] = value;
+        if (UINT32[0] < 0x80) {
             return 1;
-        } else if (value < 0x4000) {
+        } else if (UINT32[0] < 0x4000) {
             return 2;
-        } else if (value < 0x200000) {
+        } else if (UINT32[0] < 0x200000) {
             return 3;
-        } else if (value < 0x10000000) {
+        } else if (UINT32[0] < 0x10000000) {
             return 4;
         } else {
             return 5;
-        }
+        } // As this is casted, we can't throw an overflow error.
     };
 
     /**
@@ -912,6 +964,155 @@
     };
 
     /**
+     * Decodes a single UTF8 character from the specified ByteBuffer. The ByteBuffer's offsets are not modified.
+     * @param {ByteBuffer} src
+     * @param {number} offset Offset to read from
+     * @return {{char: number, length: number}} Decoded char code and the actual number of bytes read
+     * @throws {Error} If the character cannot be decoded or there is a capacity overflow
+     */
+    ByteBuffer.decodeUTF8Char = function(src, offset) {
+        var a = src.readUint8(offset), b, c, d, e, f, start = offset, charCode;
+        // ref: http://en.wikipedia.org/wiki/UTF-8#Description
+        // It's quite huge but should be pretty fast.
+        if ((a&0x80)==0) {
+            charCode = a;
+            offset += 1;
+        } else if ((a&0xE0)==0xC0) {
+            b = src.readUint8(offset+1);
+            charCode = ((a&0x1F)<<6) | (b&0x3F);
+            offset += 2;
+        } else if ((a&0xF0)==0xE0) {
+            b = src.readUint8(offset+1);
+            c = src.readUint8(offset+2);
+            charCode = ((a&0x0F)<<12) | ((b&0x3F)<<6) | (c&0x3F);
+            offset += 3;
+        } else if ((a&0xF8)==0xF0) {
+            b = src.readUint8(offset+1);
+            c = src.readUint8(offset+2);
+            d = src.readUint8(offset+3);
+            charCode = ((a&0x07)<<18) | ((b&0x3F)<<12) | ((c&0x3F)<<6) | (d&0x3F);
+            offset += 4;
+        } else if ((a&0xFC)==0xF8) {
+            b = src.readUint8(offset+1);
+            c = src.readUint8(offset+2);
+            d = src.readUint8(offset+3);
+            e = src.readUint8(offset+4);
+            charCode = ((a&0x03)<<24) | ((b&0x3F)<<18) | ((c&0x3F)<<12) | ((d&0x3F)<<6) | (e&0x3F);
+            offset += 5;
+        } else if ((a&0xFE)==0xFC) {
+            b = src.readUint8(offset+1);
+            c = src.readUint8(offset+2);
+            d = src.readUint8(offset+3);
+            e = src.readUint8(offset+4);
+            f = src.readUint8(offset+5);
+            charCode = ((a&0x01)<<30) | ((b&0x3F)<<24) | ((c&0x3F)<<18) | ((d&0x3F)<<12) | ((e&0x3F)<<6) | (f&0x3F);
+            offset += 6;
+        } else {
+            throw(new Error("Cannot decode UTF8 character at offset "+offset+": charCode (0x"+a.toString(16)+") is invalid"));
+        }
+        return {
+            "char": charCode ,
+            "length": offset-start
+        };
+    };
+
+    /**
+     * Encodes a single UTF8 character to the specified ByteBuffer. The ByteBuffer's offsets are not modified.
+     * @param {number} charCode Character to encode as char code
+     * @param {ByteBuffer} dst ByteBuffer to encode to
+     * @param {number} offset Offset to write to
+     * @return {number} Actual number of bytes written
+     * @throws {Error} If the character cannot be encoded
+     */
+    ByteBuffer.encodeUTF8Char = function(charCode, dst, offset) {
+        var start = offset;
+        // ref: http://en.wikipedia.org/wiki/UTF-8#Description
+        // It's quite huge but should be pretty fast.
+        if (charCode < 0) {
+            throw(new Error("Cannot encode UTF8 character: charCode ("+charCode+") is negative"));
+        }
+        if (charCode < 0x80) {
+            dst.writeUint8(charCode&0x7F, offset);
+            offset += 1;
+        } else if (charCode < 0x800) {
+            dst.writeUint8(((charCode>>6)&0x1F)|0xC0, offset)
+                .writeUint8((charCode&0x3F)|0x80, offset+1);
+            offset += 2;
+        } else if (charCode < 0x10000) {
+            dst.writeUint8(((charCode>>12)&0x0F)|0xE0, offset)
+                .writeUint8(((charCode>>6)&0x3F)|0x80, offset+1)
+                .writeUint8((charCode&0x3F)|0x80, offset+2);
+            offset += 3;
+        } else if (charCode < 0x200000) {
+            dst.writeUint8(((charCode>>18)&0x07)|0xF0, offset)
+                .writeUint8(((charCode>>12)&0x3F)|0x80, offset+1)
+                .writeUint8(((charCode>>6)&0x3F)|0x80, offset+2)
+                .writeUint8((charCode&0x3F)|0x80, offset+3);
+            offset += 4;
+        } else if (charCode < 0x4000000) {
+            dst.writeUint8(((charCode>>24)&0x03)|0xF8, offset)
+                .writeUint8(((charCode>>18)&0x3F)|0x80, offset+1)
+                .writeUint8(((charCode>>12)&0x3F)|0x80, offset+2)
+                .writeUint8(((charCode>>6)&0x3F)|0x80, offset+3)
+                .writeUint8((charCode&0x3F)|0x80, offset+4);
+            offset += 5;
+        } else if (charCode < 0x80000000) {
+            dst.writeUint8(((charCode>>30)&0x01)|0xFC, offset)
+                .writeUint8(((charCode>>24)&0x3F)|0x80, offset+1)
+                .writeUint8(((charCode>>18)&0x3F)|0x80, offset+2)
+                .writeUint8(((charCode>>12)&0x3F)|0x80, offset+3)
+                .writeUint8(((charCode>>6)&0x3F)|0x80, offset+4)
+                .writeUint8((charCode&0x3F)|0x80, offset+5);
+            offset += 6;
+        } else {
+            throw(new Error("Cannot encode UTF8 character: charCode (0x"+charCode.toString(16)+") is too large (>= 0x80000000)"));
+        }
+        return offset-start;
+    };
+
+    /**
+     * Calculates the actual number of bytes required to encode the specified char code.
+     * @param {number} charCode Character to encode as char code
+     * @return {number} Number of bytes required to encode the specified char code
+     * @throws {Error} If the character cannot be calculated (too large)
+     */
+    ByteBuffer.calculateUTF8Char = function(charCode) {
+        if (charCode < 0) {
+            throw(new Error("Cannot calculate length of UTF8 character: charCode ("+charCode+") is negative"));
+        }
+        if (charCode < 0x80) {
+            return 1;
+        } else if (charCode < 0x800) {
+            return 2;
+        } else if (charCode < 0x10000) {
+            return 3;
+        } else if (charCode < 0x200000) {
+            return 4;
+        } else if (charCode < 0x4000000) {
+            return 5;
+        } else if (charCode < 0x80000000) {
+            return 6;
+        } else {
+            throw(new Error("Cannot calculate length of UTF8 character: charCode (0x"+charCode.toString(16)+") is too large (>= 0x80000000)"));
+        }
+    };
+
+    /**
+     * Calculates the number of bytes required to store an UTF8 encoded string.
+     * @param {string} str String to calculate
+     * @return {number} Number of bytes required
+     */
+    ByteBuffer.calculateUTF8String = function(str) {
+        str = ""+str;
+        var bytes = 0;
+        for (var i=0; i<str.length; i++) {
+            // Does not throw since JS strings are already UTF8 encoded
+            bytes += ByteBuffer.calculateUTF8Char(str.charCodeAt(i));
+        }
+        return bytes;
+    };
+
+    /**
      * Writes an UTF8 string.
      * @param {string} str String to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
@@ -921,12 +1122,10 @@
         var advance = typeof offset == 'undefined';
         offset = typeof offset != 'undefined' ? offset : this.offset;
         var start = offset;
-        var encLen = 0, i;
-        for (i=0;i< str.length; i++) {
-            encLen += ByteBuffer.calculateUTF8Char(str.charCodeAt(i));
-        }
+        var encLen = ByteBuffer.calculateUTF8String(str), i; // See [1]
         this.ensureCapacity(offset+encLen);
         for (i=0; i<str.length; i++) {
+            // [1] Does not throw since JS strings are already UTF8 encoded
             offset += ByteBuffer.encodeUTF8Char(str.charCodeAt(i), this, offset);
         }
         if (advance) {
@@ -942,6 +1141,7 @@
      * @param {number} chars Number of characters to read
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
+     * @throws {Error} If the string cannot be decoded
      */
     ByteBuffer.prototype.readUTF8String = function(chars, offset) {
         var advance = typeof offset == 'undefined';
@@ -964,12 +1164,44 @@
     };
 
     /**
+     * Reads an UTF8 string with the specified byte length.
+     * @param {number} length Byte length
+     * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+     * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
+     * @throws {Error} If the length did not match or the string cannot be decoded
+     */
+    ByteBuffer.prototype.readUTF8StringBytes = function(length, offset) {
+        var advance = typeof offset == 'undefined';
+        offset = typeof offset != 'undefined' ? offset : this.offset;
+        var dec, result = "", start = offset;
+        length = offset + length; // Limit
+        while (offset < length) {
+            dec = ByteBuffer.decodeUTF8Char(this, offset);
+            offset += dec["length"];
+            result += String.fromCharCode(dec["char"]);
+        }
+        if (offset != length) {
+            throw(new Error("Actual string length differs from the specified: "+((offset>length ? "+" : "")+offset-length)+" bytes"));
+        }
+        if (advance) {
+            this.offset = offset;
+            return result;
+        } else {
+            return {
+                "string": result,
+                "length": offset-start
+            }
+        }
+    };
+
+    /**
      * Writes a string with prepended number of characters, which is also encoded as an UTF8 character..
      * @param {string} str String to write
      * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
      */
     ByteBuffer.prototype.writeLString = function(str, offset) {
+        str = ""+str;
         var advance = typeof offset == 'undefined';
         offset = typeof offset != 'undefined' ? offset : this.offset;
         var encLen = ByteBuffer.encodeUTF8Char(str.length, this, offset);
@@ -986,6 +1218,7 @@
      * Reads a string with a prepended number of characters, which is also encoded as an UTF8 character.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
+     * @throws {Error} If the string cannot be decoded
      */
     ByteBuffer.prototype.readLString = function(offset) {
         var advance = typeof offset == 'undefined';
@@ -1010,9 +1243,10 @@
      * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
      */
     ByteBuffer.prototype.writeVString = function(str, offset) {
+        str = ""+str;
         var advance = typeof offset == 'undefined';
         offset = typeof offset != 'undefined' ? offset : this.offset;
-        var encLen = this.writeVarint32(str.length, offset);
+        var encLen = this.writeVarint32(ByteBuffer.calculateUTF8String(str), offset);
         encLen += this.writeUTF8String(str, offset+encLen);
         if (advance) {
             this.offset += encLen;
@@ -1026,12 +1260,13 @@
      * Reads a string with a prepended number of characters, which is encoded as a 32bit base 128 variable-length  integer.
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
+     * @throws {Error} If the string cannot be decoded or the delimiter is not a valid varint
      */
     ByteBuffer.prototype.readVString = function(offset) {
         var advance = typeof offset == 'undefined';
         offset = typeof offset != 'undefined' ? offset : this.offset;
         var lenDec = this.readVarint32(offset);
-        var dec = this.readUTF8String(lenDec["value"], offset+lenDec["length"]);
+        var dec = this.readUTF8StringBytes(lenDec["value"], offset+lenDec["length"]);
         if (advance) {
             this.offset += lenDec["length"]+dec["length"];
             return dec["string"];
@@ -1052,6 +1287,7 @@
      * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
      */
     ByteBuffer.prototype.writeCString = function(str, offset) {
+        str = ""+str;
         var advance = typeof offset == 'undefined';
         offset = typeof offset != 'undefined' ? offset : this.offset;
         var encLen = this.writeUTF8String(str, offset);
@@ -1068,6 +1304,7 @@
      * Reads a string followed by a NULL character (Uint8).
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {string|{string: string, length: number}} The string read if offset is omitted, else the string read and the actual number of bytes read.
+     * @throws {Error} If the string cannot be decoded
      */
     ByteBuffer.prototype.readCString = function(offset) {
         var advance = typeof offset == 'undefined';
@@ -1097,7 +1334,7 @@
      * @return {ByteBuffer|number} this if offset is omitted, else the actual number if bytes written,
      */
     ByteBuffer.prototype.writeJSON = function(data, offset, stringify) {
-        stringify = stringify || JSON.stringify;
+        stringify = typeof stringify == 'function' ? stringify : JSON.stringify;
         return this.writeLString(stringify(data), offset);
     };
 
@@ -1106,9 +1343,10 @@
      * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @param {function=} parse Parse implementation to use. Defaults to {@link JSON.parse}.
      * @return {*|{data: *, length: number}} Data payload if offset is omitted, else the data payload and the actual number of bytes read.
+     * @throws {Error} If the data cannot be decoded
      */
     ByteBuffer.prototype.readJSON = function(offset, parse) {
-        parse = parse || JSON.parse;
+        parse = typeof parse == 'function' ? parse : JSON.parse;
         var result = this.readLString(offset);
         if (typeof result == "string") {
             return parse(result);
@@ -1249,146 +1487,16 @@
     };
 
     /**
-     * Decodes a single UTF8 character from the specified ByteBuffer. The ByteBuffer's offsets are not modified.
-     * @param {ByteBuffer} src
-     * @param {number} offset Offset to read from
-     * @return {{char: number, length: number}} Decoded char code and the actual number of bytes read
-     */
-    ByteBuffer.decodeUTF8Char = function(src, offset) {
-        var a = src.readUint8(offset), b, c, d, e, f, start = offset, charCode;
-        // ref: http://en.wikipedia.org/wiki/UTF-8#Description
-        // It's quite huge but should be pretty fast.
-        if ((a&0x80)==0) {
-            charCode = a;
-            offset += 1;
-        } else if ((a&0xE0)==0xC0) {
-            b = src.readUint8(offset+1);
-            charCode = ((a&0x1F)<<6) | (b&0x3F);
-            offset += 2;
-        } else if ((a&0xF0)==0xE0) {
-            b = src.readUint8(offset+1);
-            c = src.readUint8(offset+2);
-            charCode = ((a&0x0F)<<12) | ((b&0x3F)<<6) | (c&0x3F);
-            offset += 3;
-        } else if ((a&0xF8)==0xF0) {
-            b = src.readUint8(offset+1);
-            c = src.readUint8(offset+2);
-            d = src.readUint8(offset+3);
-            charCode = ((a&0x07)<<18) | ((b&0x3F)<<12) | ((c&0x3F)<<6) | (d&0x3F);
-            offset += 4;
-        } else if ((a&0xFC)==0xF8) {
-            b = src.readUint8(offset+1);
-            c = src.readUint8(offset+2);
-            d = src.readUint8(offset+3);
-            e = src.readUint8(offset+4);
-            charCode = ((a&0x03)<<24) | ((b&0x3F)<<18) | ((c&0x3F)<<12) | ((d&0x3F)<<6) | (e&0x3F);
-            offset += 5;
-        } else if ((a&0xFE)==0xFC) {
-            b = src.readUint8(offset+1);
-            c = src.readUint8(offset+2);
-            d = src.readUint8(offset+3);
-            e = src.readUint8(offset+4);
-            f = src.readUint8(offset+5);
-            charCode = ((a&0x01)<<30) | ((b&0x3F)<<24) | ((c&0x3F)<<18) | ((d&0x3F)<<12) | ((e&0x3F)<<6) | (f&0x3F);
-            offset += 6;
-        } else {
-            throw("Cannot decode UTF8 character at offset "+offset+": charCode (0x"+a.toString(16)+") is invalid");
-        }
-        return {
-            "char": charCode ,
-            "length": offset-start
-        };
-    };
-
-    /**
-     * Encodes a single UTF8 character to the specified ByteBuffer. The ByteBuffer's offsets are not modified.
-     * @param {number} charCode Character to encode as char code
-     * @param {ByteBuffer} dst ByteBuffer to encode to
-     * @param {number} offset Offset to write to
-     * @return {number} Actual number of bytes written
-     */
-    ByteBuffer.encodeUTF8Char = function(charCode, dst, offset) {
-        var start = offset;
-        // ref: http://en.wikipedia.org/wiki/UTF-8#Description
-        // It's quite huge but should be pretty fast.
-        if (charCode < 0) {
-            throw("Cannot encode UTF8 character: charCode ("+charCode+") is negative");
-        }
-        if (charCode < 0x80) {
-            dst.writeUint8(charCode&0x7F, offset);
-            offset += 1;
-        } else if (charCode < 0x800) {
-            dst.writeUint8(((charCode>>6)&0x1F)|0xC0, offset)
-                .writeUint8((charCode&0x3F)|0x80, offset+1);
-            offset += 2;
-        } else if (charCode < 0x10000) {
-            dst.writeUint8(((charCode>>12)&0x0F)|0xE0, offset)
-                .writeUint8(((charCode>>6)&0x3F)|0x80, offset+1)
-                .writeUint8((charCode&0x3F)|0x80, offset+2);
-            offset += 3;
-        } else if (charCode < 0x200000) {
-            dst.writeUint8(((charCode>>18)&0x07)|0xF0, offset)
-                .writeUint8(((charCode>>12)&0x3F)|0x80, offset+1)
-                .writeUint8(((charCode>>6)&0x3F)|0x80, offset+2)
-                .writeUint8((charCode&0x3F)|0x80, offset+3);
-            offset += 4;
-        } else if (charCode < 0x4000000) {
-            dst.writeUint8(((charCode>>24)&0x03)|0xF8, offset)
-                .writeUint8(((charCode>>18)&0x3F)|0x80, offset+1)
-                .writeUint8(((charCode>>12)&0x3F)|0x80, offset+2)
-                .writeUint8(((charCode>>6)&0x3F)|0x80, offset+3)
-                .writeUint8((charCode&0x3F)|0x80, offset+4);
-            offset += 5;
-        } else if (charCode < 0x80000000) {
-            dst.writeUint8(((charCode>>30)&0x01)|0xFC, offset)
-                .writeUint8(((charCode>>24)&0x3F)|0x80, offset+1)
-                .writeUint8(((charCode>>18)&0x3F)|0x80, offset+2)
-                .writeUint8(((charCode>>12)&0x3F)|0x80, offset+3)
-                .writeUint8(((charCode>>6)&0x3F)|0x80, offset+4)
-                .writeUint8((charCode&0x3F)|0x80, offset+5);
-            offset += 6;
-        } else {
-            throw("Cannot encode UTF8 character: charCode (0x"+charCode.toString(16)+") is too large (>= 0x80000000)");
-        }
-        return offset-start;
-    };
-
-    /**
-     * Calculates the actual number of bytes required to encode the specified char code.
-     * @param {number} charCode Character to encode as char code
-     * @return {number} Number of bytes required to encode the specified char code
-     */
-    ByteBuffer.calculateUTF8Char = function(charCode) {
-        if (charCode < 0) {
-            throw("Cannot calculate length of UTF8 character: charCode ("+charCode+") is negative");
-        }
-        if (charCode < 0x80) {
-            return 1;
-        } else if (charCode < 0x800) {
-            return 2;
-        } else if (charCode < 0x10000) {
-            return 3;
-        } else if (charCode < 0x200000) {
-            return 4;
-        } else if (charCode < 0x4000000) {
-            return 5;
-        } else if (charCode < 0x80000000) {
-            return 6;
-        } else {
-            throw("Cannot calculate length of UTF8 character: charCode (0x"+charCode.toString(16)+") is too large (>= 0x80000000)");
-        }
-    };
-
-    /**
      * Extends the ByteBuffer prototype with additional methods.
      * @param {string} name Method name
      * @param {!Function} func Prototype function
+     * @throws {Error} If the arguments are invalid
      */
     ByteBuffer.extend = function(name, func) {
         if (typeof name == "string" && typeof func == "function") {
             ByteBuffer.prototype[name] = func;
         } else {
-            throw("Cannot extend prototype with "+name+"="+func+" (exptected string and function)")
+            throw(new Error("Cannot extend prototype with "+name+"="+func+" (exptected string and function)"));
         }
     };
 

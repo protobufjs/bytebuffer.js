@@ -84,6 +84,7 @@ ByteBuffer.allocate = function(capacity, littleEndian) {};
  * @param {!ArrayBuffer|!{array: ArrayBuffer}|!{buffer: ArrayBuffer}|string} buffer
  * @param {boolean=} littleEndian
  * @return {!ByteBuffer}
+ * @throws {Error}
  * @nosideeffects
  */
 ByteBuffer.wrap = function(buffer, littleEndian) {};
@@ -98,6 +99,7 @@ ByteBuffer.prototype.resize = function(capacity) {};
  * @param {number} begin
  * @param {number} end
  * @return {!ByteBuffer}
+ * @throws {Error}
  */
 ByteBuffer.prototype.slice = function(begin, end) {};
 
@@ -105,6 +107,7 @@ ByteBuffer.prototype.slice = function(begin, end) {};
  * @param {number} begin
  * @param {number} end
  * @returns {!ByteBuffer}
+ * @throws {Error}
  */
 ByteBuffer.prototype.sliceAndCompact = function(begin, end) {};
 
@@ -146,6 +149,7 @@ ByteBuffer.prototype.capacity = function() {};
 
 /**
  * @return {!ByteBuffer}
+ * @throws {Error}
  */
 ByteBuffer.prototype.compact = function() {};
 
@@ -156,6 +160,7 @@ ByteBuffer.prototype.destroy = function() {};
 
 /**
  * @return {!ByteBuffer}
+ * @throws {Error}
  */
 ByteBuffer.prototype.reverse = function() {};
 
@@ -163,6 +168,7 @@ ByteBuffer.prototype.reverse = function() {};
  * @param {!ByteBuffer} src
  * @param {number=} offset
  * @return {!ByteBuffer}
+ * @throws {Error}
  */
 ByteBuffer.prototype.append = function(src, offset) {};
 
@@ -170,6 +176,7 @@ ByteBuffer.prototype.append = function(src, offset) {};
  * @param {!ByteBuffer} src
  * @param {number=} offset
  * @return {!ByteBuffer}
+ * @throws {Error}
  */
 ByteBuffer.prototype.prepend = function(src, offset) {};
 
@@ -183,6 +190,7 @@ ByteBuffer.prototype.writeInt8 = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readInt8 = function(offset) {};
 
@@ -196,6 +204,7 @@ ByteBuffer.prototype.writeByte = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readByte = function(offset) {};
 
@@ -209,6 +218,7 @@ ByteBuffer.prototype.writeUint8 = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readUint8 = function(offset) {};
 
@@ -222,6 +232,7 @@ ByteBuffer.prototype.writeInt16 = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readInt16 = function(offset) {};
 
@@ -235,6 +246,7 @@ ByteBuffer.prototype.writeShort = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readShort = function (offset) {};
 
@@ -248,6 +260,7 @@ ByteBuffer.prototype.writeUint16 = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readUint16 = function(offset) {};
 
@@ -261,6 +274,7 @@ ByteBuffer.prototype.writeInt32 = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readInt32 = function(offset) {};
 
@@ -274,6 +288,7 @@ ByteBuffer.prototype.writeInt = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readInt = function(offset) {};
 
@@ -287,6 +302,7 @@ ByteBuffer.prototype.writeUint32 = function(value, offset) {};
 /**
  * @param {number=} offset 
  * @return {number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readUint32 = function(offset) {};
 
@@ -300,6 +316,7 @@ ByteBuffer.prototype.writeFloat32 = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readFloat32 = function(offset) {};
 
@@ -313,6 +330,7 @@ ByteBuffer.prototype.writeFloat = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readFloat = function(offset) {};
 
@@ -326,6 +344,7 @@ ByteBuffer.prototype.writeFloat64 = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readFloat64 = function(offset) {};
 
@@ -339,6 +358,7 @@ ByteBuffer.prototype.writeDouble = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readDouble = function(offset) {};
 
@@ -352,6 +372,7 @@ ByteBuffer.prototype.writeLong = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readLong = function(offset) {};
 
@@ -374,6 +395,7 @@ ByteBuffer.prototype.writeVarint32 = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number|!{value: number, length: number}}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readVarint32 = function(offset) {};
 
@@ -387,6 +409,7 @@ ByteBuffer.prototype.writeZigZagVarint32 = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number|!{value: number, length: number}}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readZigZagVarint32 = function(offset) {};
 
@@ -400,6 +423,7 @@ ByteBuffer.prototype.writeVarint = function(value, offset) {};
 /**
  * @param {number=} offset
  * @return {number|{value: number, length: number}}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readVarint = function(offset) {};
 
@@ -412,6 +436,13 @@ ByteBuffer.calculateVarint32 = function(value) {};
 
 /**
  * @param {string} str
+ * @return {number}
+ * @nosideeffects
+ */
+ByteBuffer.calculateUTF8String = function(str) {};
+
+/**
+ * @param {string} str
  * @param {number=} offset 
  * @return {!ByteBuffer|number}
  */
@@ -421,8 +452,16 @@ ByteBuffer.prototype.writeUTF8String = function(str, offset) {};
  * @param {number} chars
  * @param {number=} offset
  * @return {string|!{string: string, length: number}}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readUTF8String = function(chars, offset) {};
+
+/**
+ * @param {number} length
+ * @param {number} offset
+ * @throws {Error}
+ */
+ByteBuffer.prototype.readUTF8StringBytes = function(length, offset) {};
 
 /**
  * @param {string} str
@@ -434,6 +473,7 @@ ByteBuffer.prototype.writeLString = function(str, offset) {};
 /**
  * @param {number=} offset
  * @return {string|!{string: string, length: number}}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readLString = function(offset) {};
 
@@ -447,6 +487,7 @@ ByteBuffer.prototype.writeVString = function(str, offset) {};
 /**
  * @param {number=} offset
  * @return {string|!{string: string, length: number}}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readVString = function(offset) {};
 
@@ -460,6 +501,7 @@ ByteBuffer.prototype.writeCString = function(str, offset) {};
 /**
  * @param {number=} offset
  * @return {string|!{string: string, length: number}}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readCString = function(offset) {};
 
@@ -475,6 +517,7 @@ ByteBuffer.prototype.writeJSON = function(data, offset, stringify) {};
  * @param {number=} offset
  * @param {function=} parse
  * @return {*|!{data: *, length: number}}
+ * @throws {Error}
  */
 ByteBuffer.prototype.readJSON = function(offset, parse) {};
 
@@ -524,12 +567,14 @@ ByteBuffer.decodeUTF8Char = function(src, offset) {};
  * @param {!ByteBuffer} dst
  * @param {number} offset
  * @return {number}
+ * @throws {Error}
  */
 ByteBuffer.encodeUTF8Char = function(charCode, dst, offset) {};
 
 /**
  * @param {number} charCode
  * @return {number}
+ * @throws {Error}
  * @nosideeffects
  */
 ByteBuffer.calculateUTF8Char = function(charCode) {};

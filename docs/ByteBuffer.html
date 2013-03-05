@@ -258,7 +258,7 @@ without caring about signed, unsigned and the actual bit sizes.</p></div>
 <dd>
     
     <div class="description">
-        <p>Default buffer capacity of 32 if nothing else is stated. The ByteBuffer will be automatically resized by a factor
+        <p>Default buffer capacity of 16 if nothing else is stated. The ByteBuffer will be automatically resized by a factor
 of 2 if required.</p>
     </div>
     
@@ -884,6 +884,28 @@ instead.</p>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the character cannot be calculated (too large)
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -891,6 +913,134 @@ instead.</p>
             
 <div class="param-desc">
     <p>Number of bytes required to encode the specified char code</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">number</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="calculateUTF8String"><span class="type-signature">&lt;static> </span>calculateUTF8String<span class="signature">(str)</span><span class="type-signature"> &rarr; {number}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Calculates the number of bytes required to store an UTF8 encoded string.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>str</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"><p>String to calculate</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>Number of bytes required</p>
 </div>
 
 
@@ -1018,7 +1168,7 @@ instead.</p>
     
             
 <div class="param-desc">
-    <p>Number of bytes required</p>
+    <p>Number of bytes required. Capped to <a href="ByteBuffer.html#MAX_VARINT32_BYTES">ByteBuffer.MAX_VARINT32_BYTES</a> (35bit), no overflow errors.</p>
 </div>
 
 
@@ -1163,6 +1313,28 @@ instead.</p>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the character cannot be decoded or there is a capacity overflow
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -1337,6 +1509,28 @@ instead.</p>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the character cannot be encoded
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -1488,6 +1682,28 @@ instead.</p>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the arguments are invalid
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     
@@ -1643,6 +1859,28 @@ and its length to the wrapped objects byte length.</p>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the specified object cannot be wrapped
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -2065,6 +2303,28 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the specified buffer is already destroyed
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -2305,6 +2565,28 @@ length=capacity. Will do nothing but flipping, if required, if already compacted
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the buffer cannot be compacted
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -2840,6 +3122,28 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the specified buffer is already destroyed
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -3088,6 +3392,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If offset+1 is larger than the capacity
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -3222,6 +3548,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the string cannot be decoded
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -3363,6 +3711,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If offset+8 is larger than the capacity
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -3497,6 +3867,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If offset+4 is larger than the capacity
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -3631,6 +4023,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If offset+4 is larger than the capacity
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -3765,6 +4179,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If offset+8 is larger than the capacity
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -3899,6 +4335,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If offset+4 is larger than the capacity
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -4033,6 +4491,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If offset+1 is larger than the capacity
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -4167,6 +4647,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If offset+2 is larger than the capacity
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -4301,6 +4803,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If offset+4 is larger than the capacity
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -4466,6 +4990,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the data cannot be decoded
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -4607,6 +5153,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If offset+8 is larger than the capacity
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -4741,6 +5309,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the string cannot be decoded
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -4882,6 +5472,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If offset+2 is larger than the capacity
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -5016,6 +5628,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If offset+1 is larger than the capacity
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -5150,6 +5784,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If offset+2 is larger than the capacity
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -5284,6 +5940,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If offset+4 is larger than the capacity
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -5447,6 +6125,220 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the string cannot be decoded
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>The string read if offset is omitted, else the string read and the actual number of bytes read.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">string</span>
+|
+
+<span class="param-type">{string: string, length: number}</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="readUTF8StringBytes"><span class="type-signature"></span>readUTF8StringBytes<span class="signature">(length, <span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {string|{string: string, length: number}}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Reads an UTF8 string with the specified byte length.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>length</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Byte length</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>offset</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the length did not match or the string cannot be decoded
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -5729,6 +6621,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If it's not a valid varint
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -5870,6 +6784,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the string cannot be decoded or the delimiter is not a valid varint
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -6011,6 +6947,28 @@ Defaults to call console.log.</p></td>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If it's not a valid varint
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -6384,6 +7342,28 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the buffer is already destroyed
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -6536,6 +7516,28 @@ ArrayBuffer (use <a href="ByteBuffer.html#compact">ByteBuffer#compact</a> and ma
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the buffer cannot be sliced
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -6688,6 +7690,28 @@ of this ByteBuffer&#39;s contents.</p>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the buffer cannot be sliced
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -9795,6 +10819,28 @@ unless this is actually intended. This is not checked. If you have the option it
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the offset is equal to or larger than the capacity
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -10508,7 +11554,7 @@ unless this is actually intended. This is not checked. If you have the option it
     
     
     <div class="description">
-        <p>Writes a 32bit base 128 variable-length  integer as used in protobuf.</p>
+        <p>Writes a 32bit base 128 variable-length integer as used in protobuf.</p>
     </div>
     
 
