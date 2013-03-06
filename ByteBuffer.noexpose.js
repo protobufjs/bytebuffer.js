@@ -401,12 +401,15 @@
      * ByteBuffer and overwrites any contents behind the specified offset up to the number of bytes appended from
      * the specified ByteBuffer in this ByteBuffer. Will clone and flip the specified ByteBuffer if its offset is
      * larger than its length (its offsets remain untouched through cloning).
-     * @param {ByteBuffer} src ByteBuffer to append
+     * @param {*} src ByteBuffer or any object that can be wrapped by one to prepend
      * @param {number=} offset Offset to append behind. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
      * @throws {Error} If the specified buffer is already destroyed
      */
     ByteBuffer.prototype.append = function(src, offset) {
+        if (!(src instanceof ByteBuffer)) {
+            src = ByteBuffer.wrap(src);
+        }
         if (src.array == null) {
             throw(new Error(src+" cannot be appended to "+this+": Already destroyed"));
         }
@@ -429,12 +432,15 @@
      * ByteBuffer and overwrites any contents before the specified offsets up to the number of bytes prepended from
      * the specified ByteBuffer in this ByteBuffer. Will clone and flip the specified ByteBuffer if its offset is
      * larger than its length (its offsets remain untouched through cloning).
-     * @param {ByteBuffer} src ByteBuffer to prepend
+     * @param {*} src ByteBuffer or any object that can be wrapped by one to prepend
      * @param {number=} offset Offset to prepend before. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
      * @return {ByteBuffer} this
      * @throws {Error} If the specified buffer is already destroyed
      */
     ByteBuffer.prototype.prepend = function(src, offset) {
+        if (!(src instanceof ByteBuffer)) {
+            src = ByteBuffer.wrap(src);
+        }
         if (src.array == null) {
             throw(src+" cannot be prepended to "+this+": Already destroyed");
         }
