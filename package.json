@@ -11,6 +11,7 @@
         "type": "git",
         "url": "https://github.com/dcodeIO/ByteBuffer.js.git"
     },
+    "bugs": "https://github.com/dcodeIO/ByteBuffer.js/issues",
     "keywords": ["net", "array", "buffer", "arraybuffer", "typed array", "bytebuffer", "json", "websocket", "webrtc"],
     "dependencies": {
     },
