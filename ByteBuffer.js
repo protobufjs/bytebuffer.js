@@ -202,6 +202,26 @@
     };
 
     /**
+     * Switches to little endian byte order.
+     * @return {ByteBuffer} this
+     * @expose
+     */
+    ByteBuffer.prototype.LE = function() {
+        this.littleEndian = true;
+        return this;
+    };
+
+    /**
+     * Switches to bid endian byte order.
+     * @return {ByteBuffer} this
+     * @expose
+     */
+    ByteBuffer.prototype.BE = function() {
+        this.littleEndian = false;
+        return this;
+    };
+
+    /**
      * Resizes the ByteBuffer to the given capacity.
      * @param {number} capacity New capacity
      * @return {boolean} true if actually resized, false if already that large or larger

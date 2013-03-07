@@ -50,6 +50,12 @@ ByteBuffer
   bb.reset().writeInt(1).writeLString("Hello world!").flip().compact()...
   ```
   
+* Switching between little endian and big endian byte order through `ByteBuffer#LE()` and `ByteBuffer#BE()`, e.g.
+  
+  ```javascript
+  var bb = new ByteBuffer().LE().writeInt(1).BE().writeInt(1);
+  ```
+  
 * `ByteBuffer#toString()`, `ByteBuffer#toHex([wrap])`, `ByteBuffer#toASCII([wrap])` and `ByteBuffer#printDebug()`
   (emits hex + ASCII + offsets to console, looks like your favourite hex editor) for pain-free debugging
   
