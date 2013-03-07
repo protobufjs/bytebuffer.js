@@ -376,6 +376,12 @@ var suite = {
         test.done();
     },
     
+    "LE/BE": function(test) {
+        var bb = new ByteBuffer(8).LE().writeInt(1).BE().writeInt(2).flip();
+        test.equal(bb.toHex(), "<01 00 00 00 00 00 00 02>");
+        test.done();
+    },
+    
     "zigZagEncode/Decode32": function(test) {
         var values = [
             [ 0, 0],
