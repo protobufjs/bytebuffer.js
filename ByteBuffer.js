@@ -525,7 +525,7 @@
     ByteBuffer.prototype.writeInt8 = function(value, offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
         this.ensureCapacity(offset+1);
-        this.view.setInt8(offset, value, this.littleEndian);
+        this.view.setInt8(offset, value);
         return this;
     };
 
@@ -541,7 +541,7 @@
         if (offset >= this.array.byteLength) {
             throw(new Error("Cannot read int8 from "+this+": Capacity overflow"));
         }
-        return this.view.getInt8(offset, this.littleEndian);
+        return this.view.getInt8(offset);
     };
 
     /**
@@ -575,7 +575,7 @@
     ByteBuffer.prototype.writeUint8 = function(value, offset) {
         offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
         this.ensureCapacity(offset+1);
-        this.view.setUint8(offset, value, this.littleEndian);
+        this.view.setUint8(offset, value);
         return this;
     };
 
@@ -591,7 +591,7 @@
         if (offset >= this.array.byteLength) {
             throw("Cannot read uint8 from "+this+": Capacity overflow");
         }
-        return this.view.getUint8(offset, this.littleEndian);
+        return this.view.getUint8(offset);
     };
 
     /**

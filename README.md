@@ -53,7 +53,7 @@ ByteBuffer
 * Switching between little endian and big endian byte order through `ByteBuffer#LE()` and `ByteBuffer#BE()`, e.g.
   
   ```javascript
-  var bb = new ByteBuffer().LE().writeInt(1).BE().writeInt(2).flip(); // toHex: <01 00 00 00 00 00 00 02>
+  var bb = new ByteBuffer(8).LE().writeInt(1).BE().writeInt(2).flip(); // toHex: <01 00 00 00 00 00 00 02>
   ```
   
 * `ByteBuffer#toString()`, `ByteBuffer#toHex([wrap])`, `ByteBuffer#toASCII([wrap])` and `ByteBuffer#printDebug()`
