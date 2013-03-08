@@ -1,4 +1,5 @@
-ByteBuffer.js - A Java-like ByteBuffer [![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.png?branch=master)](https://travis-ci.org/dcodeIO/ByteBuffer.js)
+![ByteBuffer.js - A Java-like ByteBuffer](https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.png)
+[![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.png?branch=master)](https://travis-ci.org/dcodeIO/ByteBuffer.js)
 ======================================
 Provides a Java-like, Netty-inspired ByteBuffer implementation using typed arrays. It also tries to abstract a bit of
 the complexity away by providing convenience methods for those who just want to write stuff without caring about signed,
