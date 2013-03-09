@@ -3,15 +3,14 @@
     "version": "1.1.2",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "description": "A Java-like ByteBuffer implementation using typed arrays.",
-    "contributors": [
-        { "name": "Daniel Wirtz", "email": "dcode@dcode.io" }
-    ],
     "main": "ByteBuffer.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/dcodeIO/ByteBuffer.js.git"
     },
-    "bugs": "https://github.com/dcodeIO/ByteBuffer.js/issues",
+    "bugs": {
+        "url": "https://github.com/dcodeIO/ByteBuffer.js/issues"
+    },
     "keywords": ["net", "array", "buffer", "arraybuffer", "typed array", "bytebuffer", "json", "websocket", "webrtc"],
     "dependencies": {
     },

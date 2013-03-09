@@ -102,11 +102,12 @@ alert(bb.readLString()+" from ByteBuffer.js");
 ### Require.js / AMD ###
 
 ```javascript
-var ByteBuffer = require("/path/to/ByteBuffer.js");
-var bb = new ByteBuffer();
-bb.writeLString("Hello world!");
-bb.flip();
-alert(bb.readLString()+" from ByteBuffer.js");
+require(["/path/to/ByteBuffer.js"], function(ByteBuffer) {
+    var bb = new ByteBuffer();
+    bb.writeLString("Hello world!");
+    bb.flip();
+    alert(bb.readLString()+" from ByteBuffer.js");
+});
 ```
 
 Downloads
