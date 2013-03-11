@@ -1,6 +1,6 @@
 {
     "name": "bytebuffer",
-    "version": "1.1.2",
+    "version": "1.1.3",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "description": "A Java-like ByteBuffer implementation using typed arrays.",
     "main": "ByteBuffer.js",
@@ -15,7 +15,9 @@
     "dependencies": {
     },
     "devDependencies": {
-        "nodeunit": ">=0.7"
+        "nodeunit": ">=0.7",
+        "preprocessor": ">=1.0.2",
+        "closurecompiler": ">=1.1"
     },
     "license": "Apache License, Version 2.0",
     "engines": {
@@ -25,9 +27,10 @@
         "prepublish": "npm test",
         "test": "nodeunit tests/suite.js",
 
-        "make": "npm run-script compile && npm run-script noexpose && npm test && npm run-script jsdoc",
-        "compile": "java -jar closure-compiler/compiler.jar --create_source_map ByteBuffer.min.map --compilation_level ADVANCED_OPTIMIZATIONS --js ByteBuffer.js --js_output_file ByteBuffer.min.js",
-        "noexpose": "closure-compiler\\cat ByteBuffer.js | closure-compiler\\grep -v @expose > ByteBuffer.noexpose.js",
+        "make": "npm run-script build && npm run-script compile && npm run-script noexpose && npm test && npm run-script jsdoc",
+        "build": "preprocess src/ByteBuffer.js src/ > ByteBuffer.js",
+        "compile": "ccjs ByteBuffer.js --create_source_map=ByteBuffer.min.map --compilation_level=ADVANCED_OPTIMIZATIONS > ByteBuffer.min.js",
+        "noexpose": "cat ByteBuffer.js | grep -v @expose > ByteBuffer.noexpose.js",
         "jsdoc": "jsdoc -c jsdoc.json"
     }
 }
