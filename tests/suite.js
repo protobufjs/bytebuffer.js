@@ -560,6 +560,12 @@ var suite = {
         });
         test.done();
     },
+
+    "cast": function(test) {
+        var value = ByteBuffer.cast(ByteBuffer.UINT8, -1);
+        test.equal(value, 255);
+        test.done();
+    },
     
     "commonjs": function(test) {
         var fs = require("fs")

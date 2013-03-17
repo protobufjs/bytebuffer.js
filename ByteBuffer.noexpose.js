@@ -23,62 +23,6 @@
     "use strict";
 
     /**
-     * Int8.
-     * @type {Int8Array}
-     * @const
-     */
-    // var INT8 = new Int8Array(1);
-
-    /**
-     * Uint7.
-     * @type {Uint8Array}
-     * @const
-     */
-    // var UINT8 = new Uint8Array(1);
-
-    /**
-     * Int16.
-     * @type {Int16Array}
-     * @const
-     */
-    // var INT16 = new Int16Array(1);
-
-    /**
-     * Uint16.
-     * @type {Uint16Array}
-     * @const
-     */
-    // var UINT16 = new Uint16Array(1);
-
-    /**
-     * Int32.
-     * @type {Int32Array}
-     * @const
-     */
-    var INT32 = new Int32Array(1);
-
-    /**
-     * Uint32.
-     * @type {Uint32Array}
-     * @const
-     */
-    var UINT32 = new Uint32Array(1);
-
-    /**
-     * Float32.
-     * @type {Float32Array}
-     * @const
-     */
-    // var FLOAT32 = new Float32Array(1);
-
-    /**
-     * Float64.
-     * @type {Float64Array}
-     * @const
-     */
-    // var FLOAT64 = new Float64Array(1);
-
-    /**
      * Constructs a new ByteBuffer.
      * @exports ByteBuffer
      * @class Provides a Java-like, Netty-inspired ByteBuffer implementation using typed arrays. It also tries to
@@ -149,6 +93,73 @@
      * @const
      */
     ByteBuffer.BIG_ENDIAN = false;
+
+    /**
+     * Int8 type for use with {@link ByteBuffer.cast}.
+     * @type {Int8Array}
+     * @const
+     */
+    ByteBuffer.INT8 = new Int8Array(1);
+
+    /**
+     * Uint8 type for use with {@link ByteBuffer.cast}.
+     * @type {Uint8Array}
+     * @const
+     */
+    ByteBuffer.UINT8 = new Uint8Array(1);
+
+    /**
+     * Int16 type for use with {@link ByteBuffer.cast}.
+     * @type {Int16Array}
+     * @const
+     */
+    ByteBuffer.INT16 = new Int16Array(1);
+
+    /**
+     * Uint16 type for use with {@link ByteBuffer.cast}.
+     * @type {Uint16Array}
+     * @const
+     */
+    ByteBuffer.UINT16 = new Uint16Array(1);
+
+    /**
+     * Int32 type for use with {@link ByteBuffer.cast}.
+     * @type {Int32Array}
+     * @const
+     */
+    ByteBuffer.INT32 = new Int32Array(1);
+
+    /**
+     * Uint32 type for use with {@link ByteBuffer.cast}.
+     * @type {Uint32Array}
+     * @const
+     */
+    ByteBuffer.UINT32 = new Uint32Array(1);
+
+    /**
+     * Float32 type for use with {@link ByteBuffer.cast}.
+     * @type {Float32Array}
+     * @const
+     */
+    ByteBuffer.FLOAT32 = new Float32Array(1);
+
+    /**
+     * Float64 type for use with {@link ByteBuffer.cast}.
+     * @type {Float64Array}
+     * @const
+     */
+    ByteBuffer.FLOAT64 = new Float64Array(1);
+
+    /**
+     * Casts the specified value to the given type.
+     * @param {Uint8Array|Int8Array|Uint16Array|Int16Array|Uint32Array|Int32Array|Float32Array|Float64Array} type Type to cast to, e.g. {@link ByteBuffer.UINT32}.
+     * @param {number} value Value to cast
+     * @return {number} Casted value
+     */
+    ByteBuffer.cast = function(type, value) {
+        type[0] = value;
+        return type[0];
+    };
 
     /**
      * Allocates a new ByteBuffer.
@@ -831,8 +842,8 @@
         var advance = typeof offset == 'undefined';
         offset = typeof offset != 'undefined' ? offset : this.offset;
         // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
-        UINT32[0]=value;
-        this.ensureCapacity(offset+ByteBuffer.calculateVarint32(value=UINT32[0]));
+        ByteBuffer.UINT32[0]=value;
+        this.ensureCapacity(offset+ByteBuffer.calculateVarint32(value=ByteBuffer.UINT32[0]));
         var dst = new Uint8Array(this.array),
             size = 0;
         dst[offset] = (value | 0x80);
@@ -883,22 +894,22 @@
         var src = new Uint8Array(this.array),
             count = 0,
             b;
-        UINT32[0] = 0;
+        ByteBuffer.UINT32[0] = 0;
         do {
             if (count == ByteBuffer.MAX_VARINT32_BYTES) {
                 throw(new Error("Cannot read Varint32 from "+this+"@"+offset+": Number of bytes is larger than "+ByteBuffer.MAX_VARINT32_BYTES));
             }
             b = src[offset+count];
-            UINT32[0] |= (b&0x7F)<<(7*count);
+            ByteBuffer.UINT32[0] |= (b&0x7F)<<(7*count);
             ++count;
         } while (b & 0x80);
-        INT32[0] = UINT32[0];
+        ByteBuffer.INT32[0] = ByteBuffer.UINT32[0];
         if (advance) {
             this.offset += count;
-            return INT32[0];
+            return ByteBuffer.INT32[0];
         } else {
             return {
-                "value": INT32[0],
+                "value": ByteBuffer.INT32[0],
                 "length": count
             };
         }
@@ -953,14 +964,14 @@
      */
     ByteBuffer.calculateVarint32 = function(value) {
         // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
-        UINT32[0] = value;
-        if (UINT32[0] < 0x80) {
+        ByteBuffer.UINT32[0] = value;
+        if (ByteBuffer.UINT32[0] < 0x80) {
             return 1;
-        } else if (UINT32[0] < 0x4000) {
+        } else if (ByteBuffer.UINT32[0] < 0x4000) {
             return 2;
-        } else if (UINT32[0] < 0x200000) {
+        } else if (ByteBuffer.UINT32[0] < 0x200000) {
             return 3;
-        } else if (UINT32[0] < 0x10000000) {
+        } else if (ByteBuffer.UINT32[0] < 0x10000000) {
             return 4;
         } else {
             return 5;
@@ -973,8 +984,8 @@
      * @return {number} Unsigned, zigzag encoded integer
      */
     ByteBuffer.zigZagEncode32 = function(n) {
-        INT32[0]=n;
-        return ((n=INT32[0])>=0) ? n*2 : -n*2-1; // If we'd have real 32bit arithmetic: (n << 1) ^ (n >> 31);
+        ByteBuffer.INT32[0]=n;
+        return ((n=ByteBuffer.INT32[0])>=0) ? n*2 : -n*2-1; // If we'd have real 32bit arithmetic: (n << 1) ^ (n >> 31);
     };
 
     /**
@@ -983,8 +994,8 @@
      * @return {number} Signed integer
      */
     ByteBuffer.zigZagDecode32 = function(n) {
-        UINT32[0]=n;
-        return (((n=UINT32[0])&1)==0) ? n/2 : -(n+1)/2; // If we'd have real 32bit arithmetic: (n >> 1) ^ -(n & 1);
+        ByteBuffer.UINT32[0]=n;
+        return (((n=ByteBuffer.UINT32[0])&1)==0) ? n/2 : -(n+1)/2; // If we'd have real 32bit arithmetic: (n >> 1) ^ -(n & 1);
     };
 
     /**
