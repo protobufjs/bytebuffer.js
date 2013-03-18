@@ -380,22 +380,34 @@ var suite = {
         test.done();
     },
     
-    "write/readLong": function(test) {
+    "write/readInt64": function(test) {
         var bb = new ByteBuffer(8);
-        test.strictEqual(bb.writeFloat64, bb.writeLong);
-        var max = Math.pow(2,52)-0.5;
-        bb.writeLong(max);
-        test.notEqual(max, bb.readLong(0));
-        test.equal(Math.round(max), bb.readLong(0));
-        max = Math.pow(2,53)-1;
+        
+        var max = ByteBuffer.Long.MAX_VALUE.toNumber();
+        bb.writeLong(max).flip();
+        test.equal(bb.toHex(), "<7F FF FF FF FF FF FF FF>");
+        test.equal(bb.readLong(0), max);
+        
+        var min = ByteBuffer.Long.MIN_VALUE.toNumber();
+        bb.writeLong(min).flip();
+        test.equal(bb.toHex(), "<80 00 00 00 00 00 00 00>");
+        test.equal(bb.readLong(0), min);
+        
+        bb.writeLong(-1).flip();
+        test.equal(bb.toHex(), "<FF FF FF FF FF FF FF FF>");
+        test.equal(bb.readLong(0), -1);
+        
         bb.reset();
-        bb.writeLong(max);
-        bb.flip();
-        test.equal(max, bb.readLong());
-        bb.reset();
-        bb.writeLong(max+2);
-        bb.flip();
-        test.equal(max+2, bb.readLong());
+        bb.LE().writeInt64(new ByteBuffer.Long(0x89ABCDEF, 0x01234567)).flip();
+        test.equal(bb.toHex(), "<EF CD AB 89 67 45 23 01>");
+        
+        test.done();
+    },
+    
+    "write/readLong": function(test) {
+        var bb = new ByteBuffer(1);
+        test.strictEqual(bb.readInt64, bb.readLong);
+        test.strictEqual(bb.writeInt64, bb.writeLong);
         test.done();
     },
     
@@ -596,7 +608,13 @@ var suite = {
           , util = require('util');
         
         var code = fs.readFileSync(__dirname+"/../"+FILE);
+        var Long = ByteBuffer.Long;
         var sandbox = new Sandbox({
+            require: function(moduleName) {
+                if (moduleName == 'long') {
+                    return Long;
+                }
+            },
             module: {
                 exports: {}
             }
@@ -604,6 +622,7 @@ var suite = {
         vm.runInNewContext(code, sandbox, "ByteBuffer.js in CommonJS-VM");
         // console.log(util.inspect(sandbox));
         test.ok(typeof sandbox.module.exports == 'function');
+        test.ok(sandbox.module.exports.Long && sandbox.module.exports.Long == ByteBuffer.Long);
         test.done();
     },
     
@@ -636,10 +655,15 @@ var suite = {
             , util = require('util');
 
         var code = fs.readFileSync(__dirname+"/../"+FILE);
-        var sandbox = new Sandbox();
+        var sandbox = new Sandbox({
+            dcodeIO: {
+                Long: ByteBuffer.Long
+            }
+        });
         vm.runInNewContext(code, sandbox, "ByteBuffer.js in shim-VM");
         // console.log(util.inspect(sandbox));
         test.ok(typeof sandbox.dcodeIO != 'undefined' && typeof sandbox.dcodeIO.ByteBuffer != 'undefined');
+        test.ok(sandbox.dcodeIO.ByteBuffer.Long && sandbox.dcodeIO.ByteBuffer.Long == ByteBuffer.Long);
         test.done();
     },
     

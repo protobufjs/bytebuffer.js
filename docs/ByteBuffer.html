@@ -567,6 +567,52 @@ of 2 if required.</p>
         
             
 <dt>
+    <h4 class="name" id="Long"><span class="type-signature">&lt;static, constant> </span>Long<span class="type-signature"> :Long</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Long class for int64 support. May be undefined if the Long class has not been loaded and int64 support is
+ not available.</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="MAX_VARINT32_BYTES"><span class="type-signature">&lt;static, constant> </span>MAX_VARINT32_BYTES<span class="type-signature"> :number</span></h4>
     
     
@@ -5756,6 +5802,162 @@ Defaults to call console.log.</p></td>
         
             
 <dt>
+    <h4 class="name" id="readInt64"><span class="type-signature"></span>readInt64<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {Long}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Reads a 64bit integer. Utilizes Long.js to construct a new Long from the low and high 32 bits.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>offset</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If offset+8 is larger than the capacity or long support is not available
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+    <h5>Returns:</h5>
+    
+            
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Long</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="readJSON"><span class="type-signature"></span>readJSON<span class="signature">(<span class="optional">offset</span>, <span class="optional">parse</span>)</span><span class="type-signature"> &rarr; {*|{data: *, length: number}}</span></h4>
     
     
@@ -5950,7 +6152,7 @@ Defaults to call console.log.</p></td>
         
             
 <dt>
-    <h4 class="name" id="readLong"><span class="type-signature"></span>readLong<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {number}</span></h4>
+    <h4 class="name" id="readLong"><span class="type-signature"></span>readLong<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html#Long">ByteBuffer.Long</a>}</span></h4>
     
     
 </dt>
@@ -5958,7 +6160,7 @@ Defaults to call console.log.</p></td>
     
     
     <div class="description">
-        <p>Reads a long. This makes use of <a href="ByteBuffer.html#readFloat64">ByteBuffer#readFloat64</a> by additionally clamping the returned value to a natural number.</p>
+        <p>Reads a long. This is an alias of <a href="ByteBuffer.html#readInt64">ByteBuffer#readInt64</a>.</p>
     </div>
     
 
@@ -6092,7 +6294,7 @@ Defaults to call console.log.</p></td>
 	</dt>
 	<dd>
 		
-<span class="param-type">number</span>
+<span class="param-type"><a href="ByteBuffer.html#Long">ByteBuffer.Long</a></span>
 
 
 	</dd>
@@ -10891,6 +11093,198 @@ unless this is actually intended. This is not checked. If you have the option it
         
             
 <dt>
+    <h4 class="name" id="writeInt64"><span class="type-signature"></span>writeInt64<span class="signature">(value, <span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Writes a 64bit integer. Utilizes Long.js to write the low and high 32 bits separately.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+|
+
+<span class="param-type">Long</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Value to write</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>offset</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If long support is not available
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>this</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="ByteBuffer.html">ByteBuffer</a></span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="writeJSON"><span class="type-signature"></span>writeJSON<span class="signature">(data, <span class="optional">offset</span>, <span class="optional">stringify</span>)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>|number}</span></h4>
     
     
@@ -11100,7 +11494,7 @@ unless this is actually intended. This is not checked. If you have the option it
     
     
     <div class="description">
-        <p>Writes a long. This is an alias of <a href="ByteBuffer.html#writeFloat64">ByteBuffer#writeFloat64</a>.</p>
+        <p>Writes a long. This is an alias of <a href="ByteBuffer.html#writeInt64">ByteBuffer#writeInt64</a>.</p>
     </div>
     
 
@@ -11143,6 +11537,9 @@ unless this is actually intended. This is not checked. If you have the option it
             
                 
 <span class="param-type">number</span>
+|
+
+<span class="param-type"><a href="ByteBuffer.html#Long">ByteBuffer.Long</a></span>
 
 
             

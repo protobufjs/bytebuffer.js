@@ -16,7 +16,7 @@ ByteBuffer
 * Remaining readable bytes (`ByteBuffer#remaining()`) and backing buffer capacity getters (`ByteBuffer#capacity()`)
 * Explicit (`ByteBuffer#resize(capacity)`) and implicit resizing (`ByteBuffer#ensureCapacity(capacity)`)
 * Efficient implicit resizing by doubling the current capacity
-* Flipping (`ByteBuffer#flip()`) and resetting (`ByteBuffer#reset()`) like known from Java ByteBuffers
+* Flipping (`ByteBuffer#flip()`), marking (`ByteBuffer#mark([offset])`) and resetting (`ByteBuffer#reset()`)
 * Compacting of the backing buffer (`ByteBuffer#compact()`)
 * Conversion to ArrayBuffer (`ByteBuffer#toArrayBuffer([forceCopy])`) (i.e. to send data over the wire, e.g. a WebSocket
   with `binaryType="arraybuffer"`)
@@ -87,7 +87,11 @@ console.log(bb.readLString()+" from ByteBuffer.js");
 
 ### Browser (shim) ###
 
+Optionally depends on [Long.js](https://github.com/dcodeIO/Long.js) for long (int64) support. If you do not require long
+support, you can skip the Long.js include.
+
 ```html
+<script src="//raw.github.com/dcodeIO/Long.js/master/Long.min.js"></script>
 <script src="//raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.min.js"></script>
 ```
 
@@ -101,14 +105,32 @@ alert(bb.readLString()+" from ByteBuffer.js");
 
 ### Require.js / AMD ###
 
+Optionally depends on [Long.js](https://github.com/dcodeIO/Long.js) for long (int64) support. If you do not require long
+support, you can skip the Long.js config. [Require.js](http://requirejs.org/) example:
+
 ```javascript
-require(["/path/to/ByteBuffer.js"], function(ByteBuffer) {
+require.config({
+    "paths": {
+        "Long": "/path/to/Long.js"
+        "ByteBuffer": "/path/to/ByteBuffer.js"
+    }
+});
+require(["ByteBuffer"], function(ByteBuffer) {
     var bb = new ByteBuffer();
     bb.writeLString("Hello world!");
     bb.flip();
     alert(bb.readLString()+" from ByteBuffer.js");
 });
 ```
+
+On long (int64) support
+-----------------------
+As of the [ECMAScript specification](http://ecma262-5.com/ELS5_HTML.htm#Section_8.5), number types have a maximum value
+of 2^53. Beyond that, JavaScript falls back to double internally. However, real long support requires the full 64 bits
+with the possibility to perform bitwise operations on the value for varint en-/decoding. So, to enable true long support
+in ByteBuffer.js, it optionally depends on [Long.js](https://github.com/dcodeIO/Long.js), which actually utilizes two
+32 bit numbers internally. If you do not require long support at all, you can skip it and save the additional bandwidth.
+On node, long support is available by default through the [long](https://npmjs.org/package/long) dependency.
 
 Downloads
 ---------
