@@ -175,7 +175,30 @@ var suite = {
         test.equal(bb.length, 0);
         test.done();
     },
-
+    
+    "mark": function(test) {
+        var bb = new ByteBuffer(4);
+        bb.writeUint16(0x1234);
+        test.equal(bb.offset, 2);
+        test.equal(bb.length, 0);
+        test.equal(bb.markedOffset, -1);
+        bb.mark();
+        test.equal(bb.markedOffset, 2);
+        bb.writeUint16(0x5678);
+        test.equal(bb.offset, 4);
+        test.equal(bb.markedOffset, 2);
+        bb.reset();
+        test.equal(bb.offset, 2);
+        test.equal(bb.length, 0);
+        test.equal(bb.markedOffset, -1);
+        bb.reset();
+        test.equal(bb.offset, 0);
+        test.equal(bb.length, 0);
+        test.equal(bb.markedOffset, -1);
+        bb.mark(2);
+        test.equal(bb.markedOffset, 2);
+        test.done();
+    },
 
     "clone": function(test) {
         var bb = new ByteBuffer(1);
@@ -509,7 +532,7 @@ var suite = {
     "toString": function(test) {
         var bb = new ByteBuffer(3);
         bb.writeUint16(0x1234);
-        test.equal(bb.toString(), "ByteBuffer(offset=2,length=0,capacity=3)");
+        test.equal(bb.toString(), "ByteBuffer(offset=2,markedOffset=-1,length=0,capacity=3)");
         test.done();
     },
     

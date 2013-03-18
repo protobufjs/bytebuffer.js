@@ -884,6 +884,51 @@ instead.</p>
         
             
 <dt>
+    <h4 class="name" id="markedOffset"><span class="type-signature"></span>markedOffset<span class="type-signature"> :number</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Marked offset set through <a href="ByteBuffer.html#mark">ByteBuffer#mark</a>. Evaluates to -1 if there is no marked offset.</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="offset"><span class="type-signature"></span>offset<span class="type-signature"> :number</span></h4>
     
     
@@ -3523,7 +3568,7 @@ double the previous capacity is less than the required capacity, the required ca
     
     
     <div class="description">
-        <p>Flips the ByteBuffer. Sets length=offset and offset=0.</p>
+        <p>Makes the buffer ready for a new sequence of write or relative read operations. Sets length=offset and offset=0.</p>
     </div>
     
 
@@ -3644,6 +3689,173 @@ double the previous capacity is less than the required capacity, the required ca
     
     
     
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>this</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="ByteBuffer.html">ByteBuffer</a></span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="mark"><span class="type-signature"></span>mark<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Marks the current offset in <a href="ByteBuffer.html#markedOffset">ByteBuffer#markedOffset</a>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>offset</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Offset to mark. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a>.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="ByteBuffer.html#reset">ByteBuffer#reset</a></li>
+        </ul>
+    </dd>
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the mark cannot be set
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -7784,7 +7996,9 @@ length-offset.</p>
     
     
     <div class="description">
-        <p>Resets the ByteBuffer. Sets offset=0 and length=0.</p>
+        <p>Resets the ByteBuffer. If an offset has been marked through <a href="ByteBuffer.html#mark">ByteBuffer#mark</a> before, the offset will be
+set to the marked offset and the marked offset will be discarded. Length will not be altered. If there is no
+marked offset, sets offset=0 and length=0.</p>
     </div>
     
 
@@ -7816,6 +8030,13 @@ length-offset.</p>
     
     
     
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="ByteBuffer.html#mark">ByteBuffer#mark</a></li>
+        </ul>
+    </dd>
     
     
     
@@ -8970,7 +9191,7 @@ the unmodified backing buffer if offset=0 and length=capacity unless forceCopy i
     
             
 <div class="param-desc">
-    <p>String representation as of &quot;ByteBuffer(offset=...,length=...,capacity=...)&quot;</p>
+    <p>String representation as of &quot;ByteBuffer(offset=...,markedOffset=...,length=...,capacity=...)&quot;</p>
 </div>
 
 

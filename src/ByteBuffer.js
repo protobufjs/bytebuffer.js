@@ -62,6 +62,13 @@
         this.offset = 0;
 
         /**
+         * Marked offset set through {@link ByteBuffer#mark}. Evaluates to -1 if there is no marked offset.
+         * @type {number}
+         * @expose
+         */
+        this.markedOffset = -1;
+
+        /**
          * Length of the contained data. Offset- and capacity-independent index. Contents are the bytes between offset and
          * length, which are both absolute indexes. There is no capacity property, use {@link ByteBuffer#capacity}
          * instead.
@@ -320,7 +327,7 @@
     };
 
     /**
-     * Flips the ByteBuffer. Sets length=offset and offset=0.
+     * Makes the buffer ready for a new sequence of write or relative read operations. Sets length=offset and offset=0.
      * @return {ByteBuffer} this
      * @expose
      */
@@ -331,13 +338,41 @@
     };
 
     /**
-     * Resets the ByteBuffer. Sets offset=0 and length=0.
+     * Marks the current offset in {@link ByteBuffer#markedOffset}.
+     * @param {number=} offset Offset to mark. Defaults to {@link ByteBuffer#offset}.
      * @return {ByteBuffer} this
+     * @throws {Error} If the mark cannot be set
+     * @see ByteBuffer#reset
+     * @expose
+     */
+    ByteBuffer.prototype.mark = function(offset) {
+        if (this.array == null) {
+            throw(new Error(this+" cannot be marked: Already destroyed"));
+        }
+        offset = typeof offset != 'undefined' ? parseInt(offset, 10) : this.offset;
+        if (offset < 0 || offset > this.array.byteLength) {
+            throw(new Error(this+" cannot be marked: Offset to mark is less than 0 or bigger than the capacity ("+this.array.byteLength+"): "+offset));
+        }
+        this.markedOffset = offset;
+        return this;
+    };
+
+    /**
+     * Resets the ByteBuffer. If an offset has been marked through {@link ByteBuffer#mark} before, the offset will be
+     * set to the marked offset and the marked offset will be discarded. Length will not be altered. If there is no
+     * marked offset, sets offset=0 and length=0.
+     * @return {ByteBuffer} this
+     * @see ByteBuffer#mark
      * @expose
      */
     ByteBuffer.prototype.reset = function() {
-        this.offset = 0;
-        this.length = 0;
+        if (this.markedOffset >= 0) {
+            this.offset = this.markedOffset;
+            this.markedOffset = -1;
+        } else {
+            this.offset = 0;
+            this.length = 0;
+        }
         return this;
     };
 
@@ -1488,7 +1523,7 @@
      * @expose
      */
     ByteBuffer.prototype.printDebug = function(out) {
-        var s = (this.array != null ? "ByteBuffer(offset="+this.offset+",length="+this.length+",capacity="+this.array.byteLength+")" : "ByteBuffer(DESTROYED)")+"\n"+
+        var s = (this.array != null ? "ByteBuffer(offset="+this.offset+",markedOffset="+this.markedOffset+",length="+this.length+",capacity="+this.array.byteLength+")" : "ByteBuffer(DESTROYED)")+"\n"+
             "-------------------------------------------------------------------\n";
         var h = this.toHex(16, true);
         var a = this.toASCII(16, true);
@@ -1583,14 +1618,14 @@
 
     /**
      * Returns a string representation.
-     * @return {string} String representation as of "ByteBuffer(offset=...,length=...,capacity=...)"
+     * @return {string} String representation as of "ByteBuffer(offset=...,markedOffset=...,length=...,capacity=...)"
      * @expose
      */
     ByteBuffer.prototype.toString = function() {
         if (this.array == null) {
             return "ByteBuffer(DESTROYED)";
         }
-        return "ByteBuffer(offset="+this.offset+",length="+this.length+",capacity="+this.array.byteLength+")";
+        return "ByteBuffer(offset="+this.offset+",markedOffset="+this.markedOffset+",length="+this.length+",capacity="+this.array.byteLength+")";
     };
 
     /**
