@@ -24,13 +24,15 @@ ByteBuffer
   (`ByteBuffer#prepend(src[, offset])`) of other ByteBuffers with implicit capacity management
 * Explicit destruction (`ByteBuffer#destroy()`)
 * `ByteBuffer#writeUint/Int8/16/32(value[, offset])` and `ByteBuffer#readUint/Int8/16/32([offset])` 
-* `ByteBuffer#writeVarint32(value[, offset])` and `ByteBuffer#readVarint32([offset])` to write a base 128 variable-length
-  integer as used in [protobuf](https://developers.google.com/protocol-buffers/docs/encoding#varints)
+* `ByteBuffer#writeVarint32/64(value[, offset])` and `ByteBuffer#readVarint32/64([offset])` to write a base 128
+  variable-length integer as used in [protobuf](https://developers.google.com/protocol-buffers/docs/encoding#varints)
+* `ByteBuffer#writeZigZagVarint32/64(value[, offset])` and `ByteBuffer#readZigZagVarint32/64([offset])` to write a
+  zig-zag encoded base 128 variable-length integer as used in protobuf for efficient encoding of signed values
 * `ByteBuffer#writeUint/Int64(value[, offset])` and `ByteBuffer#readUint/Int64([offset])` via [Long.js](https://github.com/dcodeIO/Long.js)
 * `ByteBuffer#writeFloat32/64(value[, offset])` and `ByteBuffer#readFloat32/64([offset])`
 * `ByteBuffer#write/readByte`, `ByteBuffer#write/readShort`, `ByteBuffer#write/readInt`, `ByteBuffer#write/readLong`
-  (all signed), `ByteBuffer#write/readVarint`, `ByteBuffer#write/readFloat`, `ByteBuffer#write/readDouble` aliases for
-  the above for convenience
+  (all signed), `ByteBuffer#write/readVarint` and `ByteBuffer#write/readZigZagVarint` (both 32bit),
+  `ByteBuffer#write/readFloat`, `ByteBuffer#write/readDouble` aliases for the above for convenience
 * `ByteBuffer#writeUTF8String(str[, offset])` and `ByteBuffer#readUTF8String(chars[, offset])` using the included UTF8
   en-/decoder (full 6 bytes, [ref](http://en.wikipedia.org/wiki/UTF-8#Description))
 * `ByteBuffer#writeLString(str[, offset]))` and `ByteBuffer#readLString([offset])` to write respectively read a
@@ -70,7 +72,7 @@ Features
   `ByteBuffer.min.js` has been compiled this way, `ByteBuffer.min.map` is the source map)
 * Fully documented using [jsdoc3](https://github.com/jsdoc3/jsdoc)
 * Well tested through [nodeunit](https://github.com/caolan/nodeunit)
-* Zero production dependencies
+* Zero production dependencies (Long.js is optional)
 * Small footprint
 
 Usage
@@ -127,7 +129,7 @@ require(["ByteBuffer"], function(ByteBuffer) {
 On long (int64) support
 -----------------------
 As of the [ECMAScript specification](http://ecma262-5.com/ELS5_HTML.htm#Section_8.5), number types have a maximum value
-of 2^53. Beyond that, JavaScript falls back to double internally. However, real long support requires the full 64 bits
+of 2^53. Beyond that, behaviour might be unexpected. However, real long support requires the full 64 bits
 with the possibility to perform bitwise operations on the value for varint en-/decoding. So, to enable true long support
 in ByteBuffer.js, it optionally depends on [Long.js](https://github.com/dcodeIO/Long.js), which actually utilizes two
 32 bit numbers internally. If you do not require long support at all, you can skip it and save the additional bandwidth.

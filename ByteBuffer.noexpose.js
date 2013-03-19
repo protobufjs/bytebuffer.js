@@ -1028,7 +1028,7 @@
         ByteBuffer.prototype.readVarint32 = function(offset) {
             var advance = typeof offset == 'undefined';
             offset = typeof offset != 'undefined' ? offset : this.offset;
-            // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
+            // ref: src/google/protobuf/io/coded_stream.cc
             
             var src = new Uint8Array(this.array),
                 count = 0,
@@ -1078,6 +1078,149 @@
             }
             return ByteBuffer.zigZagDecode32(dec);
         };
+
+        /**
+         * Maximum number of bytes required to store a 64bit base 128 variable-length integer.
+         * @type {number}
+         * @const
+         */
+        ByteBuffer.MAX_VARINT64_BYTES = 10;
+
+        /**
+         * @type {number}
+         * @const
+         * @private
+         */
+        var TWO_PWR_7_DBL = 1 << 7;
+
+        /**
+         * @type {number}
+         * @const
+         * @private
+         */
+        var TWO_PWR_14_DBL = TWO_PWR_7_DBL * TWO_PWR_7_DBL;
+
+        /**
+         * @type {number}
+         * @const
+         * @private
+         */
+        var TWO_PWR_21_DBL = TWO_PWR_7_DBL * TWO_PWR_14_DBL;
+        
+        /**
+         * @type {number}
+         * @const
+         * @private
+         */
+        var TWO_PWR_28_DBL = TWO_PWR_14_DBL * TWO_PWR_14_DBL;
+
+        /**
+         * Writes a 64bit base 128 variable-length integer as used in protobuf.
+         * @param {number|Long} value Value to write
+         * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+         * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
+         * @throws {Error} If long support is not available
+         */
+        ByteBuffer.prototype.writeVarint64 = function(value, offset) {
+            if (!Long) {
+                throw(new Error("Long support is not available: See https://github.com/dcodeIO/ByteBuffer.js#on-long-int64-support for details"))
+            }
+            var advance = typeof offset == 'undefined';
+            offset = typeof offset != 'undefined' ? offset : this.offset;
+            if (!(typeof value == 'object' && value instanceof Long)) value = Long.fromNumber(value, false);
+            
+            var part0 = value.toInt() >>> 0,
+                part1 = value.shiftRightUnsigned(28).toInt() >>> 0,
+                part2 = value.shiftRightUnsigned(56).toInt() >>> 0,
+                size = ByteBuffer.calculateVarint64(value),
+                dst = new Uint8Array(this.array);
+            
+            this.ensureCapacity(offset+size);
+            switch (size) {
+                case 10: dst[offset+9] = ((part2 >>> 7)  | 0x80);
+                case 9 : dst[offset+8] = ((part2       ) | 0x80);
+                case 8 : dst[offset+7] = ((part1 >>> 21) | 0x80);
+                case 7 : dst[offset+6] = ((part1 >>> 14) | 0x80);
+                case 6 : dst[offset+5] = ((part1 >>>  7) | 0x80);
+                case 5 : dst[offset+4] = ((part1       ) | 0x80);
+                case 4 : dst[offset+3] = ((part0 >>> 21) | 0x80);
+                case 3 : dst[offset+2] = ((part0 >>> 14) | 0x80);
+                case 2 : dst[offset+1] = ((part0 >>>  7) | 0x80);
+                case 1 : dst[offset+0] = ((part0       ) | 0x80);
+            }
+            dst[offset+size-1] &= 0x7F;
+            if (advance) {
+                this.offset += size;
+                return this;
+            } else {
+                return size;
+            }
+        };
+        
+        /**
+         * Reads a 32bit base 128 variable-length integer as used in protobuf.
+         * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+         * @return {Long|{value: Long, length: number}} The value read if offset is omitted, else the value read and the actual number of bytes read.
+         * @throws {Error} If it's not a valid varint or long support is not available
+         */
+        ByteBuffer.prototype.readVarint64 = function(offset) {
+            if (!Long) {
+                throw(new Error("Long support is not available: See https://github.com/dcodeIO/ByteBuffer.js#on-long-int64-support for details"))
+            }
+            var advance = typeof offset == 'undefined';
+            offset = typeof offset != 'undefined' ? offset : this.offset;
+            var start = offset;
+            // ref: src/google/protobuf/io/coded_stream.cc
+            
+            var src = new Uint8Array(this.array);
+            var part0, part1 = 0, part2 = 0, b;
+            b = src[offset++]; part0  = (b & 0x7F)      ; if (b & 0x80) {
+            b = src[offset++]; part0 |= (b & 0x7F) <<  7; if (b & 0x80) {
+            b = src[offset++]; part0 |= (b & 0x7F) << 14; if (b & 0x80) {
+            b = src[offset++]; part0 |= (b & 0x7F) << 21; if (b & 0x80) {
+            b = src[offset++]; part1  = (b & 0x7F)      ; if (b & 0x80) {
+            b = src[offset++]; part1 |= (b & 0x7F) <<  7; if (b & 0x80) {
+            b = src[offset++]; part1 |= (b & 0x7F) << 14; if (b & 0x80) {
+            b = src[offset++]; part1 |= (b & 0x7F) << 21; if (b & 0x80) {
+            b = src[offset++]; part2  = (b & 0x7F)      ; if (b & 0x80) {
+            b = src[offset++]; part2 |= (b & 0x7F) <<  7; if (b & 0x80) {
+            throw(new Error("Data must be corrupt: Buffer overrun")); }}}}}}}}}}
+            var value = Long.from28Bits(part0, part1, part2, false);
+            if (advance) {
+                this.offset = offset;
+                return value;
+            } else {
+                return {
+                    "value": value,
+                    "length": offset-start
+                };
+            }
+        };
+
+        /**
+         * Writes a zigzag encoded 64bit base 128 encoded variable-length integer as used in protobuf.
+         * @param {number} value Value to write
+         * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+         * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
+         */
+        ByteBuffer.prototype.writeZigZagVarint64 = function(value, offset) {
+            return this.writeVarint64(ByteBuffer.zigZagEncode64(value), offset);
+        };
+
+        /**
+         * Reads a zigzag encoded 64bit base 128 variable-length integer as used in protobuf.
+         * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+         * @return {number|{value: number, length: number}} The value read if offset is omitted, else the value read and the actual number of bytes read.
+         * @throws {Error} If it's not a valid varint
+         */
+        ByteBuffer.prototype.readZigZagVarint64 = function(offset) {
+            var dec = this.readVarint64(offset);
+            if (typeof dec == 'object') {
+                dec['value'] = ByteBuffer.zigZagDecode64(dec['value']);
+                return dec;
+            }
+            return ByteBuffer.zigZagDecode64(dec);
+        };
     
         /**
          * Writes a base 128 variable-length integer as used in protobuf. This is an alias of {@link ByteBuffer#writeVarint32}.
@@ -1095,46 +1238,128 @@
          * @return {number|{value: number, length: number}} The value read if offset is omitted, else the value read and the actual number of bytes read.
          */
         ByteBuffer.prototype.readVarint = ByteBuffer.prototype.readVarint32;
+
+        /**
+         * Writes a zigzag encoded base 128 encoded variable-length integer as used in protobuf. This is an alias of {@link ByteBuffer#writeZigZagVarint32}.
+         * @param {number} value Value to write
+         * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+         * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
+         */
+        ByteBuffer.prototype.writeZigZagVarint = ByteBuffer.prototype.writeZigZagVarint32;
+
+        /**
+         * Reads a zigzag encoded base 128 variable-length integer as used in protobuf. This is an alias of {@link ByteBuffer#readZigZagVarint32}.
+         * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+         * @return {number|{value: number, length: number}} The value read if offset is omitted, else the value read and the actual number of bytes read.
+         * @throws {Error} If it's not a valid varint
+         */
+        ByteBuffer.prototype.readZigZagVarint = ByteBuffer.prototype.readZigZagVarint32;
     
         /**
          * Calculates the actual number of bytes required to encode a 32bit base 128 variable-length integer.
          * @param {number} value Value to encode
-         * @return {number} Number of bytes required. Capped to {@link ByteBuffer.MAX_VARINT32_BYTES} (35bit), no overflow errors.
+         * @return {number} Number of bytes required. Capped to {@link ByteBuffer.MAX_VARINT32_BYTES} (35bit). No overflow error.
          */
         ByteBuffer.calculateVarint32 = function(value) {
-            // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
-            ByteBuffer.UINT32[0] = value;
-            if (ByteBuffer.UINT32[0] < 0x80) {
+            // ref: src/google/protobuf/io/coded_stream.cc
+            value = value >>> 0;
+            if (value < TWO_PWR_7_DBL) {
                 return 1;
-            } else if (ByteBuffer.UINT32[0] < 0x4000) {
+            } else if (value < TWO_PWR_14_DBL) {
                 return 2;
-            } else if (ByteBuffer.UINT32[0] < 0x200000) {
+            } else if (value < TWO_PWR_21_DBL) {
                 return 3;
-            } else if (ByteBuffer.UINT32[0] < 0x10000000) {
+            } else if (value < TWO_PWR_28_DBL) {
                 return 4;
             } else {
                 return 5;
-            } // As this is casted, we can't throw an overflow error.
+            }
+        };
+
+        /**
+         * Calculates the actual number of bytes required to encode a 64bit base 128 variable-length integer.
+         * @param {number|Long} value Value to encode
+         * @return {number} Number of bytes required. Capped to {@link ByteBuffer.MAX_VARINT64_BYTES}. No overflow error.
+         * @throws {Error} If long support is not available
+         */
+        ByteBuffer.calculateVarint64 = function(value) {
+            if (!Long) {
+                throw(new Error("Long support is not available: See https://github.com/dcodeIO/ByteBuffer.js#on-long-int64-support for details"))
+            }
+            // ref: src/google/protobuf/io/coded_stream.cc
+            if (!(typeof value == 'object' && value instanceof Long)) value = Long.fromNumber(value, false);
+            
+            var part0 = value.toInt() >>> 0,
+                part1 = value.shiftRightUnsigned(28).toInt() >>> 0,
+                part2 = value.shiftRightUnsigned(56).toInt() >>> 0;
+            
+            if (part2 == 0) {
+                if (part1 == 0) {
+                    if (part0 < TWO_PWR_14_DBL) {
+                        return part0 < TWO_PWR_7_DBL ? 1 : 2;
+                    } else {
+                        return part0 < TWO_PWR_21_DBL ? 3 : 4; 
+                    }
+                } else {
+                    if (part1 < TWO_PWR_14_DBL) {
+                        return part1 < TWO_PWR_7_DBL ? 5 : 6;
+                    } else {
+                        return part1 < TWO_PWR_21_DBL ? 7 : 8;
+                    }
+                }
+            } else {
+                return part2 < TWO_PWR_7_DBL ? 9 : 10;
+            }
         };
     
         /**
-         * Encodes a signed integer so that it can be effectively used with varint encoding.
-         * @param {number} n Signed integer
-         * @return {number} Unsigned, zigzag encoded integer
+         * Encodes a signed 32bit integer so that it can be effectively used with varint encoding.
+         * @param {number} n Signed 32bit integer
+         * @return {number} Unsigned zigzag encoded 32bit integer
          */
         ByteBuffer.zigZagEncode32 = function(n) {
-            ByteBuffer.INT32[0]=n;
-            return ((n=ByteBuffer.INT32[0])>=0) ? n*2 : -n*2-1; // If we'd have real 32bit arithmetic: (n << 1) ^ (n >> 31);
+            // ref: src/google/protobuf/wire_format_lite.h
+            return (((n |= 0) << 1) ^ (n >> 31)) >>> 0;
         };
     
         /**
-         * Decodes a zigzag encoded signed integer.
-         * @param {number} n Unsigned zigzag encoded integer
-         * @return {number} Signed integer
+         * Decodes a zigzag encoded signed 32bit integer.
+         * @param {number} n Unsigned zigzag encoded 32bit integer
+         * @return {number} Signed 32bit integer
          */
         ByteBuffer.zigZagDecode32 = function(n) {
-            ByteBuffer.UINT32[0]=n;
-            return (((n=ByteBuffer.UINT32[0])&1)==0) ? n/2 : -(n+1)/2; // If we'd have real 32bit arithmetic: (n >> 1) ^ -(n & 1);
+            // ref: src/google/protobuf/wire_format_lite.h
+            return ((n >>> 1) ^ -(n & 1)) | 0;
+        };
+
+        /**
+         * Encodes a signed 64bit integer so that it can be effectively used with varint encoding.
+         * @param {number|Long} n Signed long
+         * @return {Long} Unsigned zigzag encoded long
+         */
+        ByteBuffer.zigZagEncode64 = function(n) {
+            // ref: src/google/protobuf/wire_format_lite.h
+            if (typeof n == 'object' && n instanceof Long) {
+                if (n.unsigned) n = n.toSigned();
+            } else {
+                n = Long.fromNumber(n, false);
+            }
+            return n.shiftLeft(1).xor(n.shiftRight(63)).toUnsigned();
+        };
+
+        /**
+         * Decodes a zigzag encoded signed 64bit integer.
+         * @param {Long} n Unsigned zigzag encoded long
+         * @return {Long} Signed long
+         */
+        ByteBuffer.zigZagDecode64 = function(n) {
+            // ref: src/google/protobuf/wire_format_lite.h
+            if (typeof n == 'object' && n instanceof Long) {
+                if (!n.unsigned) n = n.toUnsigned();
+            } else {
+                n = Long.fromNumber(n, true);
+            }
+            return n.shiftRightUnsigned(1).xor(n.and(Long.ONE).toSigned().negate()).toSigned();
         };
     
         /**

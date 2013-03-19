@@ -441,7 +441,41 @@ var suite = {
         test.done();
     },
     
-    "zigZagEncode/Decode32": function(test) {
+    "calculateVarint32/64": function(test) {
+        test.equal(ByteBuffer.MAX_VARINT32_BYTES, 5);
+        test.equal(ByteBuffer.MAX_VARINT64_BYTES, 10);
+        var values = [
+            [0, 1],
+            [-1, 5, 10],
+            [1<<7, 2],
+            [1<<14, 3],
+            [1<<21, 4],
+            [1<<28, 5],
+            [0x7FFFFFFF | 0, 5],
+            [0xFFFFFFFF, 5],
+            [0xFFFFFFFF | 0, 5, 10]
+        ];
+        for (var i=0; i<values.length; i++) {
+            test.equal(ByteBuffer.calculateVarint32(values[i][0]), values[i][1]);
+            test.equal(ByteBuffer.calculateVarint64(values[i][0]), values[i].length > 2 ? values[i][2] : values[i][1]);
+        }
+        var Long = ByteBuffer.Long;
+        values = [
+            [Long.fromNumber(1).shiftLeft(35), 6],
+            [Long.fromNumber(1).shiftLeft(42), 7],
+            [Long.fromNumber(1).shiftLeft(49), 8],
+            [Long.fromNumber(1).shiftLeft(56), 9],
+            [Long.fromNumber(1).shiftLeft(63), 10],
+            [Long.fromNumber(1, true).shiftLeft(63), 10]
+        ];
+        for (i=0; i<values.length; i++) {
+            test.equal(ByteBuffer.calculateVarint64(values[i][0]), values[i][1]);
+        }
+        test.done();
+    },
+    
+    "zigZagEncode/Decode32/64": function(test) {
+        var Long = ByteBuffer.Long;
         var values = [
             [ 0, 0],
             [-1, 1],
@@ -456,6 +490,17 @@ var suite = {
         for (var i=0; i<values.length; i++) {
             test.equal(ByteBuffer.zigZagEncode32(values[i][0]), values[i][1]);
             test.equal(ByteBuffer.zigZagDecode32(values[i][1]), values[i][0]);
+            test.equal(ByteBuffer.zigZagEncode64(values[i][0]).toNumber(), values[i][1]);
+            test.equal(ByteBuffer.zigZagDecode64(values[i][1]).toNumber(), values[i][0]);
+        }
+        values = [
+            [Long.MAX_SIGNED_VALUE, Long.MAX_UNSIGNED_VALUE.subtract(Long.ONE)],
+            [Long.MIN_SIGNED_VALUE, Long.MAX_UNSIGNED_VALUE]
+        ];
+        // NOTE: Even 64bit doubles from toNumber() fail for these values so we are using toString() here
+        for (i=0; i<values.length; i++) {
+            test.equal(ByteBuffer.zigZagEncode64(values[i][0]).toString(), values[i][1].toString());
+            test.equal(ByteBuffer.zigZagDecode64(values[i][1]).toString(), values[i][0].toString());
         }
         test.done();
     },
@@ -468,7 +513,7 @@ var suite = {
             [0xFFFFFFFF, -1],
             [0x80000000, -2147483648]
         ];
-        var bb = new ByteBuffer(10);
+        var bb = new ByteBuffer(5);
         for (var i=0; i<values.length; i++) {
             var encLen = bb.writeVarint32(values[i][0], 0);
             var dec = bb.readVarint32(0);
@@ -477,21 +522,63 @@ var suite = {
         }
         test.done();
     },
-    
-    "write/readZigZagVarint32": function(test) {
+
+    "write/readVarint64": function(test) {
+        var Long = ByteBuffer.Long;
         var values = [
-            [0,0],
-            [1,1],
-            [ 300, 300],
-            [-300,-300],
-            [ 2147483647,  2147483647],
-            [-2147483648, -2147483648]
+            [Long.ONE],
+            [Long.fromNumber(300)],
+            [Long.fromNumber(0x7FFFFFFF)],
+            [Long.fromNumber(0xFFFFFFFF)],
+            [Long.fromBits(0xFFFFFFFF, 0x7FFFFFFF)],
+            [Long.fromBits(0xFFFFFFFF, 0xFFFFFFFF)]
         ];
         var bb = new ByteBuffer(10);
         for (var i=0; i<values.length; i++) {
-            var encLen = bb.writeZigZagVarint32(values[i][0], 0);
+            var encLen = bb.writeVarint64(values[i][0], 0);
+            var dec = bb.readVarint64(0);
+            test.equal((values[i].length > 1 ? values[i][1] : values[i][0]).toString(), dec['value'].toString());
+            test.equal(encLen, dec['length']);
+        }
+        test.done();
+    },
+
+    "write/readZigZagVarint32": function(test) {
+        var values = [
+            0,
+            1,
+             300,
+            -300,
+             2147483647,
+            -2147483648
+        ];
+        var bb = new ByteBuffer(10);
+        for (var i=0; i<values.length; i++) {
+            var encLen = bb.writeZigZagVarint32(values[i], 0);
             var dec = bb.readZigZagVarint32(0);
-            test.equal(values[i][1], dec['value']);
+            test.equal(values[i], dec['value']);
+            test.equal(encLen, dec['length']);
+        }
+        test.done();
+    },
+
+    "write/readZigZagVarint64": function(test) {
+        var Long = ByteBuffer.Long;
+        var values = [
+            Long.ONE, 1,
+            Long.fromNumber(300),
+            Long.fromNumber(-300),
+            Long.fromNumber(0x7FFFFFFF),
+            Long.fromNumber(0x8FFFFFFF),
+            Long.fromNumber(0xFFFFFFFF),
+            Long.fromBits(0xFFFFFFFF, 0x7FFFFFFF),
+            Long.fromBits(0xFFFFFFFF, 0xFFFFFFFF)
+        ];
+        var bb = new ByteBuffer(10);
+        for (var i=0; i<values.length; i++) {
+            var encLen = bb.writeZigZagVarint64(values[i], 0);
+            var dec = bb.readZigZagVarint64(0);
+            test.equal(values[i].toString(), dec['value'].toString());
             test.equal(encLen, dec['length']);
         }
         test.done();
