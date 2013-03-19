@@ -861,7 +861,7 @@
                 throw(new Error("Long support is not available: See https://github.com/dcodeIO/ByteBuffer.js#on-long-int64-support for details"))
             }
             offset = typeof offset != 'undefined' ? offset : (this.offset+=8)-8;
-            if (!(typeof value == 'object' && value instanceof Long)) value = Long.fromNumber(value);
+            if (!(typeof value == 'object' && value instanceof Long)) value = Long.fromNumber(value, false);
             this.ensureCapacity(offset+8);
             if (this.littleEndian) {
                 this.view.setInt32(offset, value.getLowBits(), true);
@@ -890,14 +890,61 @@
             }
             var value;
             if (this.littleEndian) {
-                value = new Long(this.view.getInt32(offset, true), this.view.getInt32(offset+4, true));
+                value = Long.fromBits(this.view.getInt32(offset, true), this.view.getInt32(offset+4, true), false);
             } else {
-                value = new Long(this.view.getInt32(offset+4, false), this.view.getInt32(offset, false));
+                value = Long.fromBits(this.view.getInt32(offset+4, false), this.view.getInt32(offset, false), false);
             }
             return value;
         };
-        
-        // TODO: Do we need uint64?
+
+        /**
+         * Writes a 64bit unsigned integer. Utilizes Long.js to write the low and high 32 bits separately.
+         * @function
+         * @param {number|Long} value Value to write
+         * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+         * @return {ByteBuffer} this
+         * @throws {Error} If long support is not available
+         */
+        ByteBuffer.prototype.writeUint64 = function(value, offset) {
+            if (!Long) {
+                throw(new Error("Long support is not available: See https://github.com/dcodeIO/ByteBuffer.js#on-long-int64-support for details"))
+            }
+            offset = typeof offset != 'undefined' ? offset : (this.offset+=8)-8;
+            if (!(typeof value == 'object' && value instanceof Long)) value = Long.fromNumber(value, true);
+            this.ensureCapacity(offset+8);
+            if (this.littleEndian) {
+                this.view.setUint32(offset, value.getLowBitsUnsigned(), true);
+                this.view.setUint32(offset+4, value.getHighBitsUnsigned(), true);
+            } else {
+                this.view.setUint32(offset, value.getHighBitsUnsigned(), false);
+                this.view.setUint32(offset+4, value.getLowBitsUnsigned(), false);
+            }
+            return this;
+        };
+
+        /**
+         * Reads a 64bit unsigned integer. Utilizes Long.js to construct a new Long from the low and high 32 bits.
+         * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
+         * @return {Long}
+         * @throws {Error} If offset+8 is larger than the capacity or long support is not available
+         */
+        ByteBuffer.prototype.readUint64 = function(offset) {
+            if (!Long) {
+                throw(new Error("Long support is not available: See https://github.com/dcodeIO/ByteBuffer.js#on-long-int64-support for details"))
+            }
+            offset = typeof offset != 'undefined' ? offset : (this.offset+=8)-8;
+            if (this.array == null || offset+8 > this.array.byteLength) {
+                this.offset -= 8;
+                throw(new Error("Cannot read int64 from "+this+": Capacity overflow"));
+            }
+            var value;
+            if (this.littleEndian) {
+                value = Long.fromBits(this.view.getUint32(offset, true), this.view.getUint32(offset+4, true), true);
+            } else {
+                value = Long.fromBits(this.view.getUint32(offset+4, false), this.view.getUint32(offset, false), true);
+            }
+            return value;
+        };
     
         /**
          * Writes a long. This is an alias of {@link ByteBuffer#writeInt64}.

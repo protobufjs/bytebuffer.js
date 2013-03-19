@@ -383,24 +383,48 @@ var suite = {
     "write/readInt64": function(test) {
         var bb = new ByteBuffer(8);
         
-        var max = ByteBuffer.Long.MAX_VALUE.toNumber();
-        bb.writeLong(max).flip();
+        var max = ByteBuffer.Long.MAX_SIGNED_VALUE.toNumber();
+        bb.writeInt64(max).flip();
         test.equal(bb.toHex(), "<7F FF FF FF FF FF FF FF>");
-        test.equal(bb.readLong(0), max);
+        test.equal(bb.readInt64(0), max);
         
-        var min = ByteBuffer.Long.MIN_VALUE.toNumber();
-        bb.writeLong(min).flip();
+        var min = ByteBuffer.Long.MIN_SIGNED_VALUE.toNumber();
+        bb.writeInt64(min).flip();
         test.equal(bb.toHex(), "<80 00 00 00 00 00 00 00>");
-        test.equal(bb.readLong(0), min);
+        test.equal(bb.readInt64(0), min);
         
-        bb.writeLong(-1).flip();
+        bb.writeInt64(-1).flip();
         test.equal(bb.toHex(), "<FF FF FF FF FF FF FF FF>");
-        test.equal(bb.readLong(0), -1);
+        test.equal(bb.readInt64(0), -1);
         
         bb.reset();
         bb.LE().writeInt64(new ByteBuffer.Long(0x89ABCDEF, 0x01234567)).flip();
         test.equal(bb.toHex(), "<EF CD AB 89 67 45 23 01>");
         
+        test.done();
+    },
+    
+    "write/readUint64": function(test) {
+        var bb = new ByteBuffer(8);
+
+        var max = ByteBuffer.Long.MAX_UNSIGNED_VALUE.toNumber();
+        bb.writeUint64(max).flip();
+        test.equal(bb.toHex(), "<FF FF FF FF FF FF FF FF>");
+        test.equal(bb.readUint64(0), max);
+
+        var min = ByteBuffer.Long.MIN_UNSIGNED_VALUE.toNumber();
+        bb.writeLong(min).flip();
+        test.equal(bb.toHex(), "<00 00 00 00 00 00 00 00>");
+        test.equal(bb.readUint64(0), min);
+
+        bb.writeUint64(-1).flip();
+        test.equal(bb.toHex(), "<00 00 00 00 00 00 00 00>");
+        test.equal(bb.readUint64(0), 0);
+
+        bb.reset();
+        bb.LE().writeUint64(new ByteBuffer.Long(0x89ABCDEF, 0x01234567, true)).flip();
+        test.equal(bb.toHex(), "<EF CD AB 89 67 45 23 01>");
+
         test.done();
     },
     

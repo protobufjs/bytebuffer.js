@@ -1,6 +1,6 @@
 {
     "name": "bytebuffer",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "description": "ByteBuffer.js: A Java-like, Netty-inspired ByteBuffer implementation using typed arrays.",
     "main": "ByteBuffer.js",
@@ -13,7 +13,7 @@
     },
     "keywords": ["net", "array", "buffer", "arraybuffer", "typed array", "bytebuffer", "json", "websocket", "webrtc"],
     "dependencies": {
-        "long": ">=1.0.1"
+        "long": ">=1.1.0"
     },
     "devDependencies": {
         "nodeunit": ">=0.7",
