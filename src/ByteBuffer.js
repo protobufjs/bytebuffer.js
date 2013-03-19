@@ -1298,7 +1298,7 @@
          */
         ByteBuffer.prototype.readZigZagVarint64 = function(offset) {
             var dec = this.readVarint64(offset);
-            if (typeof dec == 'object') {
+            if (typeof dec == 'object' && !(dec instanceof Long)) {
                 dec['value'] = ByteBuffer.zigZagDecode64(dec['value']);
                 return dec;
             }
