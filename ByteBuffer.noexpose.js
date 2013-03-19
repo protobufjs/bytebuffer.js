@@ -1681,7 +1681,7 @@
     if (typeof module != 'undefined' && module["exports"]) { // CommonJS
         module["exports"] = loadByteBuffer(require("long"));
     } else if (typeof define != 'undefined' && define["amd"]) { // AMD
-        define("ByteBuffer", ["Long"], function(Long) { return loadByteBuffer(Long); });
+        define("ByteBuffer", ["Math/Long"], function(Long) { return loadByteBuffer(Long); });
     } else { // Shim
         if (!global["dcodeIO"]) {
             global["dcodeIO"] = {};

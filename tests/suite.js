@@ -659,17 +659,17 @@ var suite = {
         var sandbox = new Sandbox({
             require: function() {},
             define: (function() {
-                function define() {
-                    define.called = true;
+                function define(moduleName, dependencies, constructor) {
+                    define.called = [moduleName, dependencies];
                 }
                 define.amd = true;
-                define.called = false;
+                define.called = null;
                 return define;
             })()
         });
         vm.runInNewContext(code, sandbox, "ByteBuffer.js in AMD-VM");
         // console.log(util.inspect(sandbox));
-        test.ok(sandbox.define.called == true);
+        test.ok(sandbox.define.called && sandbox.define.called[0] == "ByteBuffer" && sandbox.define.called[1][0] == "Math/Long");
         test.done();
     },
     
