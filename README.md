@@ -8,6 +8,7 @@ unsigned and the actual bit sizes. It's also used for the cross-platform multipl
 ByteBuffer
 ----------
 * Mimics [Java ByteBuffers](http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/ByteBuffer.html) as close as reasonable while using typed array terms
+* Full 64bit support via [Long.js](https://github.com/dcodeIO/Long.js) (optional)
 * Simple allocation (`new ByteBuffer(capacity[, littleEndian])` or `ByteBuffer.allocate(capacity[, littleEndian])`)
 * Wrapping of quite everything which is or includes an ArrayBuffer (`ByteBuffer.wrap(buffer[, littleEndian])`)
 * Cloning using the same (`ByteBuffer#clone()`) and copying using an independent backing buffer (`ByteBuffer#copy()`)
@@ -23,15 +24,14 @@ ByteBuffer
 * Reversing (`ByteBuffer#reverse()`), appending (`ByteBuffer#append(src[, offset])`) and prepending
   (`ByteBuffer#prepend(src[, offset])`) of other ByteBuffers with implicit capacity management
 * Explicit destruction (`ByteBuffer#destroy()`)
-* `ByteBuffer#writeUint/Int8/16/32(value[, offset])` and `ByteBuffer#readUint/Int8/16/32([offset])` 
+* `ByteBuffer#writeUint/Int8/16/32/64(value[, offset])` and `ByteBuffer#readUint/Int8/16/32/64([offset])`
 * `ByteBuffer#writeVarint32/64(value[, offset])` and `ByteBuffer#readVarint32/64([offset])` to write a base 128
   variable-length integer as used in [protobuf](https://developers.google.com/protocol-buffers/docs/encoding#varints)
 * `ByteBuffer#writeZigZagVarint32/64(value[, offset])` and `ByteBuffer#readZigZagVarint32/64([offset])` to write a
   zig-zag encoded base 128 variable-length integer as used in protobuf for efficient encoding of signed values
-* `ByteBuffer#writeUint/Int64(value[, offset])` and `ByteBuffer#readUint/Int64([offset])` via [Long.js](https://github.com/dcodeIO/Long.js)
 * `ByteBuffer#writeFloat32/64(value[, offset])` and `ByteBuffer#readFloat32/64([offset])`
 * `ByteBuffer#write/readByte`, `ByteBuffer#write/readShort`, `ByteBuffer#write/readInt`, `ByteBuffer#write/readLong`
-  (all signed), `ByteBuffer#write/readVarint` and `ByteBuffer#write/readZigZagVarint` (both 32bit),
+  (all signed), `ByteBuffer#write/readVarint` and `ByteBuffer#write/readZigZagVarint` (both 32bit signed),
   `ByteBuffer#write/readFloat`, `ByteBuffer#write/readDouble` aliases for the above for convenience
 * `ByteBuffer#writeUTF8String(str[, offset])` and `ByteBuffer#readUTF8String(chars[, offset])` using the included UTF8
   en-/decoder (full 6 bytes, [ref](http://en.wikipedia.org/wiki/UTF-8#Description))
