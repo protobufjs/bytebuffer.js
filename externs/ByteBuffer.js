@@ -518,6 +518,7 @@ ByteBuffer.prototype.readZigZagVarint32 = function(offset) {};
  * @param {number|Long} value
  * @param {number=} offset
  * @return {!ByteBuffer|number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.writeVarint64 = function(value, offset) {};
 
@@ -532,6 +533,7 @@ ByteBuffer.prototype.readVarint64 = function(offset) {};
  * @param {number|Long} value
  * @param {number=} offset
  * @return {!ByteBuffer|number}
+ * @throws {Error}
  */
 ByteBuffer.prototype.writeZigZagVarint64 = function(value, offset) {};
 
@@ -573,6 +575,7 @@ ByteBuffer.prototype.readZigZagVarint = function(offset) {};
 /**
  * @param {number} value
  * @return {number}
+ * @throws {Error}
  * @nosideeffects
  */
 ByteBuffer.calculateVarint32 = function(value) {};
@@ -580,6 +583,7 @@ ByteBuffer.calculateVarint32 = function(value) {};
 /**
  * @param {number} value
  * @return {number}
+ * @throws {Error}
  * @nosideeffects
  */
 ByteBuffer.calculateVarint64 = function(value) {};

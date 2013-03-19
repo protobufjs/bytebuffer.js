@@ -3044,6 +3044,28 @@ and its length to the wrapped objects byte length.</p>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If long support is not available
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -3303,6 +3325,28 @@ and its length to the wrapped objects byte length.</p>
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If long support is not available
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>
@@ -8975,7 +9019,7 @@ Defaults to call console.log.</p></td>
         
             
 <dt>
-    <h4 class="name" id="readZigZagVarint64"><span class="type-signature"></span>readZigZagVarint64<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {number|{value: number, length: number}}</span></h4>
+    <h4 class="name" id="readZigZagVarint64"><span class="type-signature"></span>readZigZagVarint64<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {Long|{value: Long, length: number}}</span></h4>
     
     
 </dt>
@@ -9086,7 +9130,7 @@ Defaults to call console.log.</p></td>
     
             
 <div class="param-desc">
-    If it's not a valid varint
+    If it's not a valid varint or long support is not available
 </div>
 
 
@@ -9121,10 +9165,10 @@ Defaults to call console.log.</p></td>
 	</dt>
 	<dd>
 		
-<span class="param-type">number</span>
+<span class="param-type">Long</span>
 |
 
-<span class="param-type">{value: number, length: number}</span>
+<span class="param-type">{value: Long, length: number}</span>
 
 
 	</dd>
@@ -14918,6 +14962,28 @@ unless this is actually intended. This is not checked. If you have the option it
     
     
     
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If long support is not available
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
     <h5>Returns:</h5>

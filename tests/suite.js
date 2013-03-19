@@ -566,6 +566,7 @@ var suite = {
         var Long = ByteBuffer.Long;
         var values = [
             Long.ONE, 1,
+            Long.fromNumber(-3),
             Long.fromNumber(300),
             Long.fromNumber(-300),
             Long.fromNumber(0x7FFFFFFF),

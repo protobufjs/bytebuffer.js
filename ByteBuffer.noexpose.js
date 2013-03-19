@@ -1202,6 +1202,7 @@
          * @param {number} value Value to write
          * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
          * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
+         * @throws {Error} If long support is not available
          */
         ByteBuffer.prototype.writeZigZagVarint64 = function(value, offset) {
             return this.writeVarint64(ByteBuffer.zigZagEncode64(value), offset);
@@ -1210,8 +1211,8 @@
         /**
          * Reads a zigzag encoded 64bit base 128 variable-length integer as used in protobuf.
          * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
-         * @return {number|{value: number, length: number}} The value read if offset is omitted, else the value read and the actual number of bytes read.
-         * @throws {Error} If it's not a valid varint
+         * @return {Long|{value: Long, length: number}} The value read if offset is omitted, else the value read and the actual number of bytes read.
+         * @throws {Error} If it's not a valid varint or long support is not available
          */
         ByteBuffer.prototype.readZigZagVarint64 = function(offset) {
             var dec = this.readVarint64(offset);
@@ -1336,8 +1337,12 @@
          * Encodes a signed 64bit integer so that it can be effectively used with varint encoding.
          * @param {number|Long} n Signed long
          * @return {Long} Unsigned zigzag encoded long
+         * @throws {Error} If long support is not available
          */
         ByteBuffer.zigZagEncode64 = function(n) {
+            if (!Long) {
+                throw(new Error("Long support is not available: See https://github.com/dcodeIO/ByteBuffer.js#on-long-int64-support for details"))
+            }
             // ref: src/google/protobuf/wire_format_lite.h
             if (typeof n == 'object' && n instanceof Long) {
                 if (n.unsigned) n = n.toSigned();
@@ -1351,8 +1356,12 @@
          * Decodes a zigzag encoded signed 64bit integer.
          * @param {Long} n Unsigned zigzag encoded long
          * @return {Long} Signed long
+         * @throws {Error} If long support is not available
          */
         ByteBuffer.zigZagDecode64 = function(n) {
+            if (!Long) {
+                throw(new Error("Long support is not available: See https://github.com/dcodeIO/ByteBuffer.js#on-long-int64-support for details"))
+            }
             // ref: src/google/protobuf/wire_format_lite.h
             if (typeof n == 'object' && n instanceof Long) {
                 if (!n.unsigned) n = n.toUnsigned();
