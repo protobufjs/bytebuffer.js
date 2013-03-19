@@ -26,7 +26,7 @@ ByteBuffer
 * `ByteBuffer#writeUint/Int8/16/32(value[, offset])` and `ByteBuffer#readUint/Int8/16/32([offset])` 
 * `ByteBuffer#writeVarint32(value[, offset])` and `ByteBuffer#readVarint32([offset])` to write a base 128 variable-length
   integer as used in [protobuf](https://developers.google.com/protocol-buffers/docs/encoding#varints)
-* `ByteBuffer#writeInt64(value[, offset])` and `ByteBuffer#readInt64([offset])` via [Long.js](https://github.com/dcodeIO/Long.js)
+* `ByteBuffer#writeUint/Int64(value[, offset])` and `ByteBuffer#readUint/Int64([offset])` via [Long.js](https://github.com/dcodeIO/Long.js)
 * `ByteBuffer#writeFloat32/64(value[, offset])` and `ByteBuffer#readFloat32/64([offset])`
 * `ByteBuffer#write/readByte`, `ByteBuffer#write/readShort`, `ByteBuffer#write/readInt`, `ByteBuffer#write/readLong`
   (all signed), `ByteBuffer#write/readVarint`, `ByteBuffer#write/readFloat`, `ByteBuffer#write/readDouble` aliases for
