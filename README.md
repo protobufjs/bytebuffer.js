@@ -33,12 +33,13 @@ ByteBuffer
 * `ByteBuffer#write/readByte`, `ByteBuffer#write/readShort`, `ByteBuffer#write/readInt`, `ByteBuffer#write/readLong`
   (all signed), `ByteBuffer#write/readVarint` and `ByteBuffer#write/readZigZagVarint` (both 32bit signed),
   `ByteBuffer#write/readFloat`, `ByteBuffer#write/readDouble` aliases for the above for convenience
-* `ByteBuffer#writeUTF8String(str[, offset])` and `ByteBuffer#readUTF8String(chars[, offset])` using the included UTF8
-  en-/decoder (full 6 bytes, [ref](http://en.wikipedia.org/wiki/UTF-8#Description))
+* `ByteBuffer#writeUTF8String(str[, offset])`, `ByteBuffer#readUTF8String(chars[, offset])` and 
+  `ByteBuffer#readUTF8StringBytes(length[, offset])` using the included UTF8 en-/decoder (full 6 bytes,
+  [ref](http://en.wikipedia.org/wiki/UTF-8#Description))
 * `ByteBuffer#writeLString(str[, offset]))` and `ByteBuffer#readLString([offset])` to write respectively read a
   length-prepended (number of characters as UTF8 char) string
 * `ByteBuffer#writeVString(str[, offset]))` and `ByteBuffer#readVString([offset])` to write respectively read a
-  length-prepended (number of characters as base 128 variable-length 32bit integer) string
+  length-prepended (number of bytes as base 128 variable-length 32bit integer) string
 * `ByteBuffer#writeCString(str[, offset])` and `ByteBuffer#readCString([offset])` to write respectively read a
   NULL-terminated (Uint8 0x00) string
 * `ByteBuffer#writeJSON(data[, offset[, stringify]])` and `ByteBuffer#readJSON([offset[, parse]])` to write respectively

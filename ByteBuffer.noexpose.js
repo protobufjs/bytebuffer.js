@@ -101,62 +101,6 @@
          * @const
          */
         ByteBuffer.BIG_ENDIAN = false;
-    
-        /**
-         * Int8 type for use with {@link ByteBuffer.cast}.
-         * @type {Int8Array}
-         * @const
-         */
-        ByteBuffer.INT8 = new Int8Array(1);
-    
-        /**
-         * Uint8 type for use with {@link ByteBuffer.cast}.
-         * @type {Uint8Array}
-         * @const
-         */
-        ByteBuffer.UINT8 = new Uint8Array(1);
-    
-        /**
-         * Int16 type for use with {@link ByteBuffer.cast}.
-         * @type {Int16Array}
-         * @const
-         */
-        ByteBuffer.INT16 = new Int16Array(1);
-    
-        /**
-         * Uint16 type for use with {@link ByteBuffer.cast}.
-         * @type {Uint16Array}
-         * @const
-         */
-        ByteBuffer.UINT16 = new Uint16Array(1);
-    
-        /**
-         * Int32 type for use with {@link ByteBuffer.cast}.
-         * @type {Int32Array}
-         * @const
-         */
-        ByteBuffer.INT32 = new Int32Array(1);
-    
-        /**
-         * Uint32 type for use with {@link ByteBuffer.cast}.
-         * @type {Uint32Array}
-         * @const
-         */
-        ByteBuffer.UINT32 = new Uint32Array(1);
-    
-        /**
-         * Float32 type for use with {@link ByteBuffer.cast}.
-         * @type {Float32Array}
-         * @const
-         */
-        ByteBuffer.FLOAT32 = new Float32Array(1);
-    
-        /**
-         * Float64 type for use with {@link ByteBuffer.cast}.
-         * @type {Float64Array}
-         * @const
-         */
-        ByteBuffer.FLOAT64 = new Float64Array(1);
 
         /**
          * Long class for int64 support. May be undefined if the Long class has not been loaded and int64 support is
@@ -165,17 +109,6 @@
          * @const
          */
         ByteBuffer.Long = Long;
-    
-        /**
-         * Casts the specified value to the given type.
-         * @param {Uint8Array|Int8Array|Uint16Array|Int16Array|Uint32Array|Int32Array|Float32Array|Float64Array} type Type to cast to, e.g. {@link ByteBuffer.UINT32}.
-         * @param {number} value Value to cast
-         * @return {number} Casted value
-         */
-        ByteBuffer.cast = function(type, value) {
-            type[0] = value;
-            return type[0];
-        };
     
         /**
          * Allocates a new ByteBuffer.
@@ -981,8 +914,8 @@
             var advance = typeof offset == 'undefined';
             offset = typeof offset != 'undefined' ? offset : this.offset;
             // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
-            ByteBuffer.UINT32[0]=value;
-            this.ensureCapacity(offset+ByteBuffer.calculateVarint32(value=ByteBuffer.UINT32[0]));
+            value = value >>> 0;
+            this.ensureCapacity(offset+ByteBuffer.calculateVarint32(value));
             var dst = new Uint8Array(this.array),
                 size = 0;
             dst[offset] = (value | 0x80);
@@ -1033,22 +966,22 @@
             var src = new Uint8Array(this.array),
                 count = 0,
                 b;
-            ByteBuffer.UINT32[0] = 0;
+            var value = 0 >>> 0;
             do {
                 if (count == ByteBuffer.MAX_VARINT32_BYTES) {
                     throw(new Error("Cannot read Varint32 from "+this+"@"+offset+": Number of bytes is larger than "+ByteBuffer.MAX_VARINT32_BYTES));
                 }
                 b = src[offset+count];
-                ByteBuffer.UINT32[0] |= (b&0x7F)<<(7*count);
+                value |= ((b&0x7F)<<(7*count)) >>> 0;
                 ++count;
             } while (b & 0x80);
-            ByteBuffer.INT32[0] = ByteBuffer.UINT32[0];
+            value = value | 0;
             if (advance) {
                 this.offset += count;
-                return ByteBuffer.INT32[0];
+                return value;
             } else {
                 return {
-                    "value": ByteBuffer.INT32[0],
+                    "value": value,
                     "length": count
                 };
             }
