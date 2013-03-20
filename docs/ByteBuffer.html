@@ -707,51 +707,6 @@ instead.</p>
         
             
 <dt>
-    <h4 class="name" id="readZigZagVarint"><span class="type-signature"></span>readZigZagVarint<span class="type-signature"> :Error</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Reads a zigzag encoded base 128 variable-length integer as used in protobuf. This is an alias of <a href="ByteBuffer.html#readZigZagVarint32">ByteBuffer#readZigZagVarint32</a>.</p>
-    </div>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-</dd>
-
-        
-            
-<dt>
     <h4 class="name" id="view"><span class="type-signature"></span>view<span class="type-signature"> :DataView</span></h4>
     
     
@@ -760,51 +715,6 @@ instead.</p>
     
     <div class="description">
         <p>DataView to mess with the ArrayBuffer.</p>
-    </div>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="writeZigZagVarint"><span class="type-signature"></span>writeZigZagVarint<span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        <p>Writes a zigzag encoded base 128 encoded variable-length integer as used in protobuf. This is an alias of <a href="ByteBuffer.html#writeZigZagVarint32">ByteBuffer#writeZigZagVarint32</a>.</p>
     </div>
     
     
@@ -8324,6 +8234,169 @@ Defaults to call console.log.</p></td>
         
             
 <dt>
+    <h4 class="name" id="readZigZagVarint"><span class="type-signature"></span>readZigZagVarint<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {number|{value: number, length: number}}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Reads a zigzag encoded base 128 variable-length integer as used in protobuf. This is an alias of <a href="ByteBuffer.html#readZigZagVarint32">ByteBuffer#readZigZagVarint32</a>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>offset</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If it's not a valid varint
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>The value read if offset is omitted, else the value read and the actual number of bytes read.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">number</span>
+|
+
+<span class="param-type">{value: number, length: number}</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="readZigZagVarint32"><span class="type-signature"></span>readZigZagVarint32<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {number|{value: number, length: number}}</span></h4>
     
     
@@ -14021,6 +14094,176 @@ unless this is actually intended. This is not checked. If you have the option it
             
             
             <td class="description last"><p>String to write</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>offset</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>this if offset is omitted, else the actual number of bytes written.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="ByteBuffer.html">ByteBuffer</a></span>
+|
+
+<span class="param-type">number</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="writeZigZagVarint"><span class="type-signature"></span>writeZigZagVarint<span class="signature">(value, <span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>|number}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Writes a zigzag encoded base 128 encoded variable-length integer as used in protobuf. This is an alias of <a href="ByteBuffer.html#writeZigZagVarint32">ByteBuffer#writeZigZagVarint32</a>.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Value to write</p></td>
         </tr>
 	
 	

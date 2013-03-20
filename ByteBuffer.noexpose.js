@@ -1175,6 +1175,7 @@
 
         /**
          * Writes a zigzag encoded base 128 encoded variable-length integer as used in protobuf. This is an alias of {@link ByteBuffer#writeZigZagVarint32}.
+         * @function
          * @param {number} value Value to write
          * @param {number=} offset Offset to write to. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
          * @return {ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
@@ -1183,6 +1184,7 @@
 
         /**
          * Reads a zigzag encoded base 128 variable-length integer as used in protobuf. This is an alias of {@link ByteBuffer#readZigZagVarint32}.
+         * @function
          * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
          * @return {number|{value: number, length: number}} The value read if offset is omitted, else the value read and the actual number of bytes read.
          * @throws {Error} If it's not a valid varint
