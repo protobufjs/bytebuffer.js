@@ -1828,6 +1828,29 @@
             }
             return forceCopy && !copied ? b.copy().array : b.array;
         };
+
+        /**
+         * Returns a node Buffer compacted to contain this ByteBuffer's actual contents. Will implicitly
+         * {@link ByteBuffer#flip} the ByteBuffer if its offset is larger than its length. Will also copy all data (not
+         * a reference).
+         * @returns {Buffer} Compacted Buffer
+         * @throws {Error} If not running inside of node
+         */
+        ByteBuffer.prototype.toBuffer = function() {
+            try {
+                require("buffer"); // Just testing
+                var offset = this.offset, length = this.length;
+                if (offset > length) {
+                    var temp = offset;
+                    offset = length;
+                    length = temp;
+                }
+                return new Buffer(new Uint8Array(this.array).subarray(offset, length));
+            } catch (e) {
+                console.trace(e);
+                throw("ByteBuffer#toBuffer() is available with node.js only");
+            }
+        };
     
         /**
          * Extends the ByteBuffer prototype with additional methods.

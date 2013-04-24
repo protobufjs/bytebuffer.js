@@ -21,6 +21,7 @@ ByteBuffer
 * Compacting of the backing buffer (`ByteBuffer#compact()`)
 * Conversion to ArrayBuffer (`ByteBuffer#toArrayBuffer([forceCopy])`) (i.e. to send data over the wire, e.g. a WebSocket
   with `binaryType="arraybuffer"`)
+* Conversion to Buffer (`ByteBuffer#toBuffer()`) if running inside of node.js
 * Reversing (`ByteBuffer#reverse()`), appending (`ByteBuffer#append(src[, offset])`) and prepending
   (`ByteBuffer#prepend(src[, offset])`) of other ByteBuffers with implicit capacity management
 * Explicit destruction (`ByteBuffer#destroy()`)

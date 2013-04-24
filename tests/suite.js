@@ -673,6 +673,24 @@ var suite = {
         test.done();
     },
     
+    "toBuffer": function(test) {
+        var bb = new ByteBuffer(3);
+        bb.writeUint16(0x1234);
+        var buf;
+        try {
+            buf = bb.toBuffer();
+        } catch (e) {
+            console.trace(e);
+        }
+        test.equal(buf.length, 2);
+        test.equal(buf[0], 0x12);
+        test.equal(buf[1], 0x34);
+        test.equal(bb.offset, 2);
+        test.equal(bb.length, 0);
+        test.equal(bb.array.byteLength, 3);
+        test.done();
+    },
+    
     "printDebug": function(test) {
         var bb = new ByteBuffer(3);
         test.ok(typeof bb.printDebug(true) == 'string');
