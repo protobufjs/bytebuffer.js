@@ -1845,10 +1845,10 @@
                     offset = length;
                     length = temp;
                 }
-                return new Buffer(new Uint8Array(this.array).subarray(offset, length));
+                var srcView = new Uint8Array(this.array);
+                return new Buffer(srcView.subarray(offset, length));
             } catch (e) {
-                console.trace(e);
-                throw("ByteBuffer#toBuffer() is available with node.js only");
+                throw(e);
             }
         };
     
