@@ -726,6 +726,21 @@ var suite = {
         test.done();
     },
     
+    "protobuf.js issue 19": function(test) {
+        // test that this issue is fixed: https://github.com/dcodeIO/ProtoBuf.js/issues/19
+        var bb = new ByteBuffer();
+        bb.writeVarint32(16);
+        bb.writeVarint32(2);
+        bb.writeVarint32(24);
+        bb.writeVarint32(0);
+        bb.writeVarint32(32);
+        bb.writeVarint64(ByteBuffer.Long.fromString("1368057600000"));
+        bb.writeVarint32(40);
+        bb.writeVarint64(ByteBuffer.Long.fromString("1235455123"));
+        test.equals(bb.toHex(), ">10 02 18 00 20 80 B0 D9 B4 E8 27 28 93 99 8E CD \n 04<00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ");
+        test.done();
+    },
+    
     "commonjs": function(test) {
         var fs = require("fs")
           , vm = require("vm")
