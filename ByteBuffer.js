@@ -1135,10 +1135,10 @@
             var part0 = value.toInt() >>> 0,
                 part1 = value.shiftRightUnsigned(28).toInt() >>> 0,
                 part2 = value.shiftRightUnsigned(56).toInt() >>> 0,
-                size = ByteBuffer.calculateVarint64(value),
-                dst = new Uint8Array(this.array);
+                size = ByteBuffer.calculateVarint64(value);
             
             this.ensureCapacity(offset+size);
+            var dst = new Uint8Array(this.array);
             switch (size) {
                 case 10: dst[offset+9] = ((part2 >>> 7)  | 0x80);
                 case 9 : dst[offset+8] = ((part2       ) | 0x80);
