@@ -60,14 +60,6 @@ var Sandbox = function(properties) {
  * @type {Object.<string,function>}
  */
 var suite = {
-
-    setUp: function (callback) {
-        callback();
-    },
-    
-    tearDown: function (callback) {
-        callback();
-    },
     
     "init": function(test) {
         test.ok(typeof ByteBuffer == "function");
@@ -346,7 +338,7 @@ var suite = {
         var bb = new ByteBuffer(4);
         bb.writeUint32(0x12345678);
         bb.flip();
-        test.equals(0x12345678, bb.readUint32());
+        test.equal(0x12345678, bb.readUint32());
         test.done();
     },
     
@@ -354,7 +346,7 @@ var suite = {
         var bb = new ByteBuffer(4);
         bb.writeFloat32(0.5);
         bb.flip();
-        test.equals(0.5, bb.readFloat32()); // 0.5 remains 0.5 if Float32
+        test.equal(0.5, bb.readFloat32()); // 0.5 remains 0.5 if Float32
         test.done();
     },
     
@@ -369,7 +361,7 @@ var suite = {
         var bb = new ByteBuffer(8);
         bb.writeFloat64(0.1);
         bb.flip();
-        test.equals(0.1, bb.readFloat64()); // would be 0.10000000149011612 if Float32
+        test.equal(0.1, bb.readFloat64()); // would be 0.10000000149011612 if Float32
         test.done();
     },
     
@@ -597,7 +589,7 @@ var suite = {
         bb.writeLString("ab"); // resizes to 4
         test.equal(bb.array.byteLength, 4);
         test.equal(bb.offset, 3);
-        test.equals(bb.length, 0);
+        test.equal(bb.length, 0);
         bb.flip();
         test.equal(bb.toHex(), "<02 61 62>00 ");
         test.deepEqual({"string": "ab", "length": 3}, bb.readLString(0));
@@ -612,7 +604,7 @@ var suite = {
         bb.writeVString("ab"); // resizes to 4
         test.equal(bb.array.byteLength, 4);
         test.equal(bb.offset, 3);
-        test.equals(bb.length, 0);
+        test.equal(bb.length, 0);
         bb.flip();
         test.equal(bb.toHex(), "<02 61 62>00 ");
         test.deepEqual({"string": "ab", "length": 3}, bb.readVString(0));
@@ -707,9 +699,9 @@ var suite = {
         for (var i=0; i<chars.length;i++) {
             ByteBuffer.encodeUTF8Char(chars[i], bb, 0);
             dec = ByteBuffer.decodeUTF8Char(bb, 0);
-            test.equals(chars[i], dec['char']);
-            test.equals(ByteBuffer.calculateUTF8Char(chars[i]), dec["length"]);
-            test.equals(String.fromCharCode(chars[i]), String.fromCharCode(dec['char']));
+            test.equal(chars[i], dec['char']);
+            test.equal(ByteBuffer.calculateUTF8Char(chars[i]), dec["length"]);
+            test.equal(String.fromCharCode(chars[i]), String.fromCharCode(dec['char']));
         }
         test.throws(function() {
             ByteBuffer.encodeUTF8Char(-1, bb, 0);
@@ -726,7 +718,7 @@ var suite = {
         test.done();
     },
 
-    "protobuf.js issue 19": function(test) {
+    "pbjsi19": function(test) {
         // test that this issue is fixed: https://github.com/dcodeIO/ProtoBuf.js/issues/19
         var bb = new ByteBuffer(9); // Trigger resize to 18 in writeVarint64
         bb.writeVarint32(16);
@@ -737,7 +729,7 @@ var suite = {
         bb.writeVarint64(ByteBuffer.Long.fromString("1368057600000"));
         bb.writeVarint32(40);
         bb.writeVarint64(ByteBuffer.Long.fromString("1235455123"));
-        test.equals(bb.toHex(18), ">10 02 18 00 20 80 B0 D9 B4 E8 27 28 93 99 8E CD 04<00 ");
+        test.equal(bb.toHex(18), ">10 02 18 00 20 80 B0 D9 B4 E8 27 28 93 99 8E CD 04<00 ");
         test.done();
     },
     

@@ -13,12 +13,12 @@
     },
     "keywords": ["net", "array", "buffer", "arraybuffer", "typed array", "bytebuffer", "json", "websocket", "webrtc"],
     "dependencies": {
-        "long": ">=1.1.2"
+        "long": "latest"
     },
     "devDependencies": {
-        "nodeunit": ">=0.7",
-        "preprocessor": ">=1.0.2",
-        "closurecompiler": ">=1.1"
+        "testjs": "latest",
+        "preprocessor": "latest",
+        "closurecompiler": "latest"
     },
     "license": "Apache License, Version 2.0",
     "engines": {
@@ -26,7 +26,7 @@
     },
     "scripts": {
         "prepublish": "npm test",
-        "test": "nodeunit tests/suite.js",
+        "test": "node node_modules/testjs/bin/testjs tests/suite.js",
 
         "make": "npm run-script build && npm run-script compile && npm run-script noexpose && npm test && npm run-script jsdoc",
         "build": "preprocess src/ByteBuffer.js src/ > ByteBuffer.js",
