@@ -22,7 +22,11 @@
 (function(global) {
     "use strict";
 
-    function loadByteBuffer(Long) {
+    function loadByteBuffer(Long, nodeBuffer) {
+        var Buffer = nodeBuffer &&
+            typeof nodeBuffer['Buffer'] == 'function' &&
+            typeof nodeBuffer['Buffer']['isBuffer'] == 'function'
+            ? nodeBuffer['Buffer'] : null;
         
         /**
          * Constructs a new ByteBuffer.
@@ -132,6 +136,10 @@
             // Wrap a string
             if (typeof buffer == 'string') {
                 return new ByteBuffer().writeUTF8String(buffer).flip();
+            }
+            // Wrap node Buffer
+            if (Buffer && Buffer.isBuffer(buffer)) {
+                buffer = new Uint8Array(buffer);
             }
             // Wrap anything that is or contains an ArrayBuffer
             if (!!buffer["array"]) {
@@ -1837,8 +1845,7 @@
          * @throws {Error} If not running inside of node
          */
         ByteBuffer.prototype.toBuffer = function() {
-            try {
-                require("buffer"); // Just testing
+            if (Buffer) {
                 var offset = this.offset, length = this.length;
                 if (offset > length) {
                     var temp = offset;
@@ -1847,9 +1854,8 @@
                 }
                 var srcView = new Uint8Array(this.array);
                 return new Buffer(srcView.subarray(offset, length));
-            } catch (e) {
-                throw(e);
             }
+            throw(new Error("Conversion to Buffer is available under node.js only"));
         };
     
         /**
@@ -1871,7 +1877,7 @@
 
     // Enable module loading if available
     if (typeof module != 'undefined' && module["exports"]) { // CommonJS
-        module["exports"] = loadByteBuffer(require("long"));
+        module["exports"] = loadByteBuffer(require("long"), require("buffer"));
     } else if (typeof define != 'undefined' && define["amd"]) { // AMD
         define("ByteBuffer", ["Math/Long"], function(Long) { return loadByteBuffer(Long); });
     } else { // Shim

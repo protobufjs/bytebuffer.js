@@ -105,6 +105,13 @@ var suite = {
         test.equal(bb.readUTF8String(4), "test");
         test.done();
     },
+    
+    "wrap(Buffer)": function(test) {
+        var b = new Buffer("abc", "utf8");
+        var bb = ByteBuffer.wrap(b);
+        test.equal(bb.toHex(), "<61 62 63>");
+        test.done();
+    },
 
     "resize": function(test) {
         var bb = new ByteBuffer(1);
