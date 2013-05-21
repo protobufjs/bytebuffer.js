@@ -32,6 +32,12 @@ var FILE = "ByteBuffer.min.js";
 var ByteBuffer = require(__dirname+"/../"+FILE);
 
 /**
+ * Long.
+ * @type {Long}
+ */
+var Long = ByteBuffer.Long;
+
+/**
  * Constructs a new Sandbox for module loaders and shim testing.
  * @param {Object.<string,*>} properties Additional properties to set
  * @constructor
@@ -431,6 +437,15 @@ var suite = {
         var bb = new ByteBuffer(1);
         test.strictEqual(bb.readInt64, bb.readLong);
         test.strictEqual(bb.writeInt64, bb.writeLong);
+        test.done();
+    },
+    
+    "writeVarint64/readVarint32": function(test) {
+        var bb = new ByteBuffer();
+        bb.writeVarint64(Long.fromNumber(-1));
+        bb.flip();
+        var n = bb.readVarint32();
+        test.equal(n, -1);
         test.done();
     },
     

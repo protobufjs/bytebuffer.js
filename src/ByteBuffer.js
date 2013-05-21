@@ -1042,14 +1042,11 @@
                 b;
             var value = 0 >>> 0;
             do {
-                if (count == ByteBuffer.MAX_VARINT32_BYTES) {
-                    throw(new Error("Cannot read Varint32 from "+this+"@"+offset+": Number of bytes is larger than "+ByteBuffer.MAX_VARINT32_BYTES));
-                }
                 b = src[offset+count];
                 value |= ((b&0x7F)<<(7*count)) >>> 0;
                 ++count;
             } while (b & 0x80);
-            value = value | 0;
+            value = value | 0; // Make sure to discard the higher order bits
             if (advance) {
                 this.offset += count;
                 return value;
