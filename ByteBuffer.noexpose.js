@@ -521,7 +521,7 @@
         ByteBuffer.prototype.readInt8 = function(offset) {
             offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
             if (offset >= this.array.byteLength) {
-                throw(new Error("Cannot read int8 from "+this+": Capacity overflow"));
+                throw(new Error("Cannot read int8 from "+this+" at "+offset+": Capacity overflow"));
             }
             return this.view.getInt8(offset);
         };
@@ -566,8 +566,8 @@
          */
         ByteBuffer.prototype.readUint8 = function(offset) {
             offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
-            if (offset >= this.array.byteLength) {
-                throw("Cannot read uint8 from "+this+": Capacity overflow");
+            if (offset+1 > this.array.byteLength) {
+                throw("Cannot read uint8 from "+this+" at "+offset+": Capacity overflow");
             }
             return this.view.getUint8(offset);
         };
@@ -594,7 +594,7 @@
         ByteBuffer.prototype.readInt16 = function(offset) {
             offset = typeof offset != 'undefined' ? offset : (this.offset+=2)-2;
             if (offset+2 > this.array.byteLength) {
-                throw(new Error("Cannot read int16 from "+this+": Capacity overflow"));
+                throw(new Error("Cannot read int16 from "+this+" at "+offset+": Capacity overflow"));
             }
             return this.view.getInt16(offset, this.littleEndian);
         };
@@ -639,7 +639,7 @@
         ByteBuffer.prototype.readUint16 = function(offset) {
             offset = typeof offset != 'undefined' ? offset : (this.offset+=2)-2;
             if (offset+2 > this.array.byteLEngth) {
-                throw(new Error("Cannot read int16 from "+this+": Capacity overflow"));
+                throw(new Error("Cannot read int16 from "+this+" at "+offset+": Capacity overflow"));
             }
             return this.view.getUint16(offset, this.littleEndian);
         };
@@ -666,7 +666,7 @@
         ByteBuffer.prototype.readInt32 = function(offset) {
             offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
             if (offset+4 > this.array.byteLength) {
-                throw(new Error("Cannot read int32 from "+this+": Capacity overflow"));
+                throw(new Error("Cannot read int32 from "+this+" at "+offset+": Capacity overflow"));
             }
             return this.view.getInt32(offset, this.littleEndian);
         };
@@ -711,7 +711,7 @@
         ByteBuffer.prototype.readUint32 = function(offset) {
             offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
             if (offset+4 > this.array.byteLength) {
-                throw(new Error("Cannot read uint32 from "+this+": Capacity overflow"));
+                throw(new Error("Cannot read uint32 from "+this+" at "+offset+": Capacity overflow"));
             }
             return this.view.getUint32(offset, this.littleEndian);
         };
@@ -738,7 +738,7 @@
         ByteBuffer.prototype.readFloat32 = function(offset) {
             offset = typeof offset != 'undefined' ? offset : (this.offset+=4)-4;
             if (this.array == null || offset+4 > this.array.byteLength) {
-                throw(new Error("Cannot read float32 from "+this+": Capacity overflow"));
+                throw(new Error("Cannot read float32 from "+this+" at "+offset+": Capacity overflow"));
             }
             return this.view.getFloat32(offset, this.littleEndian);
         };
@@ -783,7 +783,7 @@
         ByteBuffer.prototype.readFloat64 = function(offset) {
             offset = typeof offset != 'undefined' ? offset : (this.offset+=8)-8;
             if (this.array == null || offset+8 > this.array.byteLength) {
-                throw(new Error("Cannot read float64 from "+this+": Capacity overflow"));
+                throw(new Error("Cannot read float64 from "+this+" at "+offset+": Capacity overflow"));
             }
             return this.view.getFloat64(offset, this.littleEndian);
         };
@@ -844,7 +844,7 @@
             offset = typeof offset != 'undefined' ? offset : (this.offset+=8)-8;
             if (this.array == null || offset+8 > this.array.byteLength) {
                 this.offset -= 8;
-                throw(new Error("Cannot read int64 from "+this+": Capacity overflow"));
+                throw(new Error("Cannot read int64 from "+this+" at "+offset+": Capacity overflow"));
             }
             var value;
             if (this.littleEndian) {
@@ -893,7 +893,7 @@
             offset = typeof offset != 'undefined' ? offset : (this.offset+=8)-8;
             if (this.array == null || offset+8 > this.array.byteLength) {
                 this.offset -= 8;
-                throw(new Error("Cannot read int64 from "+this+": Capacity overflow"));
+                throw(new Error("Cannot read int64 from "+this+" at "+offset+": Capacity overflow"));
             }
             var value;
             if (this.littleEndian) {
