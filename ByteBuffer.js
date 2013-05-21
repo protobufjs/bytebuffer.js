@@ -135,11 +135,26 @@
         ByteBuffer.allocate = function(capacity, littleEndian) {
             return new ByteBuffer(capacity, littleEndian);
         };
+
+        /**
+         * Converts a node.js <= 0.8 Buffer to an ArrayBuffer.
+         * @param {Buffer} buffer Buffer to convert
+         * @return {ArrayBuffer} Converted buffer
+         * @private
+         */
+        function toArrayBuffer(buffer) {
+            var ab = new ArrayBuffer(buffer.length);
+            var view = new Uint8Array(ab);
+            for (var i = 0; i < buffer.length; ++i) {
+                view[i] = buffer[i];
+            }
+            return ab;
+        }
     
         /**
          * Wraps an ArrayBuffer, any object containing an ArrayBuffer or a string. Sets the created ByteBuffer's offset to 0
          * and its length to the wrapped objects byte length.
-         * @param {ArrayBuffer|{array: ArrayBuffer}|{buffer: ArrayBuffer}|string} buffer ArrayBuffer, any object with an .array or .buffer property or a string to wrap
+         * @param {ArrayBuffer|Buffer|string|{array: ArrayBuffer}|{buffer: ArrayBuffer}|string} buffer ArrayBuffer, any object with an .array or .buffer property or a string to wrap
          * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to true.
          * @return {ByteBuffer}
          * @throws {Error} If the specified object cannot be wrapped
@@ -150,9 +165,11 @@
             if (typeof buffer == 'string') {
                 return new ByteBuffer().writeUTF8String(buffer).flip();
             }
-            // Wrap node Buffer
+            var b;
+            // Wrap Buffer
             if (Buffer && Buffer.isBuffer(buffer)) {
-                buffer = new Uint8Array(buffer);
+                b = new Uint8Array(buffer).buffer; // noop on node <= 0.8
+                buffer = (b === buffer) ? toArrayBuffer(buffer) : b;
             }
             // Wrap anything that is or contains an ArrayBuffer
             if (!!buffer["array"]) {
@@ -161,9 +178,9 @@
                 buffer = buffer["buffer"];
             }
             if (!(buffer instanceof ArrayBuffer)) {
-                throw(new Error("Cannot wrap buffer of type "+typeof(buffer)));
+                throw(new Error("Cannot wrap buffer of type "+typeof(buffer)+", "+buffer.constructor.name));
             }
-            var b = new ByteBuffer(0, littleEndian, /* shadow copy */ true);
+            b = new ByteBuffer(0, littleEndian, /* shadow copy */ true);
             b.array = buffer;
             b.view = new DataView(b.array);
             b.offset = 0;
