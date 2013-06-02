@@ -22,11 +22,17 @@
 (function(global) {
     "use strict";
 
-    function loadByteBuffer(Long, nodeBuffer) {
-        var Buffer = nodeBuffer &&
-            typeof nodeBuffer['Buffer'] == 'function' &&
-            typeof nodeBuffer['Buffer']['isBuffer'] == 'function'
-            ? nodeBuffer['Buffer'] : null;
+    function loadByteBuffer(Long) {
+        
+        // Support node's Buffer if available, http://nodejs.org/api/buffer.html
+        var Buffer = null;
+        if (typeof require === 'function') {
+            try {
+                var nodeBuffer = require("buffer");
+                Buffer = nodeBuffer && typeof nodeBuffer['Buffer'] === 'function' && typeof nodeBuffer['Buffer']['isBuffer'] === 'function'
+                       ? nodeBuffer['Buffer'] : null;
+            } catch (e) {}
+        }
         
         /**
          * Constructs a new ByteBuffer.
@@ -1992,11 +1998,13 @@
         
         return ByteBuffer;
     }
+    
+    
 
     // Enable module loading if available
     if (typeof module != 'undefined' && module["exports"]) { // CommonJS
         /** @expose */
-        module["exports"] = loadByteBuffer(require("long"), require("buffer"));
+        module["exports"] = loadByteBuffer(require("long"));
     } else if (typeof define != 'undefined' && define["amd"]) { // AMD
         define("ByteBuffer", ["Math/Long"], function(Long) { return loadByteBuffer(Long); });
     } else { // Shim
