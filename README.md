@@ -68,7 +68,7 @@ Features
 --------
 * [CommonJS](http://www.commonjs.org/) compatible
 * [RequireJS](http://requirejs.org/)/AMD compatible
-* Shim compatible (include the script, then use var ByteBuffer = dcodeIO.ByteBuffer;)
+* Browser compatible (include the script, then use var ByteBuffer = dcodeIO.ByteBuffer;)
 * [node.js](http://nodejs.org) compatible, also available via [npm](https://npmjs.org/package/bytebuffer)
 * [Closure Compiler](https://developers.google.com/closure/compiler/) ADVANCED_OPTIMIZATIONS compatible (fully annotated,
   `ByteBuffer.min.js` has been compiled this way, `ByteBuffer.min.map` is the source map)
@@ -90,7 +90,7 @@ bb.flip();
 console.log(bb.readLString()+" from ByteBuffer.js");
 ```
 
-### Browser (shim) ###
+### Browser ###
 
 Optionally depends on [Long.js](https://github.com/dcodeIO/Long.js) for long (int64) support. If you do not require long
 support, you can skip the Long.js include.
