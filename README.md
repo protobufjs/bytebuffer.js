@@ -153,7 +153,7 @@ Tests (& Examples) [![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.
 
 Prerequisites to run it against IE<10, FF<15, Chrome<9 etc.
 -----------------------------------------------------------
-* Working ArrayBuffer, DataView & Uint8Array implementations (i.e. use a [polyfill](http://www.calormen.com/polyfill/#typedarray), [2](https://github.com/davidflanagan/DataView.js))
+* Working ArrayBuffer & DataView implementations (i.e. use a [polyfill](https://github.com/inexorabletash/polyfill#typed-arrays-polyfill))
 
 Usage with Closure Compiler set to `ADVANCED_OPTIMIZATIONS`
 -----------------------------------------------------------
@@ -174,6 +174,10 @@ Use [ByteBuffer.noexpose.js](https://github.com/dcodeIO/ByteBuffer.js/blob/maste
 the ByteBuffer class to be fully integrated into your (single file) project. Of course no external scripts will be able
 to call it or its method (trivially) because quite everything will become renamed, some parts inlined and moved around.
 This will also allow the compiler to actually remove unused code.
+
+Contributors
+------------
+[Dretch](https://github.com/Dretch) (IE8 comp.)
 
 License
 -------
