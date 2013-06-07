@@ -18,13 +18,13 @@
  * @license ByteBuffer.js (c) 2013 Daniel Wirtz <dcode@dcode.io>
  * Released under the Apache License, Version 2.0
  * see: https://github.com/dcodeIO/ByteBuffer.js for details
- *
- * Note that this library carefully avoids using the array access operator
- * (i.e. buffer[x]) on ArrayBufferView subclasses (e.g. Uint8Array), and
- * uses DataView instead. This is required for IE 8 compatibility.
  */
 (function(global) {
     "use strict";
+
+    // Note that this library carefully avoids using the array access operator
+    // (i.e. buffer[x]) on ArrayBufferView subclasses (e.g. Uint8Array), and
+    // uses DataView instead. This is required for IE 8 compatibility.
 
     function loadByteBuffer(Long) {
         

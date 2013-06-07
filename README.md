@@ -155,8 +155,8 @@ Prerequisites to run it against IE<10, FF<15, Chrome<9 etc.
 -----------------------------------------------------------
 * Working ArrayBuffer & DataView implementations (i.e. use a [polyfill](https://github.com/inexorabletash/polyfill#typed-arrays-polyfill))
 
-Usage with Closure Compiler set to `ADVANCED_OPTIMIZATIONS`
------------------------------------------------------------
+Usage with Closure Compiler's advanced optimizations
+----------------------------------------------------
 You basically have the following three options:
 
 #### ByteBuffer.js as external dependency ####
