@@ -18,6 +18,10 @@
  * @license ByteBuffer.js (c) 2013 Daniel Wirtz <dcode@dcode.io>
  * Released under the Apache License, Version 2.0
  * see: https://github.com/dcodeIO/ByteBuffer.js for details
+ *
+ * Note that this library carefully avoids using the array access operator
+ * (i.e. buffer[x]) on ArrayBufferView subclasses (e.g. Uint8Array), and
+ * uses DataView instead. This is required for IE 8 compatibility.
  */
 (function(global) {
     "use strict";
@@ -947,32 +951,32 @@
             // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
             value = value >>> 0;
             this.ensureCapacity(offset+ByteBuffer.calculateVarint32(value));
-            var dst = new Uint8Array(this.array),
+            var dst = new DataView(this.array),
                 size = 0;
-            dst[offset] = (value | 0x80);
+            dst.setUint8(offset, value | 0x80);
             if (value >= (1 << 7)) {
-                dst[offset+1] = ((value >> 7) | 0x80);
+                dst.setUint8(offset+1, (value >> 7) | 0x80);
                 if (value >= (1 << 14)) {
-                    dst[offset+2] = ((value >> 14) | 0x80);
+                    dst.setUint8(offset+2, (value >> 14) | 0x80);
                     if (value >= (1 << 21)) {
-                        dst[offset+3] = ((value >> 21) | 0x80);
+                        dst.setUint8(offset+3, (value >> 21) | 0x80);
                         if (value >= (1 << 28)) {
-                            dst[offset+4] = (value >> 28) & 0x7F;
+                            dst.setUint8(offset+4, (value >> 28) & 0x7F);
                             size = 5;
                         } else {
-                            dst[offset+3] &= 0x7F;
+                            dst.setUint8(offset+3, dst.getUint8(offset+3) & 0x7F);
                             size = 4;
                         }
                     } else {
-                        dst[offset+2] &= 0x7F;
+                        dst.setUint8(offset+2, dst.getUint8(offset+2) & 0x7F);
                         size = 3;
                     }
                 } else {
-                    dst[offset+1] &= 0x7F;
+                    dst.setUint8(offset+1, dst.getUint8(offset+1) & 0x7F);
                     size = 2;
                 }
             } else {
-                dst[offset] &= 0x7F;
+                dst.setUint8(offset, dst.getUint8(offset) & 0x7F);
                 size = 1;
             }
             if (advance) {
@@ -994,12 +998,12 @@
             offset = typeof offset != 'undefined' ? offset : this.offset;
             // ref: src/google/protobuf/io/coded_stream.cc
             
-            var src = new Uint8Array(this.array),
+            var src = new DataView(this.array),
                 count = 0,
                 b;
             var value = 0 >>> 0;
             do {
-                b = src[offset+count];
+                b = src.getUint8(offset+count);
                 value |= ((b&0x7F)<<(7*count)) >>> 0;
                 ++count;
             } while (b & 0x80);
@@ -1096,20 +1100,20 @@
                 size = ByteBuffer.calculateVarint64(value);
             
             this.ensureCapacity(offset+size);
-            var dst = new Uint8Array(this.array);
+            var dst = new DataView(this.array);
             switch (size) {
-                case 10: dst[offset+9] = ((part2 >>> 7)  | 0x80);
-                case 9 : dst[offset+8] = ((part2       ) | 0x80);
-                case 8 : dst[offset+7] = ((part1 >>> 21) | 0x80);
-                case 7 : dst[offset+6] = ((part1 >>> 14) | 0x80);
-                case 6 : dst[offset+5] = ((part1 >>>  7) | 0x80);
-                case 5 : dst[offset+4] = ((part1       ) | 0x80);
-                case 4 : dst[offset+3] = ((part0 >>> 21) | 0x80);
-                case 3 : dst[offset+2] = ((part0 >>> 14) | 0x80);
-                case 2 : dst[offset+1] = ((part0 >>>  7) | 0x80);
-                case 1 : dst[offset+0] = ((part0       ) | 0x80);
+                case 10: dst.setUint8(offset+9, (part2 >>>  7) | 0x80);
+                case 9 : dst.setUint8(offset+8, (part2       ) | 0x80);
+                case 8 : dst.setUint8(offset+7, (part1 >>> 21) | 0x80);
+                case 7 : dst.setUint8(offset+6, (part1 >>> 14) | 0x80);
+                case 6 : dst.setUint8(offset+5, (part1 >>>  7) | 0x80);
+                case 5 : dst.setUint8(offset+4, (part1       ) | 0x80);
+                case 4 : dst.setUint8(offset+3, (part0 >>> 21) | 0x80);
+                case 3 : dst.setUint8(offset+2, (part0 >>> 14) | 0x80);
+                case 2 : dst.setUint8(offset+1, (part0 >>>  7) | 0x80);
+                case 1 : dst.setUint8(offset+0, (part0       ) | 0x80);
             }
-            dst[offset+size-1] &= 0x7F;
+            dst.setUint8(offset+size-1, dst.getUint8(offset+size-1) & 0x7F);
             if (advance) {
                 this.offset += size;
                 return this;
@@ -1133,18 +1137,18 @@
             var start = offset;
             // ref: src/google/protobuf/io/coded_stream.cc
             
-            var src = new Uint8Array(this.array);
+            var src = new DataView(this.array);
             var part0, part1 = 0, part2 = 0, b;
-            b = src[offset++]; part0  = (b & 0x7F)      ; if (b & 0x80) {
-            b = src[offset++]; part0 |= (b & 0x7F) <<  7; if (b & 0x80) {
-            b = src[offset++]; part0 |= (b & 0x7F) << 14; if (b & 0x80) {
-            b = src[offset++]; part0 |= (b & 0x7F) << 21; if (b & 0x80) {
-            b = src[offset++]; part1  = (b & 0x7F)      ; if (b & 0x80) {
-            b = src[offset++]; part1 |= (b & 0x7F) <<  7; if (b & 0x80) {
-            b = src[offset++]; part1 |= (b & 0x7F) << 14; if (b & 0x80) {
-            b = src[offset++]; part1 |= (b & 0x7F) << 21; if (b & 0x80) {
-            b = src[offset++]; part2  = (b & 0x7F)      ; if (b & 0x80) {
-            b = src[offset++]; part2 |= (b & 0x7F) <<  7; if (b & 0x80) {
+            b = src.getUint8(offset++); part0  = (b & 0x7F)      ; if (b & 0x80) {
+            b = src.getUint8(offset++); part0 |= (b & 0x7F) <<  7; if (b & 0x80) {
+            b = src.getUint8(offset++); part0 |= (b & 0x7F) << 14; if (b & 0x80) {
+            b = src.getUint8(offset++); part0 |= (b & 0x7F) << 21; if (b & 0x80) {
+            b = src.getUint8(offset++); part1  = (b & 0x7F)      ; if (b & 0x80) {
+            b = src.getUint8(offset++); part1 |= (b & 0x7F) <<  7; if (b & 0x80) {
+            b = src.getUint8(offset++); part1 |= (b & 0x7F) << 14; if (b & 0x80) {
+            b = src.getUint8(offset++); part1 |= (b & 0x7F) << 21; if (b & 0x80) {
+            b = src.getUint8(offset++); part2  = (b & 0x7F)      ; if (b & 0x80) {
+            b = src.getUint8(offset++); part2 |= (b & 0x7F) <<  7; if (b & 0x80) {
             throw(new Error("Data must be corrupt: Buffer overrun")); }}}}}}}}}}
             var value = Long.from28Bits(part0, part1, part2, false);
             if (advance) {
@@ -1761,7 +1765,7 @@
             asArray = !!asArray;
             wrap = typeof wrap != 'undefined' ? parseInt(wrap, 10) : 16;
             if (wrap < 1) wrap = 16;
-            var out = "", lines = [], view = new Uint8Array(this.array);
+            var out = "", lines = [], view = new DataView(this.array);
             if (this.offset == 0 && this.length == 0) {
                 out += "|";
             } else if (this.length == 0) {
@@ -1776,7 +1780,7 @@
                     lines.push(out);
                     out = " ";
                 }
-                var val = view[i];
+                var val = view.getUint8(i);
                 val = val.toString(16).toUpperCase();
                 if (val.length < 2) val = "0"+val;
                 out += val;
@@ -1808,13 +1812,13 @@
             asArray = !!asArray;
             wrap = typeof wrap != 'undefined' ? parseInt(wrap, 10) : 16;
             if (wrap < 1) wrap = 16;
-            var out = "", lines = [], view = new Uint8Array(this.array);
+            var out = "", lines = [], view = new DataView(this.array);
             for (var i=0; i<this.array.byteLength; i++) {
                 if (i>0 && i%wrap == 0) {
                     lines.push(out);
                     out = "";
                 }
-                var val = view[i];
+                var val = view.getUint8(i);
                 if (val >  32 && val < 127) {
                     val = String.fromCharCode(val);
                 } else {
