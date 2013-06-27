@@ -2,8 +2,7 @@
 ======================================
 Provides a Java-like, Netty-inspired ByteBuffer implementation using typed arrays. It also tries to abstract a bit of
 the complexity away by providing convenience methods for those who just want to write stuff without caring about signed,
-unsigned and the actual bit sizes. It's also used for the cross-platform multiplayer component in
-[eSoccer](http://www.esoccer.me), an HTML5 game developed at [University of Applied Sciences Bonn](http://www.h-brs.de).
+unsigned and the actual bit sizes. It's also one of the components driving [ProtoBuf.js](https://github.com/dcodeIO/ProtoBuf.js).
 
 ByteBuffer
 ----------
@@ -68,8 +67,8 @@ Features
 --------
 * [CommonJS](http://www.commonjs.org/) compatible
 * [RequireJS](http://requirejs.org/)/AMD compatible
-* Browser compatible (include the script, then use var ByteBuffer = dcodeIO.ByteBuffer;)
 * [node.js](http://nodejs.org) compatible, also available via [npm](https://npmjs.org/package/bytebuffer)
+* Browser compatible
 * [Closure Compiler](https://developers.google.com/closure/compiler/) ADVANCED_OPTIMIZATIONS compatible (fully annotated,
   `ByteBuffer.min.js` has been compiled this way, `ByteBuffer.min.map` is the source map)
 * Fully documented using [jsdoc3](https://github.com/jsdoc3/jsdoc)
