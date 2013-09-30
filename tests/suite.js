@@ -97,10 +97,11 @@ var suite = {
         test.done();
     },
     
-    "wrap(ByteBuffer)": function(test) {
-        var bb2 = new ByteBuffer(1);
+    "wrap(ByteBuffer)": function(test) { // clones
+        var bb2 = new ByteBuffer(4).writeInt32(0x12345678).flip();
+        bb2.offset = 1;
         var bb = ByteBuffer.wrap(bb2);
-        test.strictEqual(bb.array, bb2.array);
+        test.strictEqual(bb2.toHex(), bb.toHex());
         test.done();
     },
     

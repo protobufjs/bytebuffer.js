@@ -168,7 +168,15 @@
                 b = new Uint8Array(buffer).buffer; // noop on node <= 0.8
                 buffer = (b === buffer) ? toArrayBuffer(buffer) : b;
             }
-            // Wrap anything that is or contains an ArrayBuffer
+            // Refuse to wrap anything that's null or not an object
+            if (buffer === null || typeof buffer !== 'object') {
+                throw(new Error("Cannot wrap null or non-object"));
+            }
+            // Wrap ByteBuffer by cloning (preserve offsets)
+            if (buffer instanceof ByteBuffer) {
+                return buffer.clone();
+            }
+            // Wrap any object that is or contains an ArrayBuffer
             if (!!buffer["array"]) {
                 buffer = buffer["array"];
             } else if (!!buffer["buffer"]) {
@@ -1004,7 +1012,9 @@
             var value = 0 >>> 0;
             do {
                 b = src.getUint8(offset+count);
-                value |= ((b&0x7F)<<(7*count)) >>> 0;
+                if (count < ByteBuffer.MAX_VARINT32_BYTES) {
+                    value |= ((b&0x7F)<<(7*count)) >>> 0;
+                }
                 ++count;
             } while (b & 0x80);
             value = value | 0; // Make sure to discard the higher order bits
