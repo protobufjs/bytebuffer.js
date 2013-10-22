@@ -1922,7 +1922,7 @@
          * @returns {string} Base 64 encoded string
          */
         ByteBuffer.prototype.toBase64 = function() {
-            if (this.array == null || this.offset < this.length) return "";
+            if (this.array == null || this.offset >= this.length) return "";
             return ByteBuffer.encode64(this);
         };
 
@@ -1931,7 +1931,7 @@
          * @returns {string}
          */
         ByteBuffer.prototype.toUTF8 = function() {
-            if (this.array == null || this.offset < this.length) return "";
+            if (this.array == null || this.offset >= this.length) return "";
             return this.readUTF8StringBytes(this.length - this.offset, this.offset).string;
         };
         

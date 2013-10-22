@@ -2025,7 +2025,7 @@
          * @expose
          */
         ByteBuffer.prototype.toBase64 = function() {
-            if (this.array == null || this.offset < this.length) return "";
+            if (this.array == null || this.offset >= this.length) return "";
             return ByteBuffer.encode64(this);
         };
 
@@ -2035,7 +2035,7 @@
          * @expose
          */
         ByteBuffer.prototype.toUTF8 = function() {
-            if (this.array == null || this.offset < this.length) return "";
+            if (this.array == null || this.offset >= this.length) return "";
             return this.readUTF8StringBytes(this.length - this.offset, this.offset).string;
         };
         

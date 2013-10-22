@@ -23,7 +23,7 @@
  * File to use.
  * @type {string}
  */
-var FILE = "ByteBuffer.js";
+var FILE = "ByteBuffer.min.js";
 
 /**
  * ByteBuffer.
@@ -769,6 +769,8 @@ var suite = {
             var bb = ByteBuffer.decode64(b64);
             test.strictEqual(bb.readUTF8String(str.length, 0).string, str);
             test.strictEqual(ByteBuffer.encode64(bb), b64);
+            test.strictEqual(bb.toBase64(), b64);
+            test.strictEqual(bb.toString("base64"), b64);
         }
         test.done();
     },
