@@ -23,7 +23,7 @@
  * File to use.
  * @type {string}
  */
-var FILE = "ByteBuffer.min.js";
+var FILE = "ByteBuffer.js";
 
 /**
  * ByteBuffer.
@@ -753,6 +753,23 @@ var suite = {
         bb.writeVarint32(40);
         bb.writeVarint64(ByteBuffer.Long.fromString("1235455123"));
         test.equal(bb.toHex(18), ">10 02 18 00 20 80 B0 D9 B4 E8 27 28 93 99 8E CD 04<00 ");
+        test.done();
+    },
+    
+    "encode/decode64": function(test) {
+        var values = [
+            ["ProtoBuf.js", "UHJvdG9CdWYuanM="],
+            ["ProtoBuf.j", "UHJvdG9CdWYuag=="],
+            ["ProtoBuf.", "UHJvdG9CdWYu"],
+            ["ProtoBuf", "UHJvdG9CdWY="]
+        ];
+        for (var i=0; i<values.length; i++) {
+            var str = values[i][0],
+                b64 = values[i][1];
+            var bb = ByteBuffer.decode64(b64);
+            test.strictEqual(bb.readUTF8String(str.length, 0).string, str);
+            test.strictEqual(ByteBuffer.encode64(bb), b64);
+        }
         test.done();
     },
     

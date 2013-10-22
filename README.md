@@ -36,6 +36,8 @@ ByteBuffer
 * `ByteBuffer#writeUTF8String(str[, offset])`, `ByteBuffer#readUTF8String(chars[, offset])` and 
   `ByteBuffer#readUTF8StringBytes(length[, offset])` using the included UTF8 en-/decoder (full 6 bytes,
   [ref](http://en.wikipedia.org/wiki/UTF-8#Description))
+* `ByteBuffer.encode64(bb)`, `ByteBuffer.decode64(str)` and `ByteBuffer#toBase64()` using the included Base64
+  en/-decoder.
 * `ByteBuffer#writeLString(str[, offset]))` and `ByteBuffer#readLString([offset])` to write respectively read a
   length-prepended (number of characters as UTF8 char) string
 * `ByteBuffer#writeVString(str[, offset]))` and `ByteBuffer#readVString([offset])` to write respectively read a
@@ -60,8 +62,9 @@ ByteBuffer
   var bb = new ByteBuffer(8).LE().writeInt(1).BE().writeInt(2).flip(); // toHex: <01 00 00 00 00 00 00 02>
   ```
   
-* `ByteBuffer#toString()`, `ByteBuffer#toHex([wrap])`, `ByteBuffer#toASCII([wrap])` and `ByteBuffer#printDebug()`
-  (emits hex + ASCII + offsets to console, looks like your favourite hex editor) for pain-free debugging
+* `ByteBuffer#toString([enc])`, `ByteBuffer#toHex([wrap])`, `ByteBuffer#toASCII([wrap])`, `ByteBuffer#toUTF8()`,
+  `ByteBuffer#toBase64()` and `ByteBuffer#printDebug()` (emits hex + ASCII + offsets to console, looks like your
+  favourite hex editor) for pain-free debugging
   
 Features
 --------
