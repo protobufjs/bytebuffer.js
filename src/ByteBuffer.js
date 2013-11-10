@@ -469,6 +469,7 @@
             var o = this.offset;
             this.offset = this.array.byteLength - this.length;
             this.length = this.array.byteLength - o;
+            this.view = new DataView(this.array);
             return this;
         };
     
@@ -1071,11 +1072,11 @@
             offset = typeof offset !== 'undefined' ? offset : this.offset;
             // ref: src/google/protobuf/io/coded_stream.cc
             
-            var count = 0,
-                b;
+            var count = 0, b,
+                src = this.view;
             var value = 0 >>> 0;
             do {
-                b = this.view.getUint8(offset+count);
+                b = src.getUint8(offset+count);
                 if (count < ByteBuffer.MAX_VARINT32_BYTES) {
                     value |= ((b&0x7F)<<(7*count)) >>> 0;
                 }
@@ -2001,13 +2002,13 @@
             asArray = !!asArray;
             wrap = typeof wrap !== 'undefined' ? parseInt(wrap, 10) : 16;
             if (wrap < 1) wrap = 16;
-            var out = "", lines = [];
+            var out = "", lines = [], src = this.view;
             for (var i=0; i<this.array.byteLength; i++) {
                 if (i>0 && i%wrap == 0) {
                     lines.push(out);
                     out = "";
                 }
-                var val = this.view.getUint8(i);
+                var val = src.getUint8(i);
                 if (val >  32 && val < 127) {
                     val = String.fromCharCode(val);
                 } else {
