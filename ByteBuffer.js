@@ -67,7 +67,6 @@
              * @expose
              */
             this.view = this.array != null ? new DataView(this.array) : null;
-    
             /**
              * Current read/write offset. Length- and capacity-independent index. Contents are the bytes between offset and
              * length, which are both absolute indexes. There is no capacity property, use {@link ByteBuffer#capacity}
@@ -1024,7 +1023,7 @@
             // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
             value = value >>> 0;
             this.ensureCapacity(offset+ByteBuffer.calculateVarint32(value));
-            var dst = new DataView(this.array),
+            var dst = this.view,
                 size = 0;
             dst.setUint8(offset, value | 0x80);
             if (value >= (1 << 7)) {
@@ -1072,12 +1071,11 @@
             offset = typeof offset !== 'undefined' ? offset : this.offset;
             // ref: src/google/protobuf/io/coded_stream.cc
             
-            var src = new DataView(this.array),
-                count = 0,
+            var count = 0,
                 b;
             var value = 0 >>> 0;
             do {
-                b = src.getUint8(offset+count);
+                b = this.view.getUint8(offset+count);
                 if (count < ByteBuffer.MAX_VARINT32_BYTES) {
                     value |= ((b&0x7F)<<(7*count)) >>> 0;
                 }
@@ -1180,7 +1178,7 @@
                 size = ByteBuffer.calculateVarint64(value);
             
             this.ensureCapacity(offset+size);
-            var dst = new DataView(this.array);
+            var dst = this.view;
             switch (size) {
                 case 10: dst.setUint8(offset+9, (part2 >>>  7) | 0x80);
                 case 9 : dst.setUint8(offset+8, (part2       ) | 0x80);
@@ -1218,8 +1216,8 @@
             var start = offset;
             // ref: src/google/protobuf/io/coded_stream.cc
             
-            var src = new DataView(this.array);
-            var part0, part1 = 0, part2 = 0, b;
+            var src = this.view,
+                part0, part1 = 0, part2 = 0, b;
             b = src.getUint8(offset++); part0  = (b & 0x7F)      ; if (b & 0x80) {
             b = src.getUint8(offset++); part0 |= (b & 0x7F) <<  7; if (b & 0x80) {
             b = src.getUint8(offset++); part0 |= (b & 0x7F) << 14; if (b & 0x80) {
@@ -1953,7 +1951,9 @@
             asArray = !!asArray;
             wrap = typeof wrap !== 'undefined' ? parseInt(wrap, 10) : 16;
             if (wrap < 1) wrap = 16;
-            var out = "", lines = [], view = new DataView(this.array);
+            var out = "",
+                lines = [],
+                view = this.view;
             if (this.offset == 0 && this.length == 0) {
                 out += "|";
             } else if (this.length == 0) {
@@ -2001,13 +2001,13 @@
             asArray = !!asArray;
             wrap = typeof wrap !== 'undefined' ? parseInt(wrap, 10) : 16;
             if (wrap < 1) wrap = 16;
-            var out = "", lines = [], view = new DataView(this.array);
+            var out = "", lines = [];
             for (var i=0; i<this.array.byteLength; i++) {
                 if (i>0 && i%wrap == 0) {
                     lines.push(out);
                     out = "";
                 }
-                var val = view.getUint8(i);
+                var val = this.view.getUint8(i);
                 if (val >  32 && val < 127) {
                     val = String.fromCharCode(val);
                 } else {
