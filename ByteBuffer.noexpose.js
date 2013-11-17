@@ -1504,8 +1504,10 @@
 
         /**
          * Base64 alphabet.
-         * @type {string}
-         */ // @const will inline this, which is not so smart
+         * @type{string}
+         * @const
+         * @private
+         */ // FIXME: CC inlines this, which is not so smart regarding script size. Any ideas?
         var B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
         /**
@@ -2078,10 +2080,8 @@
     } else if (typeof define !== 'undefined' && define["amd"]) { // AMD
         define("ByteBuffer", ["Math/Long"], function(Long) { return loadByteBuffer(Long); });
     } else { // Shim
-        if (!global["dcodeIO"]) {
-            global["dcodeIO"] = {};
-        }
-        global["dcodeIO"]["ByteBuffer"] = loadByteBuffer(dcodeIO.Long);
+        if (!global["dcodeIO"]) global["dcodeIO"] = {};
+        global["dcodeIO"]["ByteBuffer"] = loadByteBuffer(global["dcodeIO"]["Long"]);
     }
 
 })(this);
