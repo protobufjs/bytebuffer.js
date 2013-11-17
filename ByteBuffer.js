@@ -111,7 +111,7 @@
          * @const
          * @expose
          */
-        ByteBuffer.VERSION = "2.0.0-pre";
+        ByteBuffer.VERSION = "2.0.0";
 
         /**
          * Default buffer capacity of `16`. The ByteBuffer will be automatically resized by a factor of 2 if required.
@@ -140,7 +140,7 @@
         /**
          * Long class for int64 support. May be undefined if the Long class has not been loaded and int64 support is
          *  not available.
-         * @type {?Long}
+         * @type {Long|undefined}
          * @const
          * @expose
          */

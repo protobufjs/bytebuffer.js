@@ -140,7 +140,7 @@
         /**
          * Long class for int64 support. May be undefined if the Long class has not been loaded and int64 support is
          *  not available.
-         * @type {?Long}
+         * @type {Long|undefined}
          * @const
          * @expose
          */

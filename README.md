@@ -4,7 +4,7 @@ Provides a full-featured ByteBuffer implementation using typed arrays. It's one 
 [ProtoBuf.js](https://github.com/dcodeIO/ProtoBuf.js) and the [PSON](https://github.com/dcodeIO/PSON) reference
 implementation.
 
-*Note:* The API behind toHex and toString has changed with ByteBuffer 2.0.0, which is a generally revised release, in
+*Note:* The API behind #toHex and #toString has changed with ByteBuffer 2, which is a generally revised release, in
 favor of making this more intuitive.
 
 What can it do?
