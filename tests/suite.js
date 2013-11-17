@@ -110,6 +110,13 @@ var suite = {
         test.equal(bb.offset, 0);
         test.equal(bb.length, 4);
         test.equal(bb.readUTF8String(4), "test");
+        
+        bb = ByteBuffer.wrap("6162", "hex");
+        test.equal(bb.toHex(true), "<61 62>");
+        
+        bb = ByteBuffer.wrap("YWI=", "base64");
+        test.equal(bb.toHex(true), "<61 62>");
+        
         test.done();
     },
     

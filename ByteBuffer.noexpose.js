@@ -160,14 +160,26 @@
          * Wraps an ArrayBuffer, any object containing an ArrayBuffer or a string. Sets the created ByteBuffer's offset to 0
          * and its length to the wrapped objects byte length.
          * @param {!ArrayBuffer|!Buffer|string|{array: !ArrayBuffer}|{buffer: !ArrayBuffer}|string} buffer Anything that man be wrapped
-         * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to true.
+         * @param {(string|boolean)=} enc String encoding if a string is provided (hex, utf8, defaults to base64)
+         * @param {boolean=} littleEndian true to use little endian multi byte values, false for big endian. Defaults to false.
          * @returns {!ByteBuffer}
          * @throws {Error} If the specified object cannot be wrapped
          */
-        ByteBuffer.wrap = function(buffer, littleEndian) {
+        ByteBuffer.wrap = function(buffer, enc, littleEndian) {
+            if (typeof enc === 'boolean') {
+                littleEndian = enc;
+                enc = "utf8";
+            }
             // Wrap a string
             if (typeof buffer === 'string') {
-                return new ByteBuffer().writeUTF8String(buffer).flip();
+                switch (enc) {
+                    case "hex":
+                        return ByteBuffer.decodeHex(buffer, littleEndian);
+                    case "base64":
+                        return ByteBuffer.decode64(buffer, littleEndian);
+                    default:
+                        return new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, littleEndian).writeUTF8String(buffer).flip();
+                }
             }
             var b;
             // Wrap Buffer
@@ -1547,16 +1559,17 @@
         /**
          * Decodes a base6 encoded string to a ByteBuffer.
          * @param {string} str Base64 encoded string
+         * @param {boolean=} littleEndian true to use little endian byte order, else false. Defaults to false.
          * @returns {!ByteBuffer} ByteBuffer
          * @throws {Error} If the argument is not a valid base64 encoded string
          */
-        ByteBuffer.decode64 = function(str) {
+        ByteBuffer.decode64 = function(str, littleEndian) {
             // ref: http://phpjs.org/functions/base64_decode/
             if (typeof str !== 'string') {
                 throw(new Error("Illegal argument: Not a string"));
             }
             var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
-                out = new ByteBuffer(Math.ceil(str.length / 3));
+                out = new ByteBuffer(Math.ceil(str.length / 3), littleEndian);
             do {
                 h1 = b64.indexOf(str.charAt(i++));
                 h2 = b64.indexOf(str.charAt(i++));
@@ -1580,6 +1593,28 @@
                        .writeUint8(o3);
                 }
             } while (i < str.length);
+            return out.flip();
+        };
+
+        /**
+         * Decodes a hex encoded string to a ByteBuffer.
+         * @param {string} str Hex encoded string
+         * @param {boolean=} littleEndian true to use little endian byte order, else false. Defaults to false.
+         * @returns {!ByteBuffer} ByteBuffer
+         * @throws {Error} If the argument is not a valid hex encoded string
+         */
+        ByteBuffer.decodeHex = function(str, littleEndian) {
+            if (typeof str !== 'string') {
+                throw(new Error("Illegal argument: Not a string"));
+            }
+            if (str.length % 2 !== 0) {
+                throw(new Error("Illegal argument: Not a hex encoded string"));
+            }
+            var o,
+                out = new ByteBuffer(str.length/2, littleEndian);
+            for (var i=0; i<str.length; i+=2) {
+                out.writeUint8(parseInt(str.substring(i, i+2), 16));
+            }
             return out.flip();
         };
 

@@ -1,6 +1,6 @@
 ![ByteBuffer.js - A Java-like ByteBuffer](https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.png)
 ======================================
-Provides a full-features ByteBuffer implementation using typed arrays. It's one of the core components driving
+Provides a full-featured ByteBuffer implementation using typed arrays. It's one of the core components driving
 [ProtoBuf.js](https://github.com/dcodeIO/ProtoBuf.js) and the [PSON](https://github.com/dcodeIO/PSON) reference
 implementation.
 
@@ -13,14 +13,14 @@ What can it do?
 * Signed and unsigned integers (8, 16, 32, 64 bit through [Long.js](https://github.com/dcodeIO/Long.js)) with endianness support
 * Varints as known from protobuf including zig-zag encoding
 * Includes an UTF8 and Base64 en-/decoder
-* C-strings, Varint-prefixed strings and UTF8 length-prefixed strings 
+* C-strings, V(arint-prefixed)-strings and UTF8 L(ength-prefixed)-strings 
 * Rich string toolset (to hex, base64, utf8, debug, columns)
 * Relative and absolute zero-copy operations
 * Automatic resizing (always doubles)
 * Chaining of all operations that do not return a specific value
 * Slicing, appending, prepending, flip, reset, etc.
 
-And much more... (see the API documentation)
+And much more...
 
 Features
 --------
@@ -54,8 +54,8 @@ Optionally depends on [Long.js](https://github.com/dcodeIO/Long.js) for long (in
 support, you can skip the Long.js include.
 
 ```html
-<script src="//raw.github.com/dcodeIO/Long.js/master/Long.min.js"></script>
-<script src="//raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.min.js"></script>
+<script src="Long.min.js"></script>
+<script src="ByteBuffer.min.js"></script>
 ```
 
 ```javascript
@@ -111,7 +111,7 @@ Tests (& Examples) [![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.
 
 Support for IE<10, FF<15, Chrome<9 etc.
 ---------------------------------------
-* Requires a working ArrayBuffer & DataView implementations (i.e. use a [polyfill](https://github.com/inexorabletash/polyfill#typed-arrays-polyfill))
+* Requires working ArrayBuffer & DataView implementations (i.e. use a [polyfill](https://github.com/inexorabletash/polyfill#typed-arrays-polyfill))
 
 Contributors
 ------------

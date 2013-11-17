@@ -1527,7 +1527,7 @@ instead.</p>
         
             
 <dt>
-    <h4 class="name" id="decode64"><span class="type-signature">&lt;static> </span>decode64<span class="signature">(str)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
+    <h4 class="name" id="decode64"><span class="type-signature">&lt;static> </span>decode64<span class="signature">(str, <span class="optional">littleEndian</span>)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
     
     
 </dt>
@@ -1557,6 +1557,8 @@ instead.</p>
 		<th>Type</th>
 		
 		
+		<th>Argument</th>
+		
 		
 		
 		
@@ -1582,10 +1584,47 @@ instead.</p>
             </td>
             
             
+                <td class="attributes">
+                
+                    
+                
+                </td>
+            
             
             
             
             <td class="description last"><p>Base64 encoded string</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>littleEndian</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>true to use little endian byte order, else false. Defaults to false.</p></td>
         </tr>
 	
 	
@@ -1629,6 +1668,195 @@ instead.</p>
             
 <div class="param-desc">
     If the argument is not a valid base64 encoded string
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Error</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>ByteBuffer</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type"><a href="ByteBuffer.html">ByteBuffer</a></span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="decodeHex"><span class="type-signature">&lt;static> </span>decodeHex<span class="signature">(str, <span class="optional">littleEndian</span>)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Decodes a hex encoded string to a ByteBuffer.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>str</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Hex encoded string</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>littleEndian</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>true to use little endian byte order, else false. Defaults to false.</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+<div class="param-desc">
+    If the argument is not a valid hex encoded string
 </div>
 
 
@@ -2347,7 +2575,7 @@ instead.</p>
         
             
 <dt>
-    <h4 class="name" id="wrap"><span class="type-signature">&lt;static> </span>wrap<span class="signature">(buffer, <span class="optional">littleEndian</span>)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
+    <h4 class="name" id="wrap"><span class="type-signature">&lt;static> </span>wrap<span class="signature">(buffer, <span class="optional">enc</span>, <span class="optional">littleEndian</span>)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
     
     
 </dt>
@@ -2436,6 +2664,40 @@ and its length to the wrapped objects byte length.</p>
 	
         <tr>
             
+                <td class="name"><code>enc</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+|
+
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>String encoding if a string is provided (hex, utf8, defaults to base64)</p></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
                 <td class="name"><code>littleEndian</code></td>
             
             
@@ -2460,7 +2722,7 @@ and its length to the wrapped objects byte length.</p>
             
             
             
-            <td class="description last"><p>true to use little endian multi byte values, false for big endian. Defaults to true.</p></td>
+            <td class="description last"><p>true to use little endian multi byte values, false for big endian. Defaults to false.</p></td>
         </tr>
 	
 	
