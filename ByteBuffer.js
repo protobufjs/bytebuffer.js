@@ -46,7 +46,7 @@
         /**
          * Constructs a new ByteBuffer.
          * @exports ByteBuffer
-         * @class A full-features ByteBuffer implementation in JavaScript using typed arrays.
+         * @class A full-featured ByteBuffer implementation in JavaScript using typed arrays.
          * @param {number=} capacity Initial capacity. Defaults to {@link ByteBuffer.DEFAULT_CAPACITY}.
          * @param {boolean=} littleEndian `true` to use little endian multi byte values, defaults to `false` for big
          *  endian.
@@ -1165,52 +1165,48 @@
          */
         var TWO_PWR_28_DBL = TWO_PWR_14_DBL * TWO_PWR_14_DBL;
 
-        /**
-         * Writes a 64bit base 128 variable-length integer as used in protobuf.
-         * @param {number|Long} value Value to write
-         * @param {number=} offset Offset to write to. Will use and advance {@link ByteBuffer#offset} if omitted.
-         * @returns {!ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
-         * @throws {Error} If long support is not available
-         * @expose
-         */
-        ByteBuffer.prototype.writeVarint64 = function(value, offset) {
-            if (!Long) {
-                throw(new Error("Long support is not available: See https://github.com/dcodeIO/ByteBuffer.js#on-long-int64-support for details"))
-            }
-            var advance = typeof offset === 'undefined';
-            offset = typeof offset !== 'undefined' ? offset : this.offset;
-            if (!(typeof value === 'object' && value instanceof Long)) value = Long.fromNumber(value, false);
-
-            var part0 = value.toInt() >>> 0,
-                part1 = value.shiftRightUnsigned(28).toInt() >>> 0,
-                part2 = value.shiftRightUnsigned(56).toInt() >>> 0,
-                size = ByteBuffer.calculateVarint64(value);
-
-            this.ensureCapacity(offset+size);
-            var dst = this.view;
-            switch (size) {
-                case 10: dst.setUint8(offset+9, (part2 >>>  7) | 0x80);
-                case 9 : dst.setUint8(offset+8, (part2       ) | 0x80);
-                case 8 : dst.setUint8(offset+7, (part1 >>> 21) | 0x80);
-                case 7 : dst.setUint8(offset+6, (part1 >>> 14) | 0x80);
-                case 6 : dst.setUint8(offset+5, (part1 >>>  7) | 0x80);
-                case 5 : dst.setUint8(offset+4, (part1       ) | 0x80);
-                case 4 : dst.setUint8(offset+3, (part0 >>> 21) | 0x80);
-                case 3 : dst.setUint8(offset+2, (part0 >>> 14) | 0x80);
-                case 2 : dst.setUint8(offset+1, (part0 >>>  7) | 0x80);
-                case 1 : dst.setUint8(offset+0, (part0       ) | 0x80);
-            }
-            dst.setUint8(offset+size-1, dst.getUint8(offset+size-1) & 0x7F);
-            if (advance) {
-                this.offset += size;
-                return this;
-            } else {
-                return size;
-            }
-        };
-        
         // Available with Long.js only
         if (Long) {
+
+            /**
+             * Writes a 64bit base 128 variable-length integer as used in protobuf.
+             * @param {number|Long} value Value to write
+             * @param {number=} offset Offset to write to. Will use and advance {@link ByteBuffer#offset} if omitted.
+             * @returns {!ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
+             * @expose
+             */
+            ByteBuffer.prototype.writeVarint64 = function(value, offset) {
+                var advance = typeof offset === 'undefined';
+                offset = typeof offset !== 'undefined' ? offset : this.offset;
+                if (!(typeof value === 'object' && value instanceof Long)) value = Long.fromNumber(value, false);
+    
+                var part0 = value.toInt() >>> 0,
+                    part1 = value.shiftRightUnsigned(28).toInt() >>> 0,
+                    part2 = value.shiftRightUnsigned(56).toInt() >>> 0,
+                    size = ByteBuffer.calculateVarint64(value);
+    
+                this.ensureCapacity(offset+size);
+                var dst = this.view;
+                switch (size) {
+                    case 10: dst.setUint8(offset+9, (part2 >>>  7) | 0x80);
+                    case 9 : dst.setUint8(offset+8, (part2       ) | 0x80);
+                    case 8 : dst.setUint8(offset+7, (part1 >>> 21) | 0x80);
+                    case 7 : dst.setUint8(offset+6, (part1 >>> 14) | 0x80);
+                    case 6 : dst.setUint8(offset+5, (part1 >>>  7) | 0x80);
+                    case 5 : dst.setUint8(offset+4, (part1       ) | 0x80);
+                    case 4 : dst.setUint8(offset+3, (part0 >>> 21) | 0x80);
+                    case 3 : dst.setUint8(offset+2, (part0 >>> 14) | 0x80);
+                    case 2 : dst.setUint8(offset+1, (part0 >>>  7) | 0x80);
+                    case 1 : dst.setUint8(offset+0, (part0       ) | 0x80);
+                }
+                dst.setUint8(offset+size-1, dst.getUint8(offset+size-1) & 0x7F);
+                if (advance) {
+                    this.offset += size;
+                    return this;
+                } else {
+                    return size;
+                }
+            };
     
             /**
              * Reads a 32bit base 128 variable-length integer as used in protobuf. Requires Long.js.
@@ -2157,17 +2153,18 @@
             }
             return forceCopy && !copied ? b.copy().array : b.array;
         };
-
-        /**
-         * Returns a node Buffer compacted to contain this ByteBuffer's actual contents. Will transparently
-         *  {@link ByteBuffer#flip} the ByteBuffer if its offset is larger than its length. Will also copy all data (not
-         *  a reference).
-         * @returns {?Buffer} Compacted node Buffer or null if already destroyed
-         * @throws {Error} If not running inside of node
-         * @expose
-         */
-        ByteBuffer.prototype.toBuffer = function() {
-            if (Buffer) {
+        
+        // Available with node.js only
+        if (Buffer) {
+    
+            /**
+             * Returns a node Buffer compacted to contain this ByteBuffer's actual contents. Will transparently
+             *  {@link ByteBuffer#flip} the ByteBuffer if its offset is larger than its length. Will also copy all data (not
+             *  a reference).
+             * @returns {?Buffer} Compacted node Buffer or null if already destroyed
+             * @expose
+             */
+            ByteBuffer.prototype.toBuffer = function() {
                 if (this.array === null) return null;
                 var offset = this.offset, length = this.length;
                 if (offset > length) {
@@ -2175,11 +2172,9 @@
                     offset = length;
                     length = temp;
                 }
-                var srcView = new Uint8Array(this.array);
-                return new Buffer(srcView.subarray(offset, length));
-            }
-            throw(new Error("Conversion to Buffer is available under node.js only"));
-        };
+                return new Buffer(new Uint8Array(this.array).subarray(offset, length));
+            };
+        }
 
         return ByteBuffer;
     }
