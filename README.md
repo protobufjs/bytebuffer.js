@@ -16,7 +16,7 @@ What can it do?
 * C-strings, V(arint-prefixed)-strings and UTF8 L(ength-prefixed)-strings 
 * Rich string toolset (to hex, base64, utf8, debug, columns)
 * Relative and absolute zero-copy operations
-* Automatic resizing (always doubles)
+* Manual and automatic resizing (doubles capacity)
 * Chaining of all operations that do not return a specific value
 * Slicing, appending, prepending, flip, reset, etc.
 

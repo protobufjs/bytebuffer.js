@@ -30,9 +30,7 @@
     ByteBuffer
     </h2>
     
-        <div class="class-description"><p>Provides a Java-like, Netty-inspired ByteBuffer implementation using typed arrays. It also tries to
-abstract a bit of the complexity away by providing convenience methods for those who just want to write stuff
-without caring about signed, unsigned and the actual bit sizes.</p></div>
+        <div class="class-description"><p>A full-features ByteBuffer implementation in JavaScript using typed arrays.</p></div>
     
 </header>  
 
@@ -142,7 +140,8 @@ without caring about signed, unsigned and the actual bit sizes.</p></div>
             
             
             
-            <td class="description last"><p>true to use little endian multi byte values, false for big endian. Defaults to false.</p></td>
+            <td class="description last"><p><code>true</code> to use little endian multi byte values, defaults to <code>false</code> for big
+ endian.</p></td>
         </tr>
 	
 	
@@ -213,7 +212,7 @@ without caring about signed, unsigned and the actual bit sizes.</p></div>
 <dd>
     
     <div class="description">
-        <p>Big endian constant for usage in constructors instead of a boolean value. Evaluates to false.</p>
+        <p>Big endian constant for usage in constructors instead of a boolean value. Evaluates to <code>false</code>.</p>
     </div>
     
     
@@ -258,8 +257,7 @@ without caring about signed, unsigned and the actual bit sizes.</p></div>
 <dd>
     
     <div class="description">
-        <p>Default buffer capacity of 16 if nothing else is stated. The ByteBuffer will be automatically resized by a factor
-of 2 if required.</p>
+        <p>Default buffer capacity of <code>16</code>. The ByteBuffer will be automatically resized by a factor of 2 if required.</p>
     </div>
     
     
@@ -304,7 +302,7 @@ of 2 if required.</p>
 <dd>
     
     <div class="description">
-        <p>Little endian constant for usage in constructors instead of a boolean value. Evaluates to true.</p>
+        <p>Little endian constant for usage in constructors instead of a boolean value. Evaluates to <code>true</code>.</p>
     </div>
     
     
@@ -395,7 +393,7 @@ of 2 if required.</p>
 <dd>
     
     <div class="description">
-        <p>Maximum number of bytes required to store a 32bit base 128 variable-length integer.</p>
+        <p>Maximum number of bytes used by 32bit base 128 variable-length integer.</p>
     </div>
     
     
@@ -440,7 +438,7 @@ of 2 if required.</p>
 <dd>
     
     <div class="description">
-        <p>Maximum number of bytes required to store a 64bit base 128 variable-length integer.</p>
+        <p>Maximum number of bytes used by a 64bit base 128 variable-length integer.</p>
     </div>
     
     
@@ -485,7 +483,7 @@ of 2 if required.</p>
 <dd>
     
     <div class="description">
-        <p>ByteBuffer version.</p>
+        <p>Version string.</p>
     </div>
     
     
@@ -530,7 +528,7 @@ of 2 if required.</p>
 <dd>
     
     <div class="description">
-        <p>Underlying ArrayBuffer.</p>
+        <p>Backing ArrayBuffer.</p>
     </div>
     
     
@@ -575,9 +573,9 @@ of 2 if required.</p>
 <dd>
     
     <div class="description">
-        <p>Length of the contained data. Offset- and capacity-independent index. Contents are the bytes between offset and
-length, which are both absolute indexes. There is no capacity property, use <a href="ByteBuffer.html#capacity">ByteBuffer#capacity</a>
-instead.</p>
+        <p>Length of the contained data. Offset- and capacity-independent index. Contents are the bytes between
+ offset and length, which are both absolute indexes. There is no capacity property, use
+ <a href="ByteBuffer.html#capacity">ByteBuffer#capacity</a> instead.</p>
     </div>
     
     
@@ -622,7 +620,7 @@ instead.</p>
 <dd>
     
     <div class="description">
-        <p>Whether to use little endian multi byte values.</p>
+        <p>Whether to use little endian multi byte values, defaults to <code>false</code> for big endian.</p>
     </div>
     
     
@@ -667,7 +665,7 @@ instead.</p>
 <dd>
     
     <div class="description">
-        <p>Marked offset set through <a href="ByteBuffer.html#mark">ByteBuffer#mark</a>. Evaluates to -1 if there is no marked offset.</p>
+        <p>Marked offset set through <a href="ByteBuffer.html#mark">ByteBuffer#mark</a>. Defaults to <code>-1</code> (no marked offset).</p>
     </div>
     
     
@@ -712,9 +710,9 @@ instead.</p>
 <dd>
     
     <div class="description">
-        <p>Current read/write offset. Length- and capacity-independent index. Contents are the bytes between offset and
-length, which are both absolute indexes. There is no capacity property, use <a href="ByteBuffer.html#capacity">ByteBuffer#capacity</a>
-instead.</p>
+        <p>Current read/write offset. Length- and capacity-independent index. Contents are the bytes between offset
+ and length, which are both absolute indexes. There is no capacity property, use
+ <a href="ByteBuffer.html#capacity">ByteBuffer#capacity</a> instead.</p>
     </div>
     
     
@@ -902,7 +900,8 @@ instead.</p>
             
             
             
-            <td class="description last"><p>true to use little endian multi byte values, false for big endian. Defaults to true.</p></td>
+            <td class="description last"><p><code>true</code> to use little endian multi byte values, defaults to <code>false</code> for big
+ endian.</p></td>
         </tr>
 	
 	
@@ -1349,7 +1348,7 @@ instead.</p>
     
             
 <div class="param-desc">
-    <p>Number of bytes required. Capped to <a href="ByteBuffer.html#MAX_VARINT32_BYTES">ByteBuffer.MAX_VARINT32_BYTES</a> (35bit). No overflow error.</p>
+    <p>Number of bytes required. Capped to <a href="ByteBuffer.html#MAX_VARINT32_BYTES">ByteBuffer.MAX_VARINT32_BYTES</a></p>
 </div>
 
 
@@ -1425,7 +1424,7 @@ instead.</p>
 <span class="param-type">number</span>
 |
 
-<span class="param-type">Long</span>
+<span class="param-type">!Long</span>
 
 
             
@@ -1474,35 +1473,13 @@ instead.</p>
     
     
     
-    <h5>Throws:</h5>
-    
-            
-<div class="param-desc">
-    If long support is not available
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Error</span>
-
-
-	</dd>
-</dl>
-
-        
     
     
     <h5>Returns:</h5>
     
             
 <div class="param-desc">
-    <p>Number of bytes required. Capped to <a href="ByteBuffer.html#MAX_VARINT64_BYTES">ByteBuffer.MAX_VARINT64_BYTES</a>. No overflow error.</p>
+    <p>Number of bytes required. Capped to <a href="ByteBuffer.html#MAX_VARINT64_BYTES">ByteBuffer.MAX_VARINT64_BYTES</a></p>
 </div>
 
 
@@ -1535,7 +1512,7 @@ instead.</p>
     
     
     <div class="description">
-        <p>Decodes a base6 encoded string to a ByteBuffer.</p>
+        <p>Decodes a base64 encoded string to a ByteBuffer.</p>
     </div>
     
 
@@ -1624,7 +1601,7 @@ instead.</p>
             
             
             
-            <td class="description last"><p>true to use little endian byte order, else false. Defaults to false.</p></td>
+            <td class="description last"><p><code>true</code> to use little endian byte order, defaults to <code>false</code> for big endian.</p></td>
         </tr>
 	
 	
@@ -1813,7 +1790,7 @@ instead.</p>
             
             
             
-            <td class="description last"><p>true to use little endian byte order, else false. Defaults to false.</p></td>
+            <td class="description last"><p><code>true</code> to use little endian byte order, defaults to <code>false</code> for big endian.</p></td>
         </tr>
 	
 	
@@ -2424,157 +2401,6 @@ instead.</p>
         
             
 <dt>
-    <h4 class="name" id="extend"><span class="type-signature">&lt;static> </span>extend<span class="signature">(name, func)</span><span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Extends the ByteBuffer prototype with additional methods.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last"><p>Method name</p></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>func</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Function</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last"><p>Prototype function</p></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-    
-    
-    <h5>Throws:</h5>
-    
-            
-<div class="param-desc">
-    If the arguments are invalid
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Error</span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
     <h4 class="name" id="wrap"><span class="type-signature">&lt;static> </span>wrap<span class="signature">(buffer, <span class="optional">enc</span>, <span class="optional">littleEndian</span>)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
     
     
@@ -2583,8 +2409,8 @@ instead.</p>
     
     
     <div class="description">
-        <p>Wraps an ArrayBuffer, any object containing an ArrayBuffer or a string. Sets the created ByteBuffer&#39;s offset to 0
-and its length to the wrapped objects byte length.</p>
+        <p>Wraps an ArrayBuffer, any object containing an ArrayBuffer, a node buffer or a string. Sets the created
+ ByteBuffer&#39;s offset to 0 and its length to the wrapped object&#39;s byte length.</p>
     </div>
     
 
@@ -2632,13 +2458,10 @@ and its length to the wrapped objects byte length.</p>
 <span class="param-type">!Buffer</span>
 |
 
-<span class="param-type">string</span>
+<span class="param-type">!{array: !ArrayBuffer}</span>
 |
 
-<span class="param-type">{array: !ArrayBuffer}</span>
-|
-
-<span class="param-type">{buffer: !ArrayBuffer}</span>
+<span class="param-type">!{buffer: !ArrayBuffer}</span>
 |
 
 <span class="param-type">string</span>
@@ -2657,7 +2480,8 @@ and its length to the wrapped objects byte length.</p>
             
             
             
-            <td class="description last"><p>Anything that man be wrapped</p></td>
+            <td class="description last"><p>Anything that can
+ be wrapped</p></td>
         </tr>
 	
 	
@@ -2722,7 +2546,8 @@ and its length to the wrapped objects byte length.</p>
             
             
             
-            <td class="description last"><p>true to use little endian multi byte values, false for big endian. Defaults to false.</p></td>
+            <td class="description last"><p><code>true</code> to use little endian multi byte values, defaults to <code>false</code> for big
+ endian.</p></td>
         </tr>
 	
 	
@@ -3270,7 +3095,7 @@ and its length to the wrapped objects byte length.</p>
 <span class="param-type">number</span>
 |
 
-<span class="param-type">Long</span>
+<span class="param-type">!Long</span>
 
 
             
@@ -3319,28 +3144,6 @@ and its length to the wrapped objects byte length.</p>
     
     
     
-    <h5>Throws:</h5>
-    
-            
-<div class="param-desc">
-    If long support is not available
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Error</span>
-
-
-	</dd>
-</dl>
-
-        
     
     
     <h5>Returns:</h5>
@@ -3381,9 +3184,8 @@ and its length to the wrapped objects byte length.</p>
     
     <div class="description">
         <p>Appends another ByteBuffer to this one. Appends only the portion between offset and length of the specified
-ByteBuffer and overwrites any contents behind the specified offset up to the number of bytes appended from
-the specified ByteBuffer in this ByteBuffer. Will clone and flip the specified ByteBuffer if its offset is
-larger than its length (its offsets remain untouched through cloning).</p>
+ ByteBuffer and overwrites any contents behind the specified offset up to the number of bytes contained in
+ the specified ByteBuffer. Offset and length of the specified ByteBuffer will remain the same.</p>
     </div>
     
 
@@ -3441,7 +3243,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>ByteBuffer or any object that can be wrapped to prepend</p></td>
+            <td class="description last"><p>ByteBuffer or any object that can be wrapped to append</p></td>
         </tr>
 	
 	
@@ -3472,7 +3274,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to append behind. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to append at. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a>.</p></td>
         </tr>
 	
 	
@@ -3652,8 +3454,8 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
     
     <div class="description">
-        <p>Gets the capacity of the backing buffer. May be larger but not less than the contents actual length. Contents are the
-bytes between offset and length, which is independent of the actual capacity.</p>
+        <p>Gets the capacity of the backing buffer. This is independent from <a href="ByteBuffer.html#length">ByteBuffer#length</a> and returns the
+ size of the entire backing array.</p>
     </div>
     
 
@@ -3700,7 +3502,7 @@ bytes between offset and length, which is independent of the actual capacity.</p
     
             
 <div class="param-desc">
-    <p>Capacity of the backing buffer or 0 if destroyed</p>
+    <p>Capacity of the backing array or 0 if destroyed</p>
 </div>
 
 
@@ -3733,7 +3535,8 @@ bytes between offset and length, which is independent of the actual capacity.</p
     
     
     <div class="description">
-        <p>Clones this ByteBuffer. The returned cloned ByteBuffer shares the same ArrayBuffer but will have its own offsets.</p>
+        <p>Clones this ByteBuffer. The returned cloned ByteBuffer shares the same backing array but will have its own
+ offsets.</p>
     </div>
     
 
@@ -3779,6 +3582,10 @@ bytes between offset and length, which is independent of the actual capacity.</p
     <h5>Returns:</h5>
     
             
+<div class="param-desc">
+    <p>Clone</p>
+</div>
+
 
 
 <dl>
@@ -3809,10 +3616,8 @@ bytes between offset and length, which is independent of the actual capacity.</p
     
     
     <div class="description">
-        <p>Compacts the ByteBuffer to be backed by an ArrayBuffer of its actual length. Will <a href="ByteBuffer.html#flip">ByteBuffer#flip</a> the
-ByteBuffer if its offset is larger than its length. If the ByteBuffer&#39;s offset is less than its length, only the
-portion between its offset and length will be contained in the compacted backing buffer. Will set offset=0 and
-length=capacity. Will do nothing but flipping, if required, if already compacted.</p>
+        <p>Compacts the ByteBuffer to be backed by an ArrayBuffer of its actual length. Will set <code>offset=0</code> and
+ <code>length=capacity</code>.</p>
     </div>
     
 
@@ -3914,7 +3719,7 @@ length=capacity. Will do nothing but flipping, if required, if already compacted
     
     
     <div class="description">
-        <p>Copies this ByteBuffer. The returned copied ByteBuffer has its own ArrayBuffer and uses the same offsets as this one.</p>
+        <p>Copies this ByteBuffer. The copy has its own backing array and uses the same offsets as this one.</p>
     </div>
     
 
@@ -3960,6 +3765,10 @@ length=capacity. Will do nothing but flipping, if required, if already compacted
     <h5>Returns:</h5>
     
             
+<div class="param-desc">
+    <p>Copy</p>
+</div>
+
 
 
 <dl>
@@ -3990,7 +3799,10 @@ length=capacity. Will do nothing but flipping, if required, if already compacted
     
     
     <div class="description">
-        <p>Destroys the ByteBuffer, releasing all references to the backing array.</p>
+        <p>Manually destroys the ByteBuffer, releasing references to the backing array. Manually destroying a ByteBuffer
+ is usually not required but may be useful in limited memory environments. Most successive operations will
+ rise an error until <a href="ByteBuffer.html#resize">ByteBuffer#resize</a> or <a href="ByteBuffer.html#ensureCapacity">ByteBuffer#ensureCapacity</a> is called to reinitialize
+ the backing array.</p>
     </div>
     
 
@@ -4062,7 +3874,7 @@ length=capacity. Will do nothing but flipping, if required, if already compacted
         
             
 <dt>
-    <h4 class="name" id="ensureCapacity"><span class="type-signature"></span>ensureCapacity<span class="signature">(capacity)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    <h4 class="name" id="ensureCapacity"><span class="type-signature"></span>ensureCapacity<span class="signature">(capacity)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
     
     
 </dt>
@@ -4070,8 +3882,8 @@ length=capacity. Will do nothing but flipping, if required, if already compacted
     
     
     <div class="description">
-        <p>Makes sure that the specified capacity is available. If the current capacity is exceeded, it will be doubled. If
-double the previous capacity is less than the required capacity, the required capacity will be used.</p>
+        <p>Makes sure that the specified capacity is available. If the current capacity is exceeded, it will be doubled.
+ If double the previous capacity is less than the required capacity, the required capacity will be used.</p>
     </div>
     
 
@@ -4166,7 +3978,7 @@ double the previous capacity is less than the required capacity, the required ca
     
             
 <div class="param-desc">
-    <p>true if actually resized, false if already that large or larger</p>
+    <p>this</p>
 </div>
 
 
@@ -4177,7 +3989,7 @@ double the previous capacity is less than the required capacity, the required ca
 	</dt>
 	<dd>
 		
-<span class="param-type">boolean</span>
+<span class="param-type"><a href="ByteBuffer.html">ByteBuffer</a></span>
 
 
 	</dd>
@@ -4199,7 +4011,8 @@ double the previous capacity is less than the required capacity, the required ca
     
     
     <div class="description">
-        <p>Makes the buffer ready for a new sequence of write or relative read operations. Sets length=offset and offset=0.</p>
+        <p>Makes the buffer ready for a new sequence of write or relative read operations. Sets <code>length=offset</code> and
+ <code>offset=0</code>. Always make sure to flip a buffer when all relative writing operations are complete.</p>
     </div>
     
 
@@ -4359,7 +4172,7 @@ double the previous capacity is less than the required capacity, the required ca
     
     
     <div class="description">
-        <p>Marks the current offset in <a href="ByteBuffer.html#markedOffset">ByteBuffer#markedOffset</a>.</p>
+        <p>Marks an offset to be used with <a href="ByteBuffer.html#reset">ByteBuffer#reset</a>.</p>
     </div>
     
 
@@ -4527,9 +4340,8 @@ double the previous capacity is less than the required capacity, the required ca
     
     <div class="description">
         <p>Prepends another ByteBuffer to this one. Prepends only the portion between offset and length of the specified
-ByteBuffer and overwrites any contents before the specified offsets up to the number of bytes prepended from
-the specified ByteBuffer in this ByteBuffer. Will clone and flip the specified ByteBuffer if its offset is
-larger than its length (its offsets remain untouched through cloning).</p>
+ ByteBuffer and overwrites any contents before the specified offsets up to the number of bytes contained in
+ the specified ByteBuffer. Offset and length of the specified ByteBuffer will remain the same.</p>
     </div>
     
 
@@ -4587,7 +4399,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>ByteBuffer or any object that can be wrapped by one to prepend</p></td>
+            <td class="description last"><p>ByteBuffer or any object that can be wrapped to prepend</p></td>
         </tr>
 	
 	
@@ -4618,7 +4430,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to prepend before. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to prepend at. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a>.</p></td>
         </tr>
 	
 	
@@ -4894,7 +4706,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -4937,7 +4749,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+1 is larger than the capacity
+    If offset is out of bounds
 </div>
 
 
@@ -5050,7 +4862,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -5117,7 +4929,8 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    <p>The string read if offset is omitted, else the string read and the actual number of bytes read.</p>
+    <p>The string read if offset is omitted, else the string
+ read and the actual number of bytes read.</p>
 </div>
 
 
@@ -5213,7 +5026,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -5256,7 +5069,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+8 is larger than the capacity
+    If offset is out of bounds
 </div>
 
 
@@ -5369,7 +5182,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -5412,7 +5225,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+4 is larger than the capacity
+    If offset is out of bounds
 </div>
 
 
@@ -5525,7 +5338,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -5568,7 +5381,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+4 is larger than the capacity
+    If offset is out of bounds
 </div>
 
 
@@ -5681,7 +5494,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -5724,7 +5537,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+8 is larger than the capacity
+    If offset is out of bounds
 </div>
 
 
@@ -5837,7 +5650,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -5880,7 +5693,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+4 is larger than the capacity
+    If offset is out of bounds
 </div>
 
 
@@ -5933,7 +5746,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
     
     <div class="description">
-        <p>Reads an 8bit singed integer.</p>
+        <p>Reads an 8bit signed integer.</p>
     </div>
     
 
@@ -5993,7 +5806,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -6036,7 +5849,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+1 is larger than the capacity
+    If offset is out of bounds
 </div>
 
 
@@ -6149,7 +5962,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -6192,7 +6005,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+2 is larger than the capacity
+    If offset is out of bounds
 </div>
 
 
@@ -6305,7 +6118,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -6348,7 +6161,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+4 is larger than the capacity
+    If offset is out of bounds
 </div>
 
 
@@ -6401,7 +6214,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
     
     <div class="description">
-        <p>Reads a 64bit integer. Utilizes Long.js to construct a new Long from the low and high 32 bits.</p>
+        <p>Reads a 64bit integer. Requires Long.js.</p>
     </div>
     
 
@@ -6461,7 +6274,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -6504,7 +6317,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+8 is larger than the capacity or long support is not available
+    If offset is out of bounds
 </div>
 
 
@@ -6617,7 +6430,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -6715,7 +6528,8 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    <p>Data payload if offset is omitted, else the data payload and the actual number of bytes read.</p>
+    <p>Data payload if offset is omitted, else the data payload and the
+ actual number of bytes read</p>
 </div>
 
 
@@ -6743,7 +6557,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
         
             
 <dt>
-    <h4 class="name" id="readLong"><span class="type-signature"></span>readLong<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html#Long">ByteBuffer.Long</a>}</span></h4>
+    <h4 class="name" id="readLong"><span class="type-signature"></span>readLong<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {Long}</span></h4>
     
     
 </dt>
@@ -6811,7 +6625,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -6854,7 +6668,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+8 is larger than the capacity
+    If offset is out of bounds
 </div>
 
 
@@ -6885,7 +6699,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
 	</dt>
 	<dd>
 		
-<span class="param-type"><a href="ByteBuffer.html#Long">ByteBuffer.Long</a></span>
+<span class="param-type">Long</span>
 
 
 	</dd>
@@ -6967,7 +6781,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -7034,7 +6848,8 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    <p>The string read if offset is omitted, else the string read and the actual number of bytes read.</p>
+    <p>The string read if offset is omitted, else the string read
+ and the actual number of bytes read.</p>
 </div>
 
 
@@ -7130,7 +6945,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -7173,7 +6988,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+2 is larger than the capacity
+    If offset is out of bounds
 </div>
 
 
@@ -7226,7 +7041,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
     
     <div class="description">
-        <p>Reads an 8bit unsinged integer.</p>
+        <p>Reads an 8bit unsigned integer.</p>
     </div>
     
 
@@ -7286,7 +7101,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -7329,7 +7144,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+1 is larger than the capacity
+    If offset is out of bounds
 </div>
 
 
@@ -7442,7 +7257,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -7485,7 +7300,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+2 is larger than the capacity
+    If offset is out of bounds
 </div>
 
 
@@ -7598,7 +7413,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -7641,7 +7456,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+4 is larger than the capacity
+    If offset is out of bounds
 </div>
 
 
@@ -7694,7 +7509,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
     
     <div class="description">
-        <p>Reads a 64bit unsigned integer. Utilizes Long.js to construct a new Long from the low and high 32 bits.</p>
+        <p>Reads a 64bit unsigned integer. Requires Long.js.</p>
     </div>
     
 
@@ -7754,7 +7569,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -7797,7 +7612,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If offset+8 is larger than the capacity or long support is not available
+    If offset is out of bounds
 </div>
 
 
@@ -7939,7 +7754,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -8006,7 +7821,8 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    <p>The string read if offset is omitted, else the string read and the actual number of bytes read.</p>
+    <p>The string read if offset is omitted, else the string
+ read and the actual number of bytes read.</p>
 </div>
 
 
@@ -8131,7 +7947,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -8198,7 +8014,8 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    <p>The string read if offset is omitted, else the string read and the actual number of bytes read.</p>
+    <p>The string read if offset is omitted, else the string
+ read and the actual number of bytes read.</p>
 </div>
 
 
@@ -8367,7 +8184,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
         
             
 <dt>
-    <h4 class="name" id="readVarint32"><span class="type-signature"></span>readVarint32<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {number|{value: number, length: number}}</span></h4>
+    <h4 class="name" id="readVarint32"><span class="type-signature"></span>readVarint32<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {number|!{value: number, length: number}}</span></h4>
     
     
 </dt>
@@ -8435,7 +8252,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -8502,7 +8319,8 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    <p>The value read if offset is omitted, else the value read and the actual number of bytes read.</p>
+    <p>The value read if offset is omitted, else the value read
+ and the actual number of bytes read.</p>
 </div>
 
 
@@ -8516,7 +8334,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
 <span class="param-type">number</span>
 |
 
-<span class="param-type">{value: number, length: number}</span>
+<span class="param-type">!{value: number, length: number}</span>
 
 
 	</dd>
@@ -8538,7 +8356,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
     
     <div class="description">
-        <p>Reads a 32bit base 128 variable-length integer as used in protobuf.</p>
+        <p>Reads a 32bit base 128 variable-length integer as used in protobuf. Requires Long.js.</p>
     </div>
     
 
@@ -8598,7 +8416,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -8641,7 +8459,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If it's not a valid varint or long support is not available
+    If it's not a valid varint
 </div>
 
 
@@ -8665,7 +8483,8 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    <p>The value read if offset is omitted, else the value read and the actual number of bytes read.</p>
+    <p>The value read if offset is omitted, else the value read and
+ the actual number of bytes read.</p>
 </div>
 
 
@@ -8701,7 +8520,8 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
     
     <div class="description">
-        <p>Reads a string with a prepended number of characters, which is encoded as a 32bit base 128 variable-length  integer.</p>
+        <p>Reads a string with prepended number of characters, which is encoded as a 32bit base 128 variable-length 
+ integer.</p>
     </div>
     
 
@@ -8761,7 +8581,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -8804,7 +8624,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If the string cannot be decoded or the delimiter is not a valid varint
+    If the string cannot be decoded or if it is not preceeded by a valid varint
 </div>
 
 
@@ -8828,7 +8648,8 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    <p>The string read if offset is omitted, else the string read and the actual number of bytes read.</p>
+    <p>The string read if offset is omitted, else the string
+ read and the actual number of bytes read.</p>
 </div>
 
 
@@ -9087,7 +8908,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>Offset to read from. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to read from. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -9154,7 +8975,8 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    <p>The value read if offset is omitted, else the value read and the actual number of bytes read.</p>
+    <p>The value read if offset is omitted, else the value read
+ and the actual number of bytes read.</p>
 </div>
 
 
@@ -9293,7 +9115,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
             
 <div class="param-desc">
-    If it's not a valid varint or long support is not available
+    If it's not a valid varint
 </div>
 
 
@@ -9353,8 +9175,8 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
     
     <div class="description">
-        <p>Gets the number of remaining readable bytes. Contents are the bytes between offset and length, so this returns
-length-offset.</p>
+        <p>Gets the number of remaining readable bytes. Contents are the bytes between offset and length, so this
+ returns <code>length-offset</code>.</p>
     </div>
     
 
@@ -9401,7 +9223,7 @@ length-offset.</p>
     
             
 <div class="param-desc">
-    <p>Remaining readable bytes (may be negative if offset is larger than length)</p>
+    <p>Remaining readable bytes. May be negative if <code>offset&gt;length</code>.</p>
 </div>
 
 
@@ -9434,9 +9256,9 @@ length-offset.</p>
     
     
     <div class="description">
-        <p>Resets the ByteBuffer. If an offset has been marked through <a href="ByteBuffer.html#mark">ByteBuffer#mark</a> before, the offset will be
-set to the marked offset and the marked offset will be discarded. Length will not be altered. If there is no
-marked offset, sets offset=0 and length=0.</p>
+        <p>Resets the ByteBuffer. If an offset has been marked through <a href="ByteBuffer.html#mark">ByteBuffer#mark</a> before, the offset will
+ be set to the marked offset and the marked offset will be discarded. Length will not be altered. If there is
+ no marked offset, sets <code>offset=0</code> and <code>length=0</code>.</p>
     </div>
     
 
@@ -9515,7 +9337,7 @@ marked offset, sets offset=0 and length=0.</p>
         
             
 <dt>
-    <h4 class="name" id="resize"><span class="type-signature"></span>resize<span class="signature">(capacity)</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    <h4 class="name" id="resize"><span class="type-signature"></span>resize<span class="signature">(capacity)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
     
     
 </dt>
@@ -9523,7 +9345,7 @@ marked offset, sets offset=0 and length=0.</p>
     
     
     <div class="description">
-        <p>Resizes the ByteBuffer to the given capacity.</p>
+        <p>Resizes the ByteBuffer to the given capacity. Will do nothing if already that large or larger.</p>
     </div>
     
 
@@ -9618,7 +9440,7 @@ marked offset, sets offset=0 and length=0.</p>
     
             
 <div class="param-desc">
-    <p>true if actually resized, false if already that large or larger</p>
+    <p>this</p>
 </div>
 
 
@@ -9629,7 +9451,7 @@ marked offset, sets offset=0 and length=0.</p>
 	</dt>
 	<dd>
 		
-<span class="param-type">boolean</span>
+<span class="param-type"><a href="ByteBuffer.html">ByteBuffer</a></span>
 
 
 	</dd>
@@ -9651,8 +9473,8 @@ marked offset, sets offset=0 and length=0.</p>
     
     
     <div class="description">
-        <p>Reverses the underlying back buffer and adapts offset and length to retain the same relative position on the
-reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.reverse() = &quot;04 03&lt;02 01&gt;00&quot;.</p>
+        <p>Reverses the backing array and adapts offset and length to retain the same relative position on the reversed
+ data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.reverse() = &quot;04 03&lt;02 01&gt;00&quot;.</p>
     </div>
     
 
@@ -9746,7 +9568,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
         
             
 <dt>
-    <h4 class="name" id="slice"><span class="type-signature"></span>slice<span class="signature">(begin, end)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
+    <h4 class="name" id="slice"><span class="type-signature"></span>slice<span class="signature">(<span class="optional">begin</span>, <span class="optional">end</span>)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
     
     
 </dt>
@@ -9777,6 +9599,8 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
 		<th>Type</th>
 		
 		
+		<th>Argument</th>
+		
 		
 		
 		
@@ -9802,10 +9626,18 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             </td>
             
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
             
             
             
-            <td class="description last"><p>Begin offset</p></td>
+            
+            <td class="description last"><p>Begin offset, defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a>.</p></td>
         </tr>
 	
 	
@@ -9825,10 +9657,18 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             </td>
             
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
             
             
             
-            <td class="description last"><p>End offset</p></td>
+            
+            <td class="description last"><p>End offset, defaults to <a href="ByteBuffer.html#length">ByteBuffer#length</a>.</p></td>
         </tr>
 	
 	
@@ -9895,179 +9735,9 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
             
 <div class="param-desc">
-    <p>Clone of this ByteBuffer with the specified slicing applied, backed by the same ArrayBuffer</p>
+    <p>Clone of this ByteBuffer with slicing applied, backed by the same ArrayBuffer</p>
 </div>
 
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type"><a href="ByteBuffer.html">ByteBuffer</a></span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="sliceAndCompact"><span class="type-signature"></span>sliceAndCompact<span class="signature">(begin, end)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Slices and compacts the ByteBuffer. The resulting ByteBuffer will have its own ArrayBuffer with the compacted contents
- of this ByteBuffer&#39;s contents.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>begin</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last"><p>Begin offset</p></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>end</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last"><p>End offset</p></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-    
-    
-    <h5>Throws:</h5>
-    
-            
-<div class="param-desc">
-    If the buffer cannot be sliced
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Error</span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-    <h5>Returns:</h5>
-    
-            
 
 
 <dl>
@@ -10098,7 +9768,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     <div class="description">
-        <p>Returns an ArrayBuffer compacted to contain this ByteBuffer&#39;s actual contents. Will implicitly
+        <p>Returns an ArrayBuffer compacted to contain this ByteBuffer&#39;s actual contents. Will transparently
  <a href="ByteBuffer.html#flip">ByteBuffer#flip</a> the ByteBuffer if its offset is larger than its length. Will return a reference to
  the unmodified backing buffer if offset=0 and length=capacity unless forceCopy is set to true.</p>
     </div>
@@ -10160,7 +9830,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Forces the creation of a copy if set to true. Defaults to false.</p></td>
+            <td class="description last"><p><code>true</code> forces the creation of a copy, defaults to <code>false</code></p></td>
         </tr>
 	
 	
@@ -10238,7 +9908,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     <div class="description">
-        <p>Returns the base64 encoded representation of the buffer&#39;s contents.</p>
+        <p>Returns the base64 encoded representation of the ByteBuffer&#39;s contents.</p>
     </div>
     
 
@@ -10318,7 +9988,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     <div class="description">
-        <p>Returns a node Buffer compacted to contain this ByteBuffer&#39;s actual contents. Will implicitly
+        <p>Returns a node Buffer compacted to contain this ByteBuffer&#39;s actual contents. Will transparently
  <a href="ByteBuffer.html#flip">ByteBuffer#flip</a> the ByteBuffer if its offset is larger than its length. Will also copy all data (not
  a reference).</p>
     </div>
@@ -10422,7 +10092,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     <div class="description">
-        <p>Returns a two columns (hex, ascii) representation of this ByteBuffer&#39;s backing array.</p>
+        <p>Returns a textual two columns (hex, ascii) representation of this ByteBuffer&#39;s backing array.</p>
     </div>
     
 
@@ -10620,8 +10290,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Returns the entire backing array with marked offsets, defaults to false. This is used
- in ByteBuffer#toString(&quot;debug&quot;).</p></td>
+            <td class="description last"><p><code>true</code> to return the entire backing array with marked offsets, defaults to <code>false</code></p></td>
         </tr>
 	
 	
@@ -10666,7 +10335,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
             
 <div class="param-desc">
-    <p>Hex string</p>
+    <p>Hex string or debug string</p>
 </div>
 
 
@@ -10699,7 +10368,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     <div class="description">
-        <p>Returns a string representation.</p>
+        <p>Converts the ByteBuffer to a string.</p>
     </div>
     
 
@@ -10759,8 +10428,9 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Output encoding. Returns a pretty printed debug table by default but also allows direct
- conversion to &quot;utf8&quot; and &quot;base64&quot; encoding.</p></td>
+            <td class="description last"><p>Output encoding. Returns an informative string representation by default but also allows
+ direct conversion to &quot;utf8&quot;, &quot;hex&quot; and &quot;base64&quot; encoding. &quot;debug&quot; returns a hex representation with marked
+ offsets.</p></td>
         </tr>
 	
 	
@@ -10838,7 +10508,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     <div class="description">
-        <p>Returns the contents of the buffer as an UTF8 encoded string.</p>
+        <p>Returns the ByteBuffer&#39;s contents as an UTF8 encoded string.</p>
     </div>
     
 
@@ -11003,7 +10673,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -11081,9 +10751,10 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     <div class="description">
-        <p>Writes a string followed by a NULL character (Uint8). Beware: The source string must not contain NULL characters
- unless this is actually intended. This is not checked. If you have the option it is recommended to use
- <a href="ByteBuffer.html#writeLString">ByteBuffer#writeLString</a> or <a href="ByteBuffer.html#writeVString">ByteBuffer#writeVString</a> with the corresponding reading methods instead.</p>
+        <p>Writes a string followed by a NULL character (Uint8). Beware: The source string must not contain NULL
+ characters unless this is actually intended. This is not checked. If you have the option it is recommended
+ to use <a href="ByteBuffer.html#writeLString">ByteBuffer#writeLString</a> or <a href="ByteBuffer.html#writeVString">ByteBuffer#writeVString</a> with the corresponding reading
+ methods instead.</p>
     </div>
     
 
@@ -11172,7 +10843,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -11217,7 +10888,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
             
 <div class="param-desc">
-    <p>this if offset is omitted, else the actual number of bytes written.</p>
+    <p>this if offset is omitted, else the actual number of bytes written</p>
 </div>
 
 
@@ -11342,7 +11013,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -11509,7 +11180,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -11676,7 +11347,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -11843,7 +11514,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -12010,7 +11681,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -12088,7 +11759,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     <div class="description">
-        <p>Writes an 8bit singed integer.</p>
+        <p>Writes an 8bit signed integer.</p>
     </div>
     
 
@@ -12146,7 +11817,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Value to write</p></td>
+            <td class="description last"><p>Value</p></td>
         </tr>
 	
 	
@@ -12177,7 +11848,8 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if
+ omitted.</p></td>
         </tr>
 	
 	
@@ -12344,7 +12016,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -12511,7 +12183,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -12589,7 +12261,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     <div class="description">
-        <p>Writes a 64bit integer. Utilizes Long.js to write the low and high 32 bits separately.</p>
+        <p>Writes a 64bit integer. Requires Long.js.</p>
     </div>
     
 
@@ -12634,7 +12306,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
 <span class="param-type">number</span>
 |
 
-<span class="param-type">Long</span>
+<span class="param-type">!Long</span>
 
 
             
@@ -12681,7 +12353,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -12720,28 +12392,6 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     
-    <h5>Throws:</h5>
-    
-            
-<div class="param-desc">
-    If long support is not available
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Error</span>
-
-
-	</dd>
-</dl>
-
-        
     
     
     <h5>Returns:</h5>
@@ -12870,7 +12520,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted,</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -12946,7 +12596,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
             
 <div class="param-desc">
-    <p>this if offset is omitted, else the actual number if bytes written,</p>
+    <p>this if offset is omitted, else the actual number if bytes written</p>
 </div>
 
 
@@ -13027,7 +12677,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
 <span class="param-type">number</span>
 |
 
-<span class="param-type"><a href="ByteBuffer.html#Long">ByteBuffer.Long</a></span>
+<span class="param-type">!Long</span>
 
 
             
@@ -13074,7 +12724,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -13241,7 +12891,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -13411,7 +13061,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -13489,7 +13139,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     <div class="description">
-        <p>Writes an 8bit unsinged integer.</p>
+        <p>Writes an 8bit unsigned integer.</p>
     </div>
     
 
@@ -13578,7 +13228,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -13617,28 +13267,6 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     
-    <h5>Throws:</h5>
-    
-            
-<div class="param-desc">
-    If the offset is equal to or larger than the capacity
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Error</span>
-
-
-	</dd>
-</dl>
-
-        
     
     
     <h5>Returns:</h5>
@@ -13767,7 +13395,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -13934,7 +13562,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -14012,7 +13640,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     <div class="description">
-        <p>Writes a 64bit unsigned integer. Utilizes Long.js to write the low and high 32 bits separately.</p>
+        <p>Writes a 64bit unsigned integer. Requires Long.js.</p>
     </div>
     
 
@@ -14057,7 +13685,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
 <span class="param-type">number</span>
 |
 
-<span class="param-type">Long</span>
+<span class="param-type">!Long</span>
 
 
             
@@ -14104,7 +13732,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -14143,28 +13771,6 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     
-    <h5>Throws:</h5>
-    
-            
-<div class="param-desc">
-    If long support is not available
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Error</span>
-
-
-	</dd>
-</dl>
-
-        
     
     
     <h5>Returns:</h5>
@@ -14293,7 +13899,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -14633,7 +14239,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -14806,7 +14412,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -14909,7 +14515,8 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     <div class="description">
-        <p>Writes a string with prepended number of characters, which is encoded as a 32bit base 128 variable-length  integer.</p>
+        <p>Writes a string with prepended number of characters, which is encoded as a 32bit base 128 variable-length
+ integer.</p>
     </div>
     
 
@@ -14998,7 +14605,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -15043,7 +14650,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
             
 <div class="param-desc">
-    <p>this if offset is omitted, else the actual number of bytes written.</p>
+    <p>this if offset is omitted, else the actual number of bytes written</p>
 </div>
 
 
@@ -15338,7 +14945,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
             
             
             
-            <td class="description last"><p>Offset to write to. Defaults to <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> which will be modified only if omitted.</p></td>
+            <td class="description last"><p>Offset to write to. Will use and advance <a href="ByteBuffer.html#offset">ByteBuffer#offset</a> if omitted.</p></td>
         </tr>
 	
 	
@@ -15547,28 +15154,6 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     
     
-    <h5>Throws:</h5>
-    
-            
-<div class="param-desc">
-    If long support is not available
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Error</span>
-
-
-	</dd>
-</dl>
-
-        
     
     
     <h5>Returns:</h5>

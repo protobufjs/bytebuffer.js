@@ -147,18 +147,6 @@ var suite = {
         test.done();
     },
 
-    "sliceAndCompact": function(test) {
-        var bb = new ByteBuffer(3);
-        bb.writeUint8(0x12).writeUint8(0x34).writeUint8(0x56);
-        var bb2 = bb.sliceAndCompact(1,2);
-        test.notStrictEqual(bb, bb2);
-        test.notStrictEqual(bb.array, bb2.array);
-        test.equal(bb2.offset, 0);
-        test.equal(bb2.length, 1);
-        test.equal(bb2.toString("debug"), "<34>");
-        test.done();
-    },
-
     "ensureCapacity": function(test) {
         var bb = new ByteBuffer(5);
         test.equal(bb.array.byteLength, 5);
