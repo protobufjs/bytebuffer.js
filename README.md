@@ -1,9 +1,8 @@
 ![ByteBuffer.js - A Java-like ByteBuffer](https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.png)
 ======================================
-Provides a full-features ByteBuffer implementation using typed arrays. It also tries to abstract a bit of
-the complexity away by providing convenience methods for those who just want to write stuff without caring about signed,
-unsigned and the actual bit sizes. It's also one of the components driving [ProtoBuf.js](https://github.com/dcodeIO/ProtoBuf.js)
-and the [PSON](https://github.com/dcodeIO/PSON) reference implementation.
+Provides a full-features ByteBuffer implementation using typed arrays. It's one of the core components driving
+[ProtoBuf.js](https://github.com/dcodeIO/ProtoBuf.js) and the [PSON](https://github.com/dcodeIO/PSON) reference
+implementation.
 
 *Note:* The API behind toHex and toString has changed with ByteBuffer 2.0.0, which is a generally revised release, in
 favor of making this more intuitive.
@@ -19,7 +18,7 @@ What can it do?
 * Relative and absolute zero-copy operations
 * Automatic resizing (always doubles)
 * Chaining of all operations that do not return a specific value
-* Slicing, appending, prepending etc.
+* Slicing, appending, prepending, flip, reset, etc.
 
 And much more... (see the API documentation)
 
@@ -103,40 +102,20 @@ Downloads
 
 Documentation
 -------------
-* [View documentation](http://htmlpreview.github.com/?http://github.com/dcodeIO/ByteBuffer.js/master/docs/ByteBuffer.html)
+* [View the API documentation](http://htmlpreview.github.com/?http://github.com/dcodeIO/ByteBuffer.js/master/docs/ByteBuffer.html)
 
 Tests (& Examples) [![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.png?branch=master)](https://travis-ci.org/dcodeIO/ByteBuffer.js)
 ------------------
 * [View source](https://github.com/dcodeIO/ByteBuffer.js/blob/master/tests/suite.js)
 * [View report](https://travis-ci.org/dcodeIO/ByteBuffer.js)
 
-Prerequisites to run it against IE<10, FF<15, Chrome<9 etc.
------------------------------------------------------------
-* Working ArrayBuffer & DataView implementations (i.e. use a [polyfill](https://github.com/inexorabletash/polyfill#typed-arrays-polyfill))
-
-Usage with Closure Compiler's advanced optimizations
-----------------------------------------------------
-You basically have the following three options:
-
-#### ByteBuffer.js as external dependency ####
-If you compile your code but want to use ByteBuffer.js as an external dependency that's not actually compiled "into"
-your project, add the provided [externs file](https://github.com/dcodeIO/ByteBuffer.js/blob/master/externs/ByteBuffer.js)
-to your compilation step (which usually excludes compilation of ByteBuffer.js).
-  
-#### ByteBuffer.js compiled into your project and exposed ####
-Use [ByteBuffer.js](https://github.com/dcodeIO/ByteBuffer.js/blob/master/ByteBuffer.js) if you want the ByteBuffer class
-to be exposed to the outside world (of JavaScript) so it can be called by external scripts. This also removes the
-requirement of using externs but the compiler will also keep possibly unused code.
-
-#### ByteBuffer.js fully compiled into your project ####
-Use [ByteBuffer.noexpose.js](https://github.com/dcodeIO/ByteBuffer.js/blob/master/ByteBuffer.noexpose.js) if you want
-the ByteBuffer class to be fully integrated into your (single file) project. Of course no external scripts will be able
-to call it or its method (trivially) because quite everything will become renamed, some parts inlined and moved around.
-This will also allow the compiler to actually remove unused code.
+Support for IE<10, FF<15, Chrome<9 etc.
+---------------------------------------
+* Requires a working ArrayBuffer & DataView implementations (i.e. use a [polyfill](https://github.com/inexorabletash/polyfill#typed-arrays-polyfill))
 
 Contributors
 ------------
-[Dretch](https://github.com/Dretch) (IE8 comp.)
+[Dretch](https://github.com/Dretch) (IE8 compatibility)
 
 License
 -------
