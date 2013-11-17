@@ -1505,9 +1505,8 @@
         /**
          * Base64 alphabet.
          * @type {string}
-         * @const
-         */
-        var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+         */ // @const will inline this, which is not so smart
+        var B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
         /**
          * Encodes a ByteBuffer's contents to a base64 string.
@@ -1532,7 +1531,7 @@
                 h2 = bits >> 12 & 0x3f;
                 h3 = bits >> 6 & 0x3f;
                 h4 = bits & 0x3f;
-                out[oi++] = b64.charAt(h1) + b64.charAt(h2) + b64.charAt(h3) + b64.charAt(h4);
+                out[oi++] = B64.charAt(h1) + B64.charAt(h2) + B64.charAt(h3) + B64.charAt(h4);
             } while (i < bb.length);
             var enc = out.join(''),
                 r = (bb.length - bb.offset) % 3;
@@ -1554,10 +1553,10 @@
             var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
                 out = new ByteBuffer(Math.ceil(str.length / 3), littleEndian);
             do {
-                h1 = b64.indexOf(str.charAt(i++));
-                h2 = b64.indexOf(str.charAt(i++));
-                h3 = b64.indexOf(str.charAt(i++));
-                h4 = b64.indexOf(str.charAt(i++));
+                h1 = B64.indexOf(str.charAt(i++));
+                h2 = B64.indexOf(str.charAt(i++));
+                h3 = B64.indexOf(str.charAt(i++));
+                h4 = B64.indexOf(str.charAt(i++));
                 if (h1 < 0 || h2 < 0 || h3 < 0 || h4 < 0) {
                     throw(new Error("Illegal argument: Not a valid base64 encoded string"));
                 }
