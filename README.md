@@ -9,14 +9,14 @@ favor of making this more intuitive.
 
 What can it do?
 ---------------
-* Mimics Java ByteBuffers as close as reasonable while using typed array terms
 * Signed and unsigned integers (8, 16, 32, 64 bit through [Long.js](https://github.com/dcodeIO/Long.js)) with endianness support
+* 32 and 64 bit floats
 * Varints as known from protobuf including zig-zag encoding
 * Includes an UTF8 and Base64 en-/decoder
 * C-strings, V(arint-prefixed)-strings and UTF8 L(ength-prefixed)-strings 
 * Rich string toolset (to hex, base64, utf8, debug, columns)
 * Relative and absolute zero-copy operations
-* Manual and automatic resizing (doubles capacity)
+* Manual and automatic resizing (efficiently doubles capacity)
 * Chaining of all operations that do not return a specific value
 * Slicing, appending, prepending, flip, reset, etc.
 
@@ -43,8 +43,7 @@ Usage
 ```javascript
 var ByteBuffer = require("bytebuffer");
 var bb = new ByteBuffer();
-bb.writeLString("Hello world!");
-bb.flip();
+bb.writeLString("Hello world!").flip();
 console.log(bb.readLString()+" from ByteBuffer.js");
 ```
 
@@ -61,8 +60,7 @@ support, you can skip the Long.js include.
 ```javascript
 var ByteBuffer = dcodeIO.ByteBuffer;
 var bb = new ByteBuffer();
-bb.writeLString("Hello world!");
-bb.flip();
+bb.writeLString("Hello world!").flip();
 alert(bb.readLString()+" from ByteBuffer.js");
 ```
 

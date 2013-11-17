@@ -31,7 +31,7 @@
  * @param {boolean=} littleEndian
  * @constructor
  */
-var ByteBuffer = function(capacity, littleEndian) {};
+function ByteBuffer(capacity, littleEndian) {};
 
 /**
  * @type {?ArrayBuffer}

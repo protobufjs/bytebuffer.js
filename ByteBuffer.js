@@ -27,7 +27,7 @@
     // uses DataView instead. This is required for IE 8 compatibility.
 
     /**
-     * @param {?Function} Long
+     * @param {Function=} Long
      * @returns {Function}
      * @private
      */
@@ -167,7 +167,7 @@
         function b2ab(b) {
             var ab = new ArrayBuffer(b.length),
                 view = new Uint8Array(ab);
-            for (var i = 0; i < b.length; ++i) view[i] = b[i];
+            for (var i= 0, k=b.length; i < k; ++i) view[i] = b[i];
             return ab;
         }
 
@@ -621,8 +621,9 @@
          * @expose
          */
         ByteBuffer.prototype.writeUint8 = function(value, offset) {
-            offset = typeof offset != 'undefined' ? offset : (this.offset+=1)-1;
+            offset = typeof offset !== 'undefined' ? offset : (this.offset+=1)-1;
             this.ensureCapacity(offset+1);
+            this.view.setUint8(offset, value);
             this.view.setUint8(offset, value);
             return this;
         };
@@ -1581,7 +1582,7 @@
         ByteBuffer.calculateUTF8String = function(str) {
             str = ""+str;
             var bytes = 0;
-            for (var i=0; i<str.length; i++) {
+            for (var i=0, k=str.length; i<k; i++) {
                 // Does not throw since JS strings are already UTF8 encoded
                 bytes += ByteBuffer.calculateUTF8Char(str.charCodeAt(i));
             }
@@ -1685,7 +1686,7 @@
             }
             var o,
                 out = new ByteBuffer(str.length/2, littleEndian);
-            for (var i=0; i<str.length; i+=2) {
+            for (var i= 0, k=str.length; i<k; i+=2) {
                 out.writeUint8(parseInt(str.substring(i, i+2), 16));
             }
             return out.flip();
@@ -1703,9 +1704,9 @@
             var advance = typeof offset === 'undefined';
             offset = typeof offset !== 'undefined' ? offset : this.offset;
             var start = offset;
-            var encLen = ByteBuffer.calculateUTF8String(str), i; // See [1]
+            var encLen = ByteBuffer.calculateUTF8String(str); // See [1]
             this.ensureCapacity(offset+encLen);
-            for (i=0; i<str.length; i++) {
+            for (var i=0, j=str.length; i<j; i++) {
                 // [1] Does not throw since JS strings are already UTF8 encoded
                 offset += ByteBuffer.encodeUTF8Char(str.charCodeAt(i), this, offset);
             }
@@ -1972,7 +1973,8 @@
             // Left colum: hex with offsets
             var out = "",
                 lines = [],
-                val;
+                val,
+                view = this.view;
             if (this.offset == 0 && this.length == 0) {
                 out += "|";
             } else if (this.length == 0) {
@@ -1982,13 +1984,13 @@
             } else {
                 out += " ";
             }
-            for (var i=0; i<this.array.byteLength; i++) {
+            for (var i=0, k=this.array.byteLength; i<k; i++) {
                 if (i>0 && i%wrap == 0) {
                     while (out.length < 3*wrap+1) out += "   "; // Make it equal to maybe show something on the right
                     lines.push(out);
                     out = " ";
                 }
-                val =  this.view.getUint8(i).toString(16).toUpperCase();
+                val =  view.getUint8(i).toString(16).toUpperCase();
                 if (val.length < 2) val = "0"+val;
                 out += val;
                 if (i+1 == this.offset && i+1 == this.length) {
@@ -2005,19 +2007,19 @@
                 lines.push(out);
             }
             // Make it equal
-            for (i=0; i<lines.length; i++) {
+            for (i=0, k=lines.length; i<k; i++) {
                 while (lines[i].length < 3*wrap+1) lines[i] += "   "; // Make it equal to maybe show something on the right
             }
 
             // Right column: ASCII, using dots for (usually) non-printable characters
             var n = 0;
             out = "";
-            for (i=0; i<this.array.byteLength; i++) {
+            for (i=0, k=this.array.byteLength; i<k; i++) {
                 if (i>0 && i%wrap == 0) {
                     lines[n] += " "+out;
                     out = ""; n++;
                 }
-                val = this.view.getUint8(i);
+                val = view.getUint8(i);
                 out += val > 32 && val < 127 ? String.fromCharCode(val) : ".";
             }
             if (out != "") {
@@ -2047,18 +2049,20 @@
          * @expose
          */
         ByteBuffer.prototype.toHex = function(debug) {
-            var out = "", val, i;
+            var out = "",
+                val,
+                view = this.view,
+                i, k;
             if (!debug) {
                 if (this.array == null) return "";
-                for (i=this.offset; i<this.length; i++) {
-                    val = this.view.getUint8(i).toString(16).toUpperCase();
+                for (i=this.offset, k=this.length; i<k; i++) {
+                    val = view.getUint8(i).toString(16).toUpperCase();
                     if (val.length < 2) val = "0"+val;
                     out += val;
                 }
                 return out;
             } else {
                 if (this.array == null) return "DESTROYED";
-                var lines = [];
                 if (this.offset == 0 && this.length == 0) {
                     out += "|";
                 } else if (this.length == 0) {
@@ -2068,11 +2072,11 @@
                 } else {
                     out += " ";
                 }
-                for (i=0; i<this.array.byteLength; i++) {
-                    val =  this.view.getUint8(i).toString(16).toUpperCase();
+                for (i=0, k=this.array.byteLength; i<k; i++) {
+                    val =  view.getUint8(i).toString(16).toUpperCase();
                     if (val.length < 2) val = "0"+val;
                     out += val;
-                    if (i+1 == this.offset && i+1 == this.length) {
+                    if (i+1 === this.offset && i+1 === this.length) {
                         out += "|";
                     } else if (i+1 == this.offset) {
                         out += "<";
@@ -2175,13 +2179,12 @@
                 }
                 return new Buffer(new Uint8Array(this.array).subarray(offset, length));
             };
+            
         }
 
         return ByteBuffer;
     }
-
-
-
+    
     // Enable module loading if available
     if (typeof module !== 'undefined' && module["exports"]) { // CommonJS
         module["exports"] = loadByteBuffer(require("long"));
