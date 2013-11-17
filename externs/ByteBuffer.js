@@ -59,6 +59,12 @@ ByteBuffer.prototype.length;
 ByteBuffer.prototype.littleEndian;
 
 /**
+ * @type {string}
+ * @const
+ */
+ByteBuffer.VERSION;
+
+/**
  * @type {number}
  * @const
  */
@@ -676,26 +682,23 @@ ByteBuffer.prototype.writeJSON = function(data, offset, stringify) {};
 ByteBuffer.prototype.readJSON = function(offset, parse) {};
 
 /**
- * @param {function(string)=} out
+ * @param {number=} wrap
+ * @return {string}
  * @nosideeffects
+ */
+ByteBuffer.prototype.toColumns = function(wrap) {};
+
+/**
+ * @param {function(string)=} out
  */
 ByteBuffer.prototype.printDebug = function(out) {};
 
 /**
- * @param {number=} wrap
- * @param {boolean=} asArray
- * @return {string|!Array.<string>}
+ * @param {boolean=} debug
+ * @return {string}
  * @nosideeffects
  */
-ByteBuffer.prototype.toHex = function(wrap, asArray) {};
-
-/**
- * @param {number=} wrap
- * @param {boolean=} asArray
- * @return {string|!Array.<string>}
- * @nosideeffects
- */
-ByteBuffer.prototype.toASCII = function(wrap, asArray) {};
+ByteBuffer.prototype.toHex = function(debug) {};
 
 /**
  * @return {string}

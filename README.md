@@ -1,71 +1,28 @@
 ![ByteBuffer.js - A Java-like ByteBuffer](https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.png)
 ======================================
-Provides a Java-like, Netty-inspired ByteBuffer implementation using typed arrays. It also tries to abstract a bit of
+Provides a full-features ByteBuffer implementation using typed arrays. It also tries to abstract a bit of
 the complexity away by providing convenience methods for those who just want to write stuff without caring about signed,
-unsigned and the actual bit sizes. It's also one of the components driving [ProtoBuf.js](https://github.com/dcodeIO/ProtoBuf.js).
+unsigned and the actual bit sizes. It's also one of the components driving [ProtoBuf.js](https://github.com/dcodeIO/ProtoBuf.js)
+and the [PSON](https://github.com/dcodeIO/PSON) reference implementation.
 
-ByteBuffer
-----------
-* Mimics [Java ByteBuffers](http://docs.oracle.com/javase/1.5.0/docs/api/java/nio/ByteBuffer.html) as close as reasonable while using typed array terms
-* Full 64bit support via [Long.js](https://github.com/dcodeIO/Long.js) (optional)
-* Simple allocation (`new ByteBuffer(capacity[, littleEndian])` or `ByteBuffer.allocate(capacity[, littleEndian])`)
-* Wrapping of quite everything which is or includes an ArrayBuffer (`ByteBuffer.wrap(buffer[, littleEndian])`)
-* Cloning using the same (`ByteBuffer#clone()`) and copying using an independent backing buffer (`ByteBuffer#copy()`)
-* Slicing using the same (`ByteBuffer#slice(begin, end)`) and using an indepentent backing buffer (`ByteBuffer#sliceAndCompact(begin, end)`)
-* Manual offset (`ByteBuffer#offset` and `ByteBuffer#length`) and array manipulation (`ByteBuffer#array`)
-* Remaining readable bytes (`ByteBuffer#remaining()`) and backing buffer capacity getters (`ByteBuffer#capacity()`)
-* Explicit (`ByteBuffer#resize(capacity)`) and implicit resizing (`ByteBuffer#ensureCapacity(capacity)`)
-* Efficient implicit resizing by doubling the current capacity
-* Flipping (`ByteBuffer#flip()`), marking (`ByteBuffer#mark([offset])`) and resetting (`ByteBuffer#reset()`)
-* Compacting of the backing buffer (`ByteBuffer#compact()`)
-* Conversion to ArrayBuffer (`ByteBuffer#toArrayBuffer([forceCopy])`) (i.e. to send data over the wire, e.g. a WebSocket
-  with `binaryType="arraybuffer"`)
-* Conversion to Buffer (`ByteBuffer#toBuffer()`) if running inside of node.js
-* Reversing (`ByteBuffer#reverse()`), appending (`ByteBuffer#append(src[, offset])`) and prepending
-  (`ByteBuffer#prepend(src[, offset])`) of other ByteBuffers with implicit capacity management
-* Explicit destruction (`ByteBuffer#destroy()`)
-* `ByteBuffer#writeUint/Int8/16/32/64(value[, offset])` and `ByteBuffer#readUint/Int8/16/32/64([offset])`
-* `ByteBuffer#writeVarint32/64(value[, offset])` and `ByteBuffer#readVarint32/64([offset])` to write a base 128
-  variable-length integer as used in [protobuf](https://developers.google.com/protocol-buffers/docs/encoding#varints)
-* `ByteBuffer#writeZigZagVarint32/64(value[, offset])` and `ByteBuffer#readZigZagVarint32/64([offset])` to write a
-  zig-zag encoded base 128 variable-length integer as used in protobuf for efficient encoding of signed values
-* `ByteBuffer#writeFloat32/64(value[, offset])` and `ByteBuffer#readFloat32/64([offset])`
-* `ByteBuffer#write/readByte`, `ByteBuffer#write/readShort`, `ByteBuffer#write/readInt`, `ByteBuffer#write/readLong`
-  (all signed), `ByteBuffer#write/readVarint` and `ByteBuffer#write/readZigZagVarint` (both 32bit signed),
-  `ByteBuffer#write/readFloat`, `ByteBuffer#write/readDouble` aliases for the above for convenience
-* `ByteBuffer#writeUTF8String(str[, offset])`, `ByteBuffer#readUTF8String(chars[, offset])` and 
-  `ByteBuffer#readUTF8StringBytes(length[, offset])` using the included UTF8 en-/decoder (full 6 bytes,
-  [ref](http://en.wikipedia.org/wiki/UTF-8#Description))
-* `ByteBuffer.encode64(bb)`, `ByteBuffer.decode64(str)` and `ByteBuffer#toBase64()` using the included Base64
-  en/-decoder.
-* `ByteBuffer#writeLString(str[, offset]))` and `ByteBuffer#readLString([offset])` to write respectively read a
-  length-prepended (number of characters as UTF8 char) string
-* `ByteBuffer#writeVString(str[, offset]))` and `ByteBuffer#readVString([offset])` to write respectively read a
-  length-prepended (number of bytes as base 128 variable-length 32bit integer) string
-* `ByteBuffer#writeCString(str[, offset])` and `ByteBuffer#readCString([offset])` to write respectively read a
-  NULL-terminated (Uint8 0x00) string
-* `ByteBuffer#writeJSON(data[, offset[, stringify]])` and `ByteBuffer#readJSON([offset[, parse]])` to write respectively
-  read arbitraty object data. Allows overriding the default stringify (default: JSON.stringify) and parse (default: 
-  JSON.parse) implementations.
-* All with implicit offset advance if the offset parameter is omitted or without, if specified
-* Chaining of all operations that allow this (i.e. do not return some specific value like in read operations), e.g.
+*Note:* The API behind toHex and toString has changed with ByteBuffer 2.0.0, which is a generally revised release, in
+favor of making this more intuitive.
 
-  ```javascript
-  var bb = new ByteBuffer();
-  ...
-  bb.reset().writeInt(1).writeLString("Hello world!").flip().compact()...
-  ```
-  
-* Switching between little endian and big endian byte order through `ByteBuffer#LE()` and `ByteBuffer#BE()`, e.g.
-  
-  ```javascript
-  var bb = new ByteBuffer(8).LE().writeInt(1).BE().writeInt(2).flip(); // toHex: <01 00 00 00 00 00 00 02>
-  ```
-  
-* `ByteBuffer#toString([enc])`, `ByteBuffer#toHex([wrap])`, `ByteBuffer#toASCII([wrap])`, `ByteBuffer#toUTF8()`,
-  `ByteBuffer#toBase64()` and `ByteBuffer#printDebug()` (emits hex + ASCII + offsets to console, looks like your
-  favourite hex editor) for pain-free debugging
-  
+What can it do?
+---------------
+* Mimics Java ByteBuffers as close as reasonable while using typed array terms
+* Signed and unsigned integers (8, 16, 32, 64 bit through [Long.js](https://github.com/dcodeIO/Long.js)) with endianness support
+* Varints as known from protobuf including zig-zag encoding
+* Includes an UTF8 and Base64 en-/decoder
+* C-strings, Varint-prefixed strings and UTF8 length-prefixed strings 
+* Rich string toolset (to hex, base64, utf8, debug, columns)
+* Relative and absolute zero-copy operations
+* Automatic resizing (always doubles)
+* Chaining of all operations that do not return a specific value
+* Slicing, appending, prepending etc.
+
+And much more... (see the API documentation)
+
 Features
 --------
 * [CommonJS](http://www.commonjs.org/) compatible

@@ -101,7 +101,7 @@ var suite = {
         var bb2 = new ByteBuffer(4).writeInt32(0x12345678).flip();
         bb2.offset = 1;
         var bb = ByteBuffer.wrap(bb2);
-        test.strictEqual(bb2.toHex(), bb.toHex());
+        test.strictEqual(bb2.toString("debug"), bb.toString("debug"));
         test.done();
     },
     
@@ -116,7 +116,7 @@ var suite = {
     "wrap(Buffer)": function(test) {
         var b = new Buffer("abc", "utf8");
         var bb = ByteBuffer.wrap(b);
-        test.equal(bb.toHex(), "<61 62 63>");
+        test.equal(bb.toString("debug"), "<61 62 63>");
         test.done();
     },
 
@@ -124,7 +124,7 @@ var suite = {
         var bb = new ByteBuffer(1);
         bb.resize(2);
         test.equal(bb.array.byteLength, 2);
-        test.equal(bb.toHex(), "|00 00 ");
+        test.equal(bb.toString("debug"), "|00 00 ");
         test.done();
     },
     
@@ -148,7 +148,7 @@ var suite = {
         test.notStrictEqual(bb.array, bb2.array);
         test.equal(bb2.offset, 0);
         test.equal(bb2.length, 1);
-        test.equal(bb2.toHex(), "<34>");
+        test.equal(bb2.toString("debug"), "<34>");
         test.done();
     },
 
@@ -246,7 +246,7 @@ var suite = {
         test.strictEqual(bb.array, null);
         test.equal(bb.offset, 0);
         test.equal(bb.length, 0);
-        test.equal(bb.toHex(), "DESTROYED");
+        test.equal(bb.toString("debug"), "DESTROYED");
         test.done();
     },
     
@@ -255,7 +255,7 @@ var suite = {
         bb.writeUint32(0x12345678);
         bb.flip();
         bb.reverse();
-        test.equal(bb.toHex(), "<78 56 34 12>");
+        test.equal(bb.toString("debug"), "<78 56 34 12>");
         test.done();
     },
     
@@ -266,9 +266,9 @@ var suite = {
         bb2.writeUint16(0x5678);
         bb2.flip();
         bb.append(bb2);
-        test.equal(bb.toHex(), ">12 34 56 78<");
+        test.equal(bb.toString("debug"), ">12 34 56 78<");
         bb.append(bb2, 1);
-        test.equal(bb.toHex(), ">12 56 78 78<");
+        test.equal(bb.toString("debug"), ">12 56 78 78<");
         test.done();
     },
     
@@ -280,10 +280,10 @@ var suite = {
         bb2.writeUint16(0x5678);
         bb2.flip();
         bb.prepend(bb2);
-        test.equal(bb.toHex(), "<56 78 12 34>");
+        test.equal(bb.toString("debug"), "<56 78 12 34>");
         bb.offset = 4;
         bb.prepend(bb2, 3);
-        test.equal(bb.toHex(), " 56 56 78 34|")
+        test.equal(bb.toString("debug"), " 56 56 78 34|")
         test.done();
     },
     
@@ -391,21 +391,21 @@ var suite = {
         
         var max = ByteBuffer.Long.MAX_SIGNED_VALUE.toNumber();
         bb.writeInt64(max).flip();
-        test.equal(bb.toHex(), "<7F FF FF FF FF FF FF FF>");
+        test.equal(bb.toString("debug"), "<7F FF FF FF FF FF FF FF>");
         test.equal(bb.readInt64(0), max);
         
         var min = ByteBuffer.Long.MIN_SIGNED_VALUE.toNumber();
         bb.writeInt64(min).flip();
-        test.equal(bb.toHex(), "<80 00 00 00 00 00 00 00>");
+        test.equal(bb.toString("debug"), "<80 00 00 00 00 00 00 00>");
         test.equal(bb.readInt64(0), min);
         
         bb.writeInt64(-1).flip();
-        test.equal(bb.toHex(), "<FF FF FF FF FF FF FF FF>");
+        test.equal(bb.toString("debug"), "<FF FF FF FF FF FF FF FF>");
         test.equal(bb.readInt64(0), -1);
         
         bb.reset();
         bb.LE().writeInt64(new ByteBuffer.Long(0x89ABCDEF, 0x01234567)).flip();
-        test.equal(bb.toHex(), "<EF CD AB 89 67 45 23 01>");
+        test.equal(bb.toString("debug"), "<EF CD AB 89 67 45 23 01>");
         
         test.done();
     },
@@ -415,21 +415,21 @@ var suite = {
 
         var max = ByteBuffer.Long.MAX_UNSIGNED_VALUE.toNumber();
         bb.writeUint64(max).flip();
-        test.equal(bb.toHex(), "<FF FF FF FF FF FF FF FF>");
+        test.equal(bb.toString("debug"), "<FF FF FF FF FF FF FF FF>");
         test.equal(bb.readUint64(0), max);
 
         var min = ByteBuffer.Long.MIN_UNSIGNED_VALUE.toNumber();
         bb.writeLong(min).flip();
-        test.equal(bb.toHex(), "<00 00 00 00 00 00 00 00>");
+        test.equal(bb.toString("debug"), "<00 00 00 00 00 00 00 00>");
         test.equal(bb.readUint64(0), min);
 
         bb.writeUint64(-1).flip();
-        test.equal(bb.toHex(), "<00 00 00 00 00 00 00 00>");
+        test.equal(bb.toString("debug"), "<00 00 00 00 00 00 00 00>");
         test.equal(bb.readUint64(0), 0);
 
         bb.reset();
         bb.LE().writeUint64(new ByteBuffer.Long(0x89ABCDEF, 0x01234567, true)).flip();
-        test.equal(bb.toHex(), "<EF CD AB 89 67 45 23 01>");
+        test.equal(bb.toString("debug"), "<EF CD AB 89 67 45 23 01>");
 
         test.done();
     },
@@ -452,7 +452,7 @@ var suite = {
     
     "LE/BE": function(test) {
         var bb = new ByteBuffer(8).LE().writeInt(1).BE().writeInt(2).flip();
-        test.equal(bb.toHex(), "<01 00 00 00 00 00 00 02>");
+        test.equal(bb.toString("debug"), "<01 00 00 00 00 00 00 02>");
         test.done();
     },
     
@@ -614,11 +614,11 @@ var suite = {
         test.equal(bb.offset, 3);
         test.equal(bb.length, 0);
         bb.flip();
-        test.equal(bb.toHex(), "<02 61 62>00 ");
+        test.equal(bb.toString("debug"), "<02 61 62>00 ");
         test.deepEqual({"string": "ab", "length": 3}, bb.readLString(0));
-        test.equal(bb.toHex(), "<02 61 62>00 ");
+        test.equal(bb.toString("debug"), "<02 61 62>00 ");
         test.equal("ab", bb.readLString());
-        test.equal(bb.toHex(), " 02 61 62|00 ");
+        test.equal(bb.toString("debug"), " 02 61 62|00 ");
         test.done();
     },
 
@@ -629,11 +629,11 @@ var suite = {
         test.equal(bb.offset, 3);
         test.equal(bb.length, 0);
         bb.flip();
-        test.equal(bb.toHex(), "<02 61 62>00 ");
+        test.equal(bb.toString("debug"), "<02 61 62>00 ");
         test.deepEqual({"string": "ab", "length": 3}, bb.readVString(0));
-        test.equal(bb.toHex(), "<02 61 62>00 ");
+        test.equal(bb.toString("debug"), "<02 61 62>00 ");
         test.equal("ab", bb.readLString());
-        test.equal(bb.toHex(), " 02 61 62|00 ");
+        test.equal(bb.toString("debug"), " 02 61 62|00 ");
         test.done();
     },
     
@@ -644,11 +644,11 @@ var suite = {
         test.equal(bb.offset, 3);
         test.equal(bb.length, 0);
         bb.flip();
-        test.equal(bb.toHex(), "<61 62 00>00 ");
+        test.equal(bb.toString("debug"), "<61 62 00>00 ");
         test.deepEqual({"string": "ab", "length": 3}, bb.readCString(0));
-        test.equal(bb.toHex(), "<61 62 00>00 ");
+        test.equal(bb.toString("debug"), "<61 62 00>00 ");
         test.equal("ab", bb.readCString());
-        test.equal(bb.toHex(), " 61 62 00|00 ");
+        test.equal(bb.toString("debug"), " 61 62 00|00 ");
         test.done();
     },
     
@@ -664,14 +664,18 @@ var suite = {
     "toHex": function(test) {
         var bb = new ByteBuffer(3);
         bb.writeUint16(0x1234);
-        test.equal(bb.toHex(), ">12 34<00 ");
+        test.equal(bb.flip().toHex(), "1234");
         test.done();
     },
     
     "toString": function(test) {
         var bb = new ByteBuffer(3);
-        bb.writeUint16(0x1234);
-        test.equal(bb.toString(), "ByteBuffer(offset=2,markedOffset=-1,length=0,capacity=3)");
+        bb.writeUint16(0x6162).flip();
+        test.equal(bb.toString(), "ByteBuffer(offset=0,markedOffset=-1,length=2,capacity=3)");
+        test.equal(bb.toString("hex"), "6162");
+        test.equal(bb.toString("base64"), "YWI=");
+        test.equal(bb.toString("utf8"), "ab");
+        test.equal(bb.toString("debug"), "<61 62>00 ");
         test.done();
     },
     
@@ -708,7 +712,6 @@ var suite = {
     
     "printDebug": function(test) {
         var bb = new ByteBuffer(3);
-        test.ok(typeof bb.printDebug(true) == 'string');
         function callMe() { callMe.called = true; };
         bb.printDebug(callMe);
         test.ok(callMe.called);
@@ -752,7 +755,7 @@ var suite = {
         bb.writeVarint64(ByteBuffer.Long.fromString("1368057600000"));
         bb.writeVarint32(40);
         bb.writeVarint64(ByteBuffer.Long.fromString("1235455123"));
-        test.equal(bb.toHex(18), ">10 02 18 00 20 80 B0 D9 B4 E8 27 28 93 99 8E CD 04<00 ");
+        test.equal(bb.toString("debug"), ">10 02 18 00 20 80 B0 D9 B4 E8 27 28 93 99 8E CD 04<00 ");
         test.done();
     },
     

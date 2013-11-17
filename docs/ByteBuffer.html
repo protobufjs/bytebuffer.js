@@ -478,6 +478,51 @@ of 2 if required.</p>
         
             
 <dt>
+    <h4 class="name" id="VERSION"><span class="type-signature">&lt;static, constant> </span>VERSION<span class="type-signature"> :string</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>ByteBuffer version.</p>
+    </div>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="array"><span class="type-signature"></span>array<span class="type-signature"> :ArrayBuffer</span></h4>
     
     
@@ -2356,16 +2401,16 @@ and its length to the wrapped objects byte length.</p>
 <span class="param-type">ArrayBuffer</span>
 |
 
-<span class="param-type">Buffer</span>
+<span class="param-type">!Buffer</span>
 |
 
 <span class="param-type">string</span>
 |
 
-<span class="param-type">{array: ArrayBuffer}</span>
+<span class="param-type">{array: !ArrayBuffer}</span>
 |
 
-<span class="param-type">{buffer: ArrayBuffer}</span>
+<span class="param-type">{buffer: !ArrayBuffer}</span>
 |
 
 <span class="param-type">string</span>
@@ -2384,7 +2429,7 @@ and its length to the wrapped objects byte length.</p>
             
             
             
-            <td class="description last"><p>ArrayBuffer, any object with an .array or .buffer property or a string to wrap</p></td>
+            <td class="description last"><p>Anything that man be wrapped</p></td>
         </tr>
 	
 	
@@ -2680,6 +2725,9 @@ and its length to the wrapped objects byte length.</p>
             
                 
 <span class="param-type">Long</span>
+|
+
+<span class="param-type">number</span>
 
 
             
@@ -2689,7 +2737,7 @@ and its length to the wrapped objects byte length.</p>
             
             
             
-            <td class="description last"><p>Unsigned zigzag encoded long</p></td>
+            <td class="description last"><p>Unsigned zigzag encoded long or JavaScript number</p></td>
         </tr>
 	
 	
@@ -3131,7 +3179,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
             
             
             
-            <td class="description last"><p>ByteBuffer or any object that can be wrapped by one to prepend</p></td>
+            <td class="description last"><p>ByteBuffer or any object that can be wrapped to prepend</p></td>
         </tr>
 	
 	
@@ -4400,7 +4448,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
         
             
 <dt>
-    <h4 class="name" id="printDebug"><span class="type-signature"></span>printDebug<span class="signature">(out)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="printDebug"><span class="type-signature"></span>printDebug<span class="signature">(<span class="optional">out</span>)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -4408,7 +4456,7 @@ larger than its length (its offsets remain untouched through cloning).</p>
     
     
     <div class="description">
-        <p>Prints debug information about this ByteBuffer&#39;s contents to console.</p>
+        <p>Prints debug information about this ByteBuffer&#39;s contents.</p>
     </div>
     
 
@@ -4430,6 +4478,8 @@ larger than its length (its offsets remain untouched through cloning).</p>
 		<th>Type</th>
 		
 		
+		<th>Argument</th>
+		
 		
 		
 		
@@ -4448,21 +4498,25 @@ larger than its length (its offsets remain untouched through cloning).</p>
             <td class="type">
             
                 
-<span class="param-type">Function=</span>
-|
-
-<span class="param-type">boolean</span>
+<span class="param-type">function(string)</span>
 
 
             
             </td>
             
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
             
             
             
-            <td class="description last"><p>Output function to call with the result or true to return the data as a string.
-Defaults to call console.log.</p></td>
+            
+            <td class="description last"><p>Output function to call, defaults to console.log</p></td>
         </tr>
 	
 	
@@ -4666,7 +4720,7 @@ Defaults to call console.log.</p></td>
         
             
 <dt>
-    <h4 class="name" id="readCString"><span class="type-signature"></span>readCString<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {string|{string: string, length: number}}</span></h4>
+    <h4 class="name" id="readCString"><span class="type-signature"></span>readCString<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {string|!{string: string, length: number}}</span></h4>
     
     
 </dt>
@@ -4815,7 +4869,7 @@ Defaults to call console.log.</p></td>
 <span class="param-type">string</span>
 |
 
-<span class="param-type">{string: string, length: number}</span>
+<span class="param-type">!{string: string, length: number}</span>
 
 
 	</dd>
@@ -6233,7 +6287,7 @@ Defaults to call console.log.</p></td>
         
             
 <dt>
-    <h4 class="name" id="readJSON"><span class="type-signature"></span>readJSON<span class="signature">(<span class="optional">offset</span>, <span class="optional">parse</span>)</span><span class="type-signature"> &rarr; {*|{data: *, length: number}}</span></h4>
+    <h4 class="name" id="readJSON"><span class="type-signature"></span>readJSON<span class="signature">(<span class="optional">offset</span>, <span class="optional">parse</span>)</span><span class="type-signature"> &rarr; {*|!{data: *, length: number}}</span></h4>
     
     
 </dt>
@@ -6314,7 +6368,7 @@ Defaults to call console.log.</p></td>
             <td class="type">
             
                 
-<span class="param-type">function</span>
+<span class="param-type">function(string)</span>
 
 
             
@@ -6413,7 +6467,7 @@ Defaults to call console.log.</p></td>
 <span class="param-type">*</span>
 |
 
-<span class="param-type">{data: *, length: number}</span>
+<span class="param-type">!{data: *, length: number}</span>
 
 
 	</dd>
@@ -7526,7 +7580,7 @@ Defaults to call console.log.</p></td>
         
             
 <dt>
-    <h4 class="name" id="readUTF8String"><span class="type-signature"></span>readUTF8String<span class="signature">(chars, <span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {string|{string: string, length: number}}</span></h4>
+    <h4 class="name" id="readUTF8String"><span class="type-signature"></span>readUTF8String<span class="signature">(chars, <span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {string|!{string: string, length: number}}</span></h4>
     
     
 </dt>
@@ -7704,7 +7758,7 @@ Defaults to call console.log.</p></td>
 <span class="param-type">string</span>
 |
 
-<span class="param-type">{string: string, length: number}</span>
+<span class="param-type">!{string: string, length: number}</span>
 
 
 	</dd>
@@ -7718,7 +7772,7 @@ Defaults to call console.log.</p></td>
         
             
 <dt>
-    <h4 class="name" id="readUTF8StringBytes"><span class="type-signature"></span>readUTF8StringBytes<span class="signature">(length, <span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {string|{string: string, length: number}}</span></h4>
+    <h4 class="name" id="readUTF8StringBytes"><span class="type-signature"></span>readUTF8StringBytes<span class="signature">(length, <span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {string|!{string: string, length: number}}</span></h4>
     
     
 </dt>
@@ -7896,7 +7950,7 @@ Defaults to call console.log.</p></td>
 <span class="param-type">string</span>
 |
 
-<span class="param-type">{string: string, length: number}</span>
+<span class="param-type">!{string: string, length: number}</span>
 
 
 	</dd>
@@ -8214,7 +8268,7 @@ Defaults to call console.log.</p></td>
         
             
 <dt>
-    <h4 class="name" id="readVarint64"><span class="type-signature"></span>readVarint64<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {Long|{value: Long, length: number}}</span></h4>
+    <h4 class="name" id="readVarint64"><span class="type-signature"></span>readVarint64<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {Long|!{value: Long, length: number}}</span></h4>
     
     
 </dt>
@@ -8363,7 +8417,7 @@ Defaults to call console.log.</p></td>
 <span class="param-type">Long</span>
 |
 
-<span class="param-type">{value: Long, length: number}</span>
+<span class="param-type">!{value: Long, length: number}</span>
 
 
 	</dd>
@@ -8377,7 +8431,7 @@ Defaults to call console.log.</p></td>
         
             
 <dt>
-    <h4 class="name" id="readVString"><span class="type-signature"></span>readVString<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {string|{string: string, length: number}}</span></h4>
+    <h4 class="name" id="readVString"><span class="type-signature"></span>readVString<span class="signature">(<span class="optional">offset</span>)</span><span class="type-signature"> &rarr; {string|!{string: string, length: number}}</span></h4>
     
     
 </dt>
@@ -8526,7 +8580,7 @@ Defaults to call console.log.</p></td>
 <span class="param-type">string</span>
 |
 
-<span class="param-type">{string: string, length: number}</span>
+<span class="param-type">!{string: string, length: number}</span>
 
 
 	</dd>
@@ -9439,7 +9493,7 @@ reversed data in inverse order. Example: &quot;00&lt;01 02&gt;03 04&quot;.revers
     
     <div class="description">
         <p>Slices the ByteBuffer. This is independent of the ByteBuffer&#39;s actual offsets. Does not compact the underlying
-ArrayBuffer (use <a href="ByteBuffer.html#compact">ByteBuffer#compact</a> and maybe <a href="ByteBuffer.html#wrap">ByteBuffer.wrap</a> instead).</p>
+ ArrayBuffer (use <a href="ByteBuffer.html#compact">ByteBuffer#compact</a> or <a href="ByteBuffer.html#wrap">ByteBuffer.wrap</a> instead).</p>
     </div>
     
 
@@ -9613,7 +9667,7 @@ ArrayBuffer (use <a href="ByteBuffer.html#compact">ByteBuffer#compact</a> and ma
     
     <div class="description">
         <p>Slices and compacts the ByteBuffer. The resulting ByteBuffer will have its own ArrayBuffer with the compacted contents
-of this ByteBuffer&#39;s contents.</p>
+ of this ByteBuffer&#39;s contents.</p>
     </div>
     
 
@@ -9783,8 +9837,8 @@ of this ByteBuffer&#39;s contents.</p>
     
     <div class="description">
         <p>Returns an ArrayBuffer compacted to contain this ByteBuffer&#39;s actual contents. Will implicitly
-<a href="ByteBuffer.html#flip">ByteBuffer#flip</a> the ByteBuffer if its offset is larger than its length. Will return a reference to
-the unmodified backing buffer if offset=0 and length=capacity unless forceCopy is set to true.</p>
+ <a href="ByteBuffer.html#flip">ByteBuffer#flip</a> the ByteBuffer if its offset is larger than its length. Will return a reference to
+ the unmodified backing buffer if offset=0 and length=capacity unless forceCopy is set to true.</p>
     </div>
     
 
@@ -9889,7 +9943,7 @@ the unmodified backing buffer if offset=0 and length=capacity unless forceCopy i
     
             
 <div class="param-desc">
-    <p>Compacted ArrayBuffer</p>
+    <p>Compacted ArrayBuffer or null if already destroyed</p>
 </div>
 
 
@@ -9901,178 +9955,6 @@ the unmodified backing buffer if offset=0 and length=capacity unless forceCopy i
 	<dd>
 		
 <span class="param-type">ArrayBuffer</span>
-
-
-	</dd>
-</dl>
-
-        
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="toASCII"><span class="type-signature"></span>toASCII<span class="signature">(<span class="optional">wrap</span>, <span class="optional">asArray</span>)</span><span class="type-signature"> &rarr; {string|Array.&lt;string>}</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Returns an ASCII representation of this ByteBuffer&#39;s contents. Beware: May be large.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		<th>Argument</th>
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>wrap</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-            
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-                    
-                
-                </td>
-            
-            
-            
-            
-            <td class="description last"><p>Wrap length. Defaults to 16.</p></td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>asArray</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-            
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-                    
-                
-                </td>
-            
-            
-            
-            
-            <td class="description last"><p>Set to true to return an array of lines. Defaults to false.</p></td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    <p>ASCII representation as of &quot;abcdef...&quot; (33-126, else &quot;.&quot;, no marked offsets)</p>
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">string</span>
-|
-
-<span class="param-type">Array.&lt;string></span>
 
 
 	</dd>
@@ -10175,8 +10057,8 @@ the unmodified backing buffer if offset=0 and length=capacity unless forceCopy i
     
     <div class="description">
         <p>Returns a node Buffer compacted to contain this ByteBuffer&#39;s actual contents. Will implicitly
-<a href="ByteBuffer.html#flip">ByteBuffer#flip</a> the ByteBuffer if its offset is larger than its length. Will also copy all data (not
-a reference).</p>
+ <a href="ByteBuffer.html#flip">ByteBuffer#flip</a> the ByteBuffer if its offset is larger than its length. Will also copy all data (not
+ a reference).</p>
     </div>
     
 
@@ -10245,7 +10127,7 @@ a reference).</p>
     
             
 <div class="param-desc">
-    <p>Compacted Buffer</p>
+    <p>Compacted node Buffer or null if already destroyed</p>
 </div>
 
 
@@ -10270,7 +10152,7 @@ a reference).</p>
         
             
 <dt>
-    <h4 class="name" id="toHex"><span class="type-signature"></span>toHex<span class="signature">(<span class="optional">wrap</span>, <span class="optional">asArray</span>)</span><span class="type-signature"> &rarr; {string|Array.&lt;string>}</span></h4>
+    <h4 class="name" id="toColumns"><span class="type-signature"></span>toColumns<span class="signature">(<span class="optional">wrap</span>)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
     
 </dt>
@@ -10278,7 +10160,7 @@ a reference).</p>
     
     
     <div class="description">
-        <p>Returns a hex representation of this ByteBuffer&#39;s contents. Beware: May be large.</p>
+        <p>Returns a two columns (hex, ascii) representation of this ByteBuffer&#39;s backing array.</p>
     </div>
     
 
@@ -10342,10 +10224,117 @@ a reference).</p>
         </tr>
 	
 	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>Hex representation as of &quot; 00&lt;01 02&gt;03... ASCII DATA&quot; with marked offsets</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">string</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="toHex"><span class="type-signature"></span>toHex<span class="signature">(<span class="optional">debug</span>)</span><span class="type-signature"> &rarr; {string}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Returns the ByteBuffer&#39;s contents between offset and length as a hex string.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
 	
         <tr>
             
-                <td class="name"><code>asArray</code></td>
+                <td class="name"><code>debug</code></td>
             
             
             <td class="type">
@@ -10369,7 +10358,8 @@ a reference).</p>
             
             
             
-            <td class="description last"><p>Set to true to return an array of lines. Defaults to false.</p></td>
+            <td class="description last"><p>Returns the entire backing array with marked offsets, defaults to false. This is used
+ in ByteBuffer#toString(&quot;debug&quot;).</p></td>
         </tr>
 	
 	
@@ -10414,7 +10404,7 @@ a reference).</p>
     
             
 <div class="param-desc">
-    <p>Hex representation as of &quot; 00&lt;01 02&gt;03...&quot; with marked offsets</p>
+    <p>Hex string</p>
 </div>
 
 
@@ -10426,9 +10416,6 @@ a reference).</p>
 	<dd>
 		
 <span class="param-type">string</span>
-|
-
-<span class="param-type">Array.&lt;string></span>
 
 
 	</dd>
@@ -10833,8 +10820,8 @@ a reference).</p>
     
     <div class="description">
         <p>Writes a string followed by a NULL character (Uint8). Beware: The source string must not contain NULL characters
-unless this is actually intended. This is not checked. If you have the option it is recommended to use
-<a href="ByteBuffer.html#writeLString">ByteBuffer#writeLString</a> or <a href="ByteBuffer.html#writeVString">ByteBuffer#writeVString</a> with the corresponding reading methods instead.</p>
+ unless this is actually intended. This is not checked. If you have the option it is recommended to use
+ <a href="ByteBuffer.html#writeLString">ByteBuffer#writeLString</a> or <a href="ByteBuffer.html#writeVString">ByteBuffer#writeVString</a> with the corresponding reading methods instead.</p>
     </div>
     
 
@@ -12634,7 +12621,7 @@ unless this is actually intended. This is not checked. If you have the option it
             <td class="type">
             
                 
-<span class="param-type">function</span>
+<span class="param-type">function(*)</span>
 
 
             
