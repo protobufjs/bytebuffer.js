@@ -3366,7 +3366,7 @@
         
             
 <dt>
-    <h4 class="name" id="BE"><span class="type-signature"></span>BE<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
+    <h4 class="name" id="BE"><span class="type-signature"></span>BE<span class="signature">(<span class="optional">bigEndian</span>)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
     
     
 </dt>
@@ -3374,7 +3374,7 @@
     
     
     <div class="description">
-        <p>Switches to bid endian byte order.</p>
+        <p>Switches big endian byte order.</p>
     </div>
     
 
@@ -3382,6 +3382,64 @@
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>bigEndian</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Defaults to <code>true</code>, otherwise uses little endian</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
     
     
     
@@ -4084,7 +4142,7 @@
         
             
 <dt>
-    <h4 class="name" id="LE"><span class="type-signature"></span>LE<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
+    <h4 class="name" id="LE"><span class="type-signature"></span>LE<span class="signature">(<span class="optional">littleEndian</span>)</span><span class="type-signature"> &rarr; {<a href="ByteBuffer.html">ByteBuffer</a>}</span></h4>
     
     
 </dt>
@@ -4092,7 +4150,7 @@
     
     
     <div class="description">
-        <p>Switches to little endian byte order.</p>
+        <p>Switches little endian byte order.</p>
     </div>
     
 
@@ -4100,6 +4158,64 @@
     
     
     
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>littleEndian</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+            
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+            
+            <td class="description last"><p>Defaults to <code>true</code>, otherwise uses big endian</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
     
     
     

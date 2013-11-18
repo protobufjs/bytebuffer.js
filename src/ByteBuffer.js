@@ -167,7 +167,7 @@
         function b2ab(b) {
             var ab = new ArrayBuffer(b.length),
                 view = new Uint8Array(ab);
-            for (var i= 0, k=b.length; i < k; ++i) view[i] = b[i];
+            for (var i=0, k=b.length; i < k; ++i) view[i] = b[i];
             return ab;
         }
 
@@ -231,22 +231,24 @@
         };
 
         /**
-         * Switches to little endian byte order.
+         * Switches little endian byte order.
+         * @param {boolean=} littleEndian Defaults to `true`, otherwise uses big endian
          * @returns {!ByteBuffer} this
          * @expose
          */
-        ByteBuffer.prototype.LE = function() {
-            this.littleEndian = true;
+        ByteBuffer.prototype.LE = function(littleEndian) {
+            this.littleEndian = typeof littleEndian !== 'undefined' ? !!littleEndian : true;
             return this;
         };
 
         /**
-         * Switches to bid endian byte order.
+         * Switches big endian byte order.
+         * @param {boolean=} bigEndian Defaults to `true`, otherwise uses little endian
          * @returns {!ByteBuffer} this
          * @expose
          */
-        ByteBuffer.prototype.BE = function() {
-            this.littleEndian = false;
+        ByteBuffer.prototype.BE = function(bigEndian) {
+            this.littleEndian = typeof bigEndian !== 'undefined' ? !bigEndian : false;
             return this;
         };
 
@@ -1686,7 +1688,7 @@
             }
             var o,
                 out = new ByteBuffer(str.length/2, littleEndian);
-            for (var i= 0, k=str.length; i<k; i+=2) {
+            for (var i=0, k=str.length; i<k; i+=2) {
                 out.writeUint8(parseInt(str.substring(i, i+2), 16));
             }
             return out.flip();

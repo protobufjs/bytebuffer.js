@@ -1,4 +1,4 @@
-![ByteBuffer.js - A Java-like ByteBuffer](https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.png)
+![ByteBuffer.js - A full-featured ByteBuffer implementation in JavaScript](https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.png)
 ======================================
 Provides a full-featured ByteBuffer implementation using typed arrays. It's one of the core components driving
 [ProtoBuf.js](https://github.com/dcodeIO/ProtoBuf.js) and the [PSON](https://github.com/dcodeIO/PSON) reference
@@ -9,6 +9,7 @@ favor of making this more intuitive.
 
 What can it do?
 ---------------
+* Mimics Java ByteBuffers as close as reasonable while using typed array terms
 * Signed and unsigned integers (8, 16, 32, 64 bit through [Long.js](https://github.com/dcodeIO/Long.js)) with endianness support
 * 32 and 64 bit floats
 * Varints as known from protobuf including zig-zag encoding
