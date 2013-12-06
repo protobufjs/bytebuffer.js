@@ -18,7 +18,7 @@
  * @license ByteBuffer.js (c) 2013 Daniel Wirtz <dcode@dcode.io>
  * Released under the Apache License, Version 2.0
  * see: https://github.com/dcodeIO/ByteBuffer.js for details
- */
+ */ //
 (function(global) {
     "use strict";
 
@@ -29,7 +29,7 @@
     /**
      * @param {Function=} Long
      * @returns {Function}
-     * @private
+     * @inner
      */
     function loadByteBuffer(Long) {
 
@@ -45,12 +45,11 @@
 
         /**
          * Constructs a new ByteBuffer.
-         * @exports ByteBuffer
          * @class A full-featured ByteBuffer implementation in JavaScript using typed arrays.
+         * @exports ByteBuffer
          * @param {number=} capacity Initial capacity. Defaults to {@link ByteBuffer.DEFAULT_CAPACITY}.
          * @param {boolean=} littleEndian `true` to use little endian multi byte values, defaults to `false` for big
          *  endian.
-         * @constructor
          */
         var ByteBuffer = function(capacity, littleEndian) {
 
@@ -103,7 +102,7 @@
          * @type {string}
          * @const
          */
-        ByteBuffer.VERSION = "2.0.1";
+        ByteBuffer.VERSION = "2.0.2";
 
         /**
          * Default buffer capacity of `16`. The ByteBuffer will be automatically resized by a factor of 2 if required.
@@ -127,12 +126,12 @@
         ByteBuffer.BIG_ENDIAN = false;
 
         /**
-         * Long class for int64 support. May be undefined if the Long class has not been loaded and int64 support is
+         * Long class for int64 support. May be `null` if the Long class has not been loaded and int64 support is
          *  not available.
-         * @type {Long|undefined}
+         * @type {?Long}
          * @const
          */
-        ByteBuffer.Long = Long;
+        ByteBuffer.Long = Long || null;
 
         /**
          * Allocates a new ByteBuffer.
@@ -149,7 +148,7 @@
          * Converts a node.js <= 0.8 Buffer to an ArrayBuffer.
          * @param {!Buffer} b Buffer to convert
          * @returns {?ArrayBuffer} Converted buffer
-         * @private
+         * @inner
          */
         function b2ab(b) {
             var ab = new ArrayBuffer(b.length),
@@ -1051,7 +1050,7 @@
         /**
          * Reads a zigzag encoded 32bit base 128 variable-length integer as used in protobuf.
          * @param {number=} offset Offset to read from. Will use and advance {@link ByteBuffer#offset} if omitted.
-         * @returns {number|{value: number, length: number}} The value read if offset is omitted, else the value read
+         * @returns {number|!{value: number, length: number}} The value read if offset is omitted, else the value read
          *  and the actual number of bytes read.
          * @throws {Error} If it's not a valid varint
          */
@@ -1074,28 +1073,28 @@
         /**
          * @type {number}
          * @const
-         * @private
+         * @inner
          */
         var TWO_PWR_7_DBL = 1 << 7;
 
         /**
          * @type {number}
          * @const
-         * @private
+         * @inner
          */
         var TWO_PWR_14_DBL = TWO_PWR_7_DBL * TWO_PWR_7_DBL;
 
         /**
          * @type {number}
          * @const
-         * @private
+         * @inner
          */
         var TWO_PWR_21_DBL = TWO_PWR_7_DBL * TWO_PWR_14_DBL;
 
         /**
          * @type {number}
          * @const
-         * @private
+         * @inner
          */
         var TWO_PWR_28_DBL = TWO_PWR_14_DBL * TWO_PWR_14_DBL;
 
@@ -1193,7 +1192,7 @@
             /**
              * Reads a zigzag encoded 64bit base 128 variable-length integer as used in protobuf.
              * @param {number=} offset Offset to read from. Defaults to {@link ByteBuffer#offset} which will be modified only if omitted.
-             * @returns {Long|{value: Long, length: number}} The value read if offset is omitted, else the value read and the actual number of bytes read.
+             * @returns {Long|!{value: Long, length: number}} The value read if offset is omitted, else the value read and the actual number of bytes read.
              * @throws {Error} If it's not a valid varint
              */
             ByteBuffer.prototype.readZigZagVarint64 = function(offset) {
@@ -1507,11 +1506,12 @@
 
         /**
          * Base64 alphabet.
-         * @type{string}
+         * @type {string}
          * @const
-         * @private
-         */ // FIXME: CC inlines this, which is not so smart regarding script size. Any ideas?
+         * @inner
+         */
         var B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+        // FIXME: CC inlines this, which is not so smart regarding script size. Any ideas?
 
         /**
          * Encodes a ByteBuffer's contents to a base64 string.
@@ -1934,7 +1934,7 @@
          * @param {function(string)=} out Output function to call, defaults to console.log
          */
         ByteBuffer.prototype.printDebug = function(out) {
-            if (typeof out !== 'function') out = console.log;
+            if (typeof out !== 'function') out = console.log.bind(console);
             out(
                 (this.array != null ? "ByteBuffer(offset="+this.offset+",markedOffset="+this.markedOffset+",length="+this.length+",capacity="+this.array.byteLength+")" : "ByteBuffer(DESTROYED)")+"\n"+
                     "-------------------------------------------------------------------\n"+

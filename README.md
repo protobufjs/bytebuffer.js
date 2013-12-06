@@ -19,7 +19,7 @@ What can it do?
 * Relative and absolute zero-copy operations
 * Manual and automatic resizing (efficiently doubles capacity)
 * Chaining of all operations that do not return a specific value
-* Slicing, appending, prepending, flip, reset, etc.
+* Slicing, appending, prepending, reversing, flip, mark, reset, etc.
 
 And much more...
 
