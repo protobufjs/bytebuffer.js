@@ -209,7 +209,7 @@
             }
             b = new ByteBuffer(0, littleEndian, /* shadow copy */ true);
             b.array = buffer;
-            b.view = new DataView(b.array);
+            b.view = b.array.byteLength > 0 ? new DataView(b.array) : null;
             b.offset = 0;
             b.length = buffer.byteLength;
             return b;
@@ -590,7 +590,6 @@
         ByteBuffer.prototype.writeUint8 = function(value, offset) {
             offset = typeof offset !== 'undefined' ? offset : (this.offset+=1)-1;
             this.ensureCapacity(offset+1);
-            this.view.setUint8(offset, value);
             this.view.setUint8(offset, value);
             return this;
         };
