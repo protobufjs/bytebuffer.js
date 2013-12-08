@@ -233,6 +233,22 @@ var suite = {
         test.equal(bb.length, 1);
         test.done();
     },
+
+    "compactEmpty": function(test) {
+        var bb = new ByteBuffer(2);
+        bb.compact();
+        test.strictEqual(bb.offset, 0);
+        test.strictEqual(bb.length, 0);
+        test.strictEqual(bb.view, null); // Special case
+        test.strictEqual(bb.array.byteLength, 0);
+        bb.writeInt32(0xFFFFFFFF);
+        bb.flip();
+        test.strictEqual(bb.offset, 0);
+        test.strictEqual(bb.length, 4);
+        test.notStrictEqual(bb.view, null);
+        test.strictEqual(bb.array.byteLength, 4); // Cannot double 0, so it takes 32bits
+        test.done();
+    },
     
     "destroy": function(test) {
         var bb = new ByteBuffer(1);

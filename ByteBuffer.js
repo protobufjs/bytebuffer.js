@@ -110,7 +110,7 @@
          * @const
          * @expose
          */
-        ByteBuffer.VERSION = "2.0.2";
+        ByteBuffer.VERSION = "2.1.0";
 
         /**
          * Default buffer capacity of `16`. The ByteBuffer will be automatically resized by a factor of 2 if required.
@@ -259,7 +259,7 @@
          */
         ByteBuffer.prototype.resize = function(capacity) {
             if (capacity < 1) return false;
-            if (this.array == null) { // Silently recreate
+            if (this.array === null) { // Silently recreate
                 this.array = new ArrayBuffer(capacity);
                 this.view = new DataView(this.array);
             }
@@ -310,10 +310,10 @@
          * @expose
          */
         ByteBuffer.prototype.ensureCapacity = function(capacity) {
-            if (this.array == null) {
+            if (this.array === null)
                 return this.resize(capacity);
-            }
-            if (this.array.byteLength < capacity) return this.resize(this.array.byteLength*2 >= capacity ? this.array.byteLength*2 : capacity);
+            if (this.array.byteLength < capacity)
+                return this.resize(this.array.byteLength*2 >= capacity ? this.array.byteLength*2 : capacity);
             return this;
         };
 
@@ -440,7 +440,9 @@
                 this.flip();
             }
             if (this.offset === this.length) {
-                throw(new Error(this+" cannot be compacted: Offset ("+this.offset+") is equal to its length ("+this.length+")"));
+                this.array = new ArrayBuffer(0);
+                this.view = null; // A DataView on a zero-length AB would throw
+                return this;
             }
             if (this.offset === 0 && this.length === this.array.byteLength) {
                 return this; // Already compacted
@@ -1593,11 +1595,10 @@
         /**
          * Base64 alphabet.
          * @type {string}
-         * @const
          * @inner
          */
         var B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-        // FIXME: CC inlines this, which is not so smart regarding script size. Any ideas?
+        B64 = B64+""; // Prevent CC from inlining this for less code size
 
         /**
          * Encodes a ByteBuffer's contents to a base64 string.
