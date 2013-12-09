@@ -788,6 +788,18 @@ var suite = {
         }
         test.done();
     },
+
+    "NaN": function(test) {
+        var bb = new ByteBuffer(4);
+        test.ok(isNaN(bb.writeFloat(NaN).flip().readFloat(0)));
+        test.strictEqual(bb.writeFloat(+Infinity).flip().readFloat(0), +Infinity);
+        test.strictEqual(bb.writeFloat(-Infinity).flip().readFloat(0), -Infinity);
+        bb.resize(8);
+        test.ok(isNaN(bb.writeDouble(NaN).flip().readDouble(0)));
+        test.strictEqual(bb.writeDouble(+Infinity).flip().readDouble(0), +Infinity);
+        test.strictEqual(bb.writeDouble(-Infinity).flip().readDouble(0), -Infinity);
+        test.done();
+    },
     
     "commonjs": function(test) {
         var fs = require("fs")
