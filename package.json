@@ -1,6 +1,6 @@
 {
     "name": "bytebuffer",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "description": "A full-featured ByteBuffer implementation using typed arrays.",
     "main": "ByteBuffer.js",

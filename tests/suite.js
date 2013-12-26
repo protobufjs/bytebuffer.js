@@ -798,6 +798,15 @@ var suite = {
         test.ok(isNaN(bb.writeDouble(NaN).flip().readDouble(0)));
         test.strictEqual(bb.writeDouble(+Infinity).flip().readDouble(0), +Infinity);
         test.strictEqual(bb.writeDouble(-Infinity).flip().readDouble(0), -Infinity);
+
+        // Varints, however, always need a cast, which results in the following:
+        test.strictEqual(NaN >>> 0, 0);
+        test.strictEqual(NaN | 0, 0);
+        test.strictEqual(Infinity >>> 0, 0);
+        test.strictEqual(Infinity | 0, 0);
+        test.strictEqual(-Infinity >>> 0, 0);
+        test.strictEqual(-Infinity | 0, 0);
+
         test.done();
     },
     

@@ -382,6 +382,7 @@
             b.array = this.array;
             b.view = this.view;
             b.offset = this.offset;
+            b.markedOffset = this.markedOffset;
             b.length = this.length;
             return b;
         };
@@ -400,6 +401,7 @@
             var dst = new Uint8Array(b.array);
             dst.set(src);
             b.offset = this.offset;
+            b.markedOffset = this.markedOffset;
             b.length = this.length;
             return b;
         };
@@ -452,6 +454,11 @@
             var dstView = new Uint8Array(dst);
             dstView.set(srcView.subarray(this.offset, this.length));
             this.array = dst;
+            if (this.markedOffset >= this.offset) {
+                this.markedOffset -= this.offset;
+            } else {
+                this.markedOffset = -1;
+            }
             this.offset = 0;
             this.length = this.array.byteLength;
             return this;
@@ -466,28 +473,32 @@
          * @expose
          */
         ByteBuffer.prototype.destroy = function() {
-            if (this.array == null) return this; // Already destroyed
-            this.array = null;
-            this.view = null;
-            this.offset = 0;
-            this.length = 0;
+            if (this.array !== null) {
+                this.array = null;
+                this.view = null;
+                this.offset = 0;
+                this.markedOffset = -1;
+                this.length = 0;
+            }
             return this;
         };
 
         /**
          * Reverses the backing array and adapts offset and length to retain the same relative position on the reversed
-         *  data in inverse order. Example: "00<01 02>03 04".reverse() = "04 03<02 01>00".
+         *  data in inverse order. Example: "00<01 02>03 04".reverse() = "04 03<02 01>00". Also clears the marked
+         *  offset.
          * @returns {!ByteBuffer} this
          * @throws {Error} If the buffer is already destroyed
          * @expose
          */
         ByteBuffer.prototype.reverse = function() {
-            if (this.array == null) {
+            if (this.array === null) {
                 throw(new Error(this+" cannot be reversed: Already destroyed"));
             }
             Array.prototype.reverse.call(new Uint8Array(this.array));
             var o = this.offset;
             this.offset = this.array.byteLength - this.length;
+            this.markedOffset = -1;
             this.length = this.array.byteLength - o;
             this.view = new DataView(this.array);
             return this;
@@ -507,7 +518,7 @@
             if (!(src instanceof ByteBuffer)) {
                 src = ByteBuffer.wrap(src);
             }
-            if (src.array == null) {
+            if (src.array === null) {
                 throw(new Error(src+" cannot be appended to "+this+": Already destroyed"));
             }
             var n = src.length - src.offset;
@@ -538,7 +549,7 @@
             if (!(src instanceof ByteBuffer)) {
                 src = ByteBuffer.wrap(src);
             }
-            if (src.array == null) {
+            if (src.array === null) {
                 throw(src+" cannot be prepended to "+this+": Already destroyed");
             }
             var n = src.length - src.offset;
@@ -824,7 +835,7 @@
          */
         ByteBuffer.prototype.readFloat32 = function(offset) {
             offset = typeof offset !== 'undefined' ? offset : (this.offset+=4)-4;
-            if (this.array == null || offset+4 > this.array.byteLength) {
+            if (this.array === null || offset+4 > this.array.byteLength) {
                 throw(new Error("Cannot read float32 from "+this+" at "+offset+": Capacity overflow"));
             }
             return this.view.getFloat32(offset, this.littleEndian);
@@ -873,7 +884,7 @@
          */
         ByteBuffer.prototype.readFloat64 = function(offset) {
             offset = typeof offset !== 'undefined' ? offset : (this.offset+=8)-8;
-            if (this.array == null || offset+8 > this.array.byteLength) {
+            if (this.array === null || offset+8 > this.array.byteLength) {
                 throw(new Error("Cannot read float64 from "+this+" at "+offset+": Capacity overflow"));
             }
             return this.view.getFloat64(offset, this.littleEndian);
@@ -933,7 +944,7 @@
              */
             ByteBuffer.prototype.readInt64 = function(offset) {
                 offset = typeof offset !== 'undefined' ? offset : (this.offset+=8)-8;
-                if (this.array == null || offset+8 > this.array.byteLength) {
+                if (this.array === null || offset+8 > this.array.byteLength) {
                     this.offset -= 8;
                     throw(new Error("Cannot read int64 from "+this+" at "+offset+": Capacity overflow"));
                 }
@@ -977,7 +988,7 @@
              */
             ByteBuffer.prototype.readUint64 = function(offset) {
                 offset = typeof offset !== 'undefined' ? offset : (this.offset+=8)-8;
-                if (this.array == null || offset+8 > this.array.byteLength) {
+                if (this.array === null || offset+8 > this.array.byteLength) {
                     this.offset -= 8;
                     throw(new Error("Cannot read int64 from "+this+" at "+offset+": Capacity overflow"));
                 }
@@ -1968,7 +1979,7 @@
          * @expose
          */
         ByteBuffer.prototype.toColumns = function(wrap) {
-            if (this.array == null) return "DESTROYED";
+            if (this.array === null) return "DESTROYED";
             wrap = typeof wrap !== 'undefined' ? parseInt(wrap, 10) : 16;
             if (wrap < 1) wrap = 16;
 
@@ -2056,7 +2067,7 @@
                 view = this.view,
                 i, k;
             if (!debug) {
-                if (this.array == null) return "";
+                if (this.array === null) return "";
                 for (i=this.offset, k=this.length; i<k; i++) {
                     val = view.getUint8(i).toString(16).toUpperCase();
                     if (val.length < 2) val = "0"+val;
@@ -2064,7 +2075,7 @@
                 }
                 return out;
             } else {
-                if (this.array == null) return "DESTROYED";
+                if (this.array === null) return "DESTROYED";
                 if (this.offset == 0 && this.length == 0) {
                     out += "|";
                 } else if (this.length == 0) {
@@ -2098,7 +2109,7 @@
          * @expose
          */
         ByteBuffer.prototype.toBase64 = function() {
-            if (this.array == null || this.offset >= this.length) return "";
+            if (this.array === null || this.offset >= this.length) return "";
             return ByteBuffer.encode64(this);
         };
 
@@ -2108,7 +2119,7 @@
          * @expose
          */
         ByteBuffer.prototype.toUTF8 = function() {
-            if (this.array == null || this.offset >= this.length) return "";
+            if (this.array === null || this.offset >= this.length) return "";
             return this.readUTF8StringBytes(this.length - this.offset, this.offset)["string"];
         };
 
