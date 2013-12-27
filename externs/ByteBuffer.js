@@ -101,6 +101,13 @@ ByteBuffer.allocate = function(capacity, littleEndian) {};
 ByteBuffer.wrap = function(buffer, enc, littleEndian) {};
 
 /**
+ * @param {*} bb
+ * @returns {boolean}
+ * @nosideeffects
+ */
+ByteBuffer.isByteBuffer = function(bb) {};
+
+/**
  * @param {boolean=} littleEndian
  * @returns {!ByteBuffer}
  */
@@ -729,6 +736,14 @@ ByteBuffer.encode64 = function(bb) {};
  * @nosideeffects
  */
 ByteBuffer.decode64 = function(str, littleEndian) {};
+
+/**
+ * @param {!ByteBuffer} bb
+ * @returns {string}
+ * @throws {Error}
+ * @nosideeffects
+ */
+ByteBuffer.encodeHex = function(bb) {};
 
 /**
  * @param {string} str

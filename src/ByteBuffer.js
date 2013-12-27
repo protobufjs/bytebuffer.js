@@ -146,6 +146,26 @@
         ByteBuffer.Long = Long || null;
 
         /**
+         * Tests if the specified type is a ByteBuffer or ByteBuffer-like.
+         * @param {*} bb ByteBuffer to test
+         * @returns {boolean} true if it is a ByteBuffer or ByteBuffer-like, otherwise false
+         * @expose
+         */
+        ByteBuffer.isByteBuffer = function(bb) {
+            return bb && (
+                (bb instanceof ByteBuffer) || (
+                    typeof bb === 'object' &&
+                    (bb.array === null || bb.array instanceof ArrayBuffer) &&
+                    (bb.view === null || bb.view instanceof DataView) &&
+                    typeof bb.offset === 'number' &&
+                    typeof bb.markedOffset === 'number' &&
+                    typeof bb.length === 'number' &&
+                    typeof bb.littleEndian === 'boolean'
+                )
+            );
+        };
+
+        /**
          * Allocates a new ByteBuffer.
          * @param {number=} capacity Initial capacity. Defaults to {@link ByteBuffer.DEFAULT_CAPACITY}.
          * @param {boolean=} littleEndian `true` to use little endian multi byte values, defaults to `false` for big
@@ -209,8 +229,8 @@
                 throw(new Error("Cannot wrap null or non-object"));
             }
             // Wrap ByteBuffer by cloning (preserve offsets)
-            if (buffer instanceof ByteBuffer) {
-                return buffer.clone();
+            if (ByteBuffer.isByteBuffer(buffer)) {
+                return ByteBuffer.prototype.clone.call(buffer); // Also makes ByteBuffer-like a ByteBuffer
             }
             // Wrap any object that is or contains an ArrayBuffer
             if (!!buffer["array"]) {
@@ -1612,16 +1632,18 @@
 
         /**
          * Encodes a ByteBuffer's contents to a base64 string.
-         * @param {!ByteBuffer} bb ByteBuffer
+         * @param {!ByteBuffer} bb ByteBuffer to encode. Will be cloned and flipped if length < offset.
          * @returns {string} Base64 encoded string
-         * @throws {Error} If the argument is invalid
+         * @throws {Error} If the argument is not a valid ByteBuffer
          * @expose
          */
         ByteBuffer.encode64 = function(bb) {
             // ref: http://phpjs.org/functions/base64_encode/
-            if (!bb || !(bb instanceof ByteBuffer) || bb.length < bb.offset) {
-                throw(new Error("Illegal argument: Not a ByteBuffer or offset out of bounds"));
-            }
+             if (!(bb instanceof ByteBuffer)) {
+                bb = ByteBuffer.wrap(bb);
+            } else if (bb.length < bb.offset) {
+                 bb = bb.clone().flip();
+             }
             var o1, o2, o3, h1, h2, h3, h4, bits, i = bb.offset,
                 oi = 0,
                 out = [];
@@ -1680,6 +1702,29 @@
                 }
             } while (i < str.length);
             return out.flip();
+        };
+
+        /**
+         * Encodes a ByteBuffer to a hex encoded string.
+         * @param {!ByteBuffer} bb ByteBuffer to encode. Will be cloned and flipped if length < offset.
+         * @returns {string} Hex encoded string
+         * @throws {Error} If the argument is not a valid ByteBuffer
+         * @expose
+         */
+        ByteBuffer.encodeHex = function(bb) {
+            if (!(bb instanceof ByteBuffer)) {
+                bb = ByteBuffer.wrap(bb);
+            } else if (bb.length < bb.offset) {
+                bb = bb.clone().flip();
+            }
+            if (bb.array === null) return "";
+            var val, out = [];
+            for (var i=bb.offset, k=bb.length; i<k; i++) {
+                val = bb.view.getUint8(i).toString(16).toUpperCase();
+                if (val.length < 2) val = "0"+val;
+                out.push(val);
+            }
+            return out.join('');
         };
 
         /**
@@ -1825,8 +1870,8 @@
         ByteBuffer.prototype.readLString = function(offset) {
             var advance = typeof offset === 'undefined';
             offset = typeof offset !== 'undefined' ? offset : this.offset;
-            var lenDec = ByteBuffer.decodeUTF8Char(this, offset);
-            var dec = this.readUTF8String(lenDec["char"], offset+lenDec["length"]);
+            var lenDec = ByteBuffer.decodeUTF8Char(this, offset),
+                dec = this.readUTF8String(lenDec["char"], offset+lenDec["length"]);
             if (advance) {
                 this.offset += lenDec["length"]+dec["length"];
                 return dec["string"];
