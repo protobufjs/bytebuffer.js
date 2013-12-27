@@ -809,6 +809,28 @@ var suite = {
 
         test.done();
     },
+
+    "ByteBuffer-like": function(test) {
+        var bb = new ByteBuffer(4);
+        var bbLike = {
+            array: bb.array,
+            view: bb.view,
+            offset: bb.offset,
+            markedOffset: bb.markedOffset,
+            length: bb.length,
+            littleEndian: bb.littleEndian
+        };
+        test.ok(ByteBuffer.isByteBuffer(bbLike));
+        var bb2 = ByteBuffer.wrap(bbLike);
+        test.ok(bb2 instanceof ByteBuffer);
+        test.strictEqual(bbLike.array, bb2.array);
+        test.strictEqual(bbLike.view, bb2.view);
+        test.strictEqual(bbLike.offset, bb2.offset);
+        test.strictEqual(bbLike.markedOffset, bb2.markedOffset);
+        test.strictEqual(bbLike.length, bb2.length);
+        test.strictEqual(bbLike.littleEndian, bb2.littleEndian);
+        test.done();
+    },
     
     "commonjs": function(test) {
         var fs = require("fs")
