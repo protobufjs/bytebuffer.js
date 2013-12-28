@@ -659,6 +659,12 @@ ByteBuffer.prototype.toHex = function(debug) {};
  * @returns {string}
  * @nosideeffects
  */
+ByteBuffer.prototype.toBinary = function() {};
+
+/**
+ * @returns {string}
+ * @nosideeffects
+ */
 ByteBuffer.prototype.toUTF8 = function() {};
 
 /**
@@ -753,6 +759,23 @@ ByteBuffer.encodeHex = function(bb) {};
  * @nosideeffects
  */
 ByteBuffer.decodeHex = function(str, littleEndian) {};
+
+/**
+ * @param {!ByteBuffer} bb
+ * @returns {string}
+ * @throws {Error}
+ * @nosideeffects
+ */
+ByteBuffer.encodeBinary = function(bb) {};
+
+/**
+ * @param {string} str
+ * @param {boolean=} littleEndian
+ * @returns {!ByteBuffer}
+ * @throws {Error}
+ * @nosideeffects
+ */
+ByteBuffer.decodeBinary = function(str, littleEndian) {};
 
 /**
  * @type {number}

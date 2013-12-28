@@ -789,6 +789,25 @@ var suite = {
         test.done();
     },
 
+    "encode/decodeHex": function(test) {
+        var bb = new ByteBuffer(4).writeInt32(0x12345678).flip(),
+            str = bb.toString("hex");
+        test.strictEqual(str, "12345678");
+        var bb2 = ByteBuffer.wrap(str, "hex");
+        test.deepEqual(bb.array, bb2.array);
+        test.done();
+    },
+
+    "encode/decodeBinary": function(test) {
+        var bb = new ByteBuffer(4).writeInt32(0x12345678).flip(),
+            str = bb.toString("binary");
+        test.strictEqual(str.length, 4);
+        test.strictEqual(str, String.fromCharCode(0x12)+String.fromCharCode(0x34)+String.fromCharCode(0x56)+String.fromCharCode(0x78));
+        var bb2 = ByteBuffer.wrap(str, "binary");
+        test.deepEqual(bb.array, bb2.array);
+        test.done();
+    },
+
     "NaN": function(test) {
         var bb = new ByteBuffer(4);
         test.ok(isNaN(bb.writeFloat(NaN).flip().readFloat(0)));

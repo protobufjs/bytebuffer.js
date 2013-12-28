@@ -195,7 +195,7 @@
          *  ByteBuffer's offset to 0 and its length to the wrapped object's byte length.
          * @param {!ArrayBuffer|!Buffer|!{array: !ArrayBuffer}|!{buffer: !ArrayBuffer}|string} buffer Anything that can
          *  be wrapped
-         * @param {(string|boolean)=} enc String encoding if a string is provided (hex, utf8, defaults to base64)
+         * @param {(string|boolean)=} enc String encoding if a string is provided (hex, utf8, binary, defaults to base64)
          * @param {boolean=} littleEndian `true` to use little endian multi byte values, defaults to `false` for big
          *  endian.
          * @returns {!ByteBuffer}
@@ -210,10 +210,12 @@
             // Wrap a string
             if (typeof buffer === 'string') {
                 switch (enc) {
-                    case "hex":
-                        return ByteBuffer.decodeHex(buffer, littleEndian);
                     case "base64":
                         return ByteBuffer.decode64(buffer, littleEndian);
+                    case "hex":
+                        return ByteBuffer.decodeHex(buffer, littleEndian);
+                    case "binary":
+                        return ByteBuffer.decodeBinary(buffer, littleEndian);
                     default:
                         return new ByteBuffer(ByteBuffer.DEFAULT_CAPACITY, littleEndian).writeUTF8String(buffer).flip();
                 }
@@ -1615,7 +1617,7 @@
         ByteBuffer.calculateUTF8String = function(str) {
             str = ""+str;
             var bytes = 0;
-            for (var i=0, k=str.length; i<k; i++) {
+            for (var i=0, k=str.length; i<k; ++i) {
                 // Does not throw since JS strings are already UTF8 encoded
                 bytes += ByteBuffer.calculateUTF8Char(str.charCodeAt(i));
             }
@@ -1719,7 +1721,7 @@
             }
             if (bb.array === null) return "";
             var val, out = [];
-            for (var i=bb.offset, k=bb.length; i<k; i++) {
+            for (var i=bb.offset, k=bb.length; i<k; ++i) {
                 val = bb.view.getUint8(i).toString(16).toUpperCase();
                 if (val.length < 2) val = "0"+val;
                 out.push(val);
@@ -1750,6 +1752,50 @@
             return out.flip();
         };
 
+        /**
+         * Encodes a ByteBuffer to a binary string. A binary string in this case is a string composed of 8bit values
+         *  as characters with a char code between 0 and 255 inclusive.
+         * @param {!ByteBuffer} bb ByteBuffer to encode. Will be cloned and flipped if length < offset.
+         * @returns {string} Binary string
+         * @throws {Error} If the argument is not a valid ByteBuffer
+         * @expose
+         */
+        ByteBuffer.encodeBinary = function(bb) {
+            if (!(bb instanceof ByteBuffer)) {
+                bb = ByteBuffer.wrap(bb);
+            } else if (bb.length < bb.offset) {
+                bb = bb.clone().flip();
+            }
+            var out = [], view = bb.view;
+            for (var i=bb.offset, k=bb.length; i<k; ++i) {
+                out.push(String.fromCharCode(view.getUint8(i)));
+            }
+            return out.join('');
+        };
+
+        /**
+         * Decodes a binary string to a ByteBuffer.A  binary string in this case is a string composed of 8bit values
+         *  as characters with a char code between 0 and 255 inclusive.
+         * @param {string} str Binary string
+         * @param {boolean=} littleEndian `true` to use little endian byte order, defaults to `false` for big endian.
+         * @returns {!ByteBuffer} ByteBuffer
+         * @throws {Error} If the argument is not a valid binary string
+         * @expose
+         */
+        ByteBuffer.decodeBinary = function(str, littleEndian) {
+            if (typeof str !== 'string') {
+                throw(new Error("Illegal argument: Not a string"));
+            }
+            var k=str.length,
+                dst = new ArrayBuffer(k),
+                view = new DataView(dst),
+                val;
+            for (var i=0; i<k; ++i) {
+                if ((val = str.charCodeAt(i)) > 255) throw(new Error("Illegal argument: Not a binary string (char code "+val+")"));
+                view.setUint8(i, val);
+            }
+            return ByteBuffer.wrap(dst, littleEndian);
+        };
 
         /**
          * Writes an UTF8 string.
@@ -1764,7 +1810,7 @@
             var start = offset;
             var encLen = ByteBuffer.calculateUTF8String(str); // See [1]
             this.ensureCapacity(offset+encLen);
-            for (var i=0, j=str.length; i<j; i++) {
+            for (var i=0, j=str.length; i<j; ++i) {
                 // [1] Does not throw since JS strings are already UTF8 encoded
                 offset += ByteBuffer.encodeUTF8Char(str.charCodeAt(i), this, offset);
             }
@@ -1789,7 +1835,7 @@
             var advance = typeof offset === 'undefined';
             offset = typeof offset !== 'undefined' ? offset : this.offset;
             var dec, result = "", start = offset;
-            for (var i=0; i<chars; i++) {
+            for (var i=0; i<chars; ++i) {
                 dec = ByteBuffer.decodeUTF8Char(this, offset);
                 offset += dec["length"];
                 result += String.fromCharCode(dec["char"]);
@@ -2042,7 +2088,7 @@
             } else {
                 out += " ";
             }
-            for (var i=0, k=this.array.byteLength; i<k; i++) {
+            for (var i=0, k=this.array.byteLength; i<k; ++i) {
                 if (i>0 && i%wrap == 0) {
                     while (out.length < 3*wrap+1) out += "   "; // Make it equal to maybe show something on the right
                     lines.push(out);
@@ -2065,14 +2111,14 @@
                 lines.push(out);
             }
             // Make it equal
-            for (i=0, k=lines.length; i<k; i++) {
+            for (i=0, k=lines.length; i<k; ++i) {
                 while (lines[i].length < 3*wrap+1) lines[i] += "   "; // Make it equal to maybe show something on the right
             }
 
             // Right column: ASCII, using dots for (usually) non-printable characters
             var n = 0;
             out = "";
-            for (i=0, k=this.array.byteLength; i<k; i++) {
+            for (i=0, k=this.array.byteLength; i<k; ++i) {
                 if (i>0 && i%wrap == 0) {
                     lines[n] += " "+out;
                     out = ""; n++;
@@ -2112,13 +2158,7 @@
                 view = this.view,
                 i, k;
             if (!debug) {
-                if (this.array === null) return "";
-                for (i=this.offset, k=this.length; i<k; i++) {
-                    val = view.getUint8(i).toString(16).toUpperCase();
-                    if (val.length < 2) val = "0"+val;
-                    out += val;
-                }
-                return out;
+                return ByteBuffer.encodeHex(this);
             } else {
                 if (this.array === null) return "DESTROYED";
                 if (this.offset == 0 && this.length == 0) {
@@ -2130,7 +2170,7 @@
                 } else {
                     out += " ";
                 }
-                for (i=0, k=this.array.byteLength; i<k; i++) {
+                for (i=0, k=this.array.byteLength; i<k; ++i) {
                     val =  view.getUint8(i).toString(16).toUpperCase();
                     if (val.length < 2) val = "0"+val;
                     out += val;
@@ -2146,6 +2186,16 @@
                 }
                 return out;
             }
+        };
+
+        /**
+         * Returns the ByteBuffer's contents between offset and length as a binary string. A binary string in this case
+         *  is a string composed of 8bit values as characters with a char code between 0 and 255 inclusive.
+         * @returns {string} Binary string
+         * @expose
+         */
+        ByteBuffer.prototype.toBinary = function() {
+            return ByteBuffer.encodeBinary(this);
         };
 
         /**
@@ -2171,8 +2221,8 @@
         /**
          * Converts the ByteBuffer to a string.
          * @param {string=} enc Output encoding. Returns an informative string representation by default but also allows
-         *  direct conversion to "utf8", "hex" and "base64" encoding. "debug" returns a hex representation with marked
-         *  offsets.
+         *  direct conversion to "utf8", "hex", "base64" and "binary" encoding. "debug" returns a hex representation with
+         *  marked offsets.
          * @returns {string} String representation
          * @expose
          */
@@ -2185,6 +2235,8 @@
                     return this.toBase64();
                 case "hex":
                     return this.toHex();
+                case "binary":
+                    return this.toBinary();
                 case "debug":
                     return this.toHex(true);
                 default:
