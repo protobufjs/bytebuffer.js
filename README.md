@@ -15,7 +15,7 @@ What can it do?
 * Varints as known from protobuf including zig-zag encoding
 * Includes an UTF8 and Base64 en-/decoder
 * C-strings, V(arint-prefixed)-strings and UTF8 L(ength-prefixed)-strings 
-* Rich string toolset (to hex, base64, utf8, debug, columns)
+* Rich string toolset (to hex, base64, binary, utf8, debug, columns)
 * Relative and absolute zero-copy operations
 * Manual and automatic resizing (efficiently doubles capacity)
 * Chaining of all operations that do not return a specific value
