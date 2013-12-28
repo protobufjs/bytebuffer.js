@@ -1661,6 +1661,13 @@
             return out.flip();
         };
 
+        // NOTE on binary strings: Binary strings as used here have nothing to do with frequently asked questions about
+        // conversion between ArrayBuffer and String. What we do here is what libraries like node-forge do to simulate a
+        // byte buffer: Conversion between 8 bit unsigned integers and the low 8 bit UTF8/UCS2 characters. This is not
+        // perfect as it effectively uses 16 bit per character in memory to store the 8 bit values, but that's not our
+        // concern as we just want it to be compatible. It's always better to use ArrayBuffer/Buffer (!) while base64
+        // and hex should be slightly worse regarding memory consumption and encoding speed.
+
         /**
          * Encodes a ByteBuffer to a binary string. A binary string in this case is a string composed of 8bit values
          *  as characters with a char code between 0 and 255 inclusive.
