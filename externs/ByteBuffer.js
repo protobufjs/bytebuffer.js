@@ -29,9 +29,10 @@
 /**
  * @param {number=} capacity
  * @param {boolean=} littleEndian
+ * @param {boolean=} sparse
  * @constructor
  */
-function ByteBuffer(capacity, littleEndian) {};
+function ByteBuffer(capacity, littleEndian, sparse) {};
 
 /**
  * @type {?ArrayBuffer}

@@ -50,10 +50,11 @@
          * @param {number=} capacity Initial capacity. Defaults to {@link ByteBuffer.DEFAULT_CAPACITY}.
          * @param {boolean=} littleEndian `true` to use little endian multi byte values, defaults to `false` for big
          *  endian.
+         * @param {boolean=} sparse If set to `true`, a ByteBuffer with array=view=null will be created which have to be
+         *  set manually afterwards. Defaults to `false`.
          * @expose
          */
-        var ByteBuffer = function(capacity, littleEndian) {
-
+        var ByteBuffer = function(capacity, littleEndian, sparse) {
             capacity = typeof capacity !== 'undefined' ? parseInt(capacity, 10) : ByteBuffer.DEFAULT_CAPACITY;
             if (capacity < 1) capacity = ByteBuffer.DEFAULT_CAPACITY;
 
@@ -62,14 +63,14 @@
              * @type {?ArrayBuffer}
              * @expose
              */
-            this.array = arguments.length == 3 && arguments[2] === true ? null : new ArrayBuffer(capacity);
+            this.array = sparse ? null : new ArrayBuffer(capacity);
 
             /**
              * DataView to mess with the ArrayBuffer.
              * @type {?DataView}
              * @expose
              */
-            this.view = this.array != null ? new DataView(this.array) : null;
+            this.view = sparse ? null : new DataView(this.array);
 
             /**
              * Current read/write offset. Length- and capacity-independent index. Contents are the bytes between offset
@@ -110,7 +111,7 @@
          * @const
          * @expose
          */
-        ByteBuffer.VERSION = "2.3.0";
+        ByteBuffer.VERSION = "2.3.1";
 
         /**
          * Default buffer capacity of `16`. The ByteBuffer will be automatically resized by a factor of 2 if required.
@@ -243,7 +244,7 @@
             if (!(buffer instanceof ArrayBuffer)) {
                 throw(new Error("Cannot wrap buffer of type "+typeof(buffer)+", "+buffer.constructor.name));
             }
-            b = new ByteBuffer(0, littleEndian, /* shadow copy */ true);
+            b = new ByteBuffer(0, littleEndian, true);
             b.array = buffer;
             b.view = b.array.byteLength > 0 ? new DataView(b.array) : null;
             b.offset = 0;
@@ -1781,7 +1782,7 @@
         };
 
         /**
-         * Decodes a binary string to a ByteBuffer.A  binary string in this case is a string composed of 8bit values
+         * Decodes a binary string to a ByteBuffer. A binary string in this case is a string composed of 8bit values
          *  as characters with a char code between 0 and 255 inclusive.
          * @param {string} str Binary string
          * @param {boolean=} littleEndian `true` to use little endian byte order, defaults to `false` for big endian.
@@ -1801,7 +1802,11 @@
                 if ((val = str.charCodeAt(i)) > 255) throw(new Error("Illegal argument: Not a binary string (char code "+val+")"));
                 view.setUint8(i, val);
             }
-            return ByteBuffer.wrap(dst, littleEndian);
+            var bb = new ByteBuffer(k, littleEndian, true);
+            bb.array = dst;
+            bb.view = view;
+            bb.length = k;
+            return bb;
         };
 
         /**
