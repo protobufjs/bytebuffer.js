@@ -10,7 +10,7 @@
  */
 function utf8_decode_char(bb, offset) { //? // Also required for node to extract CStrings and such
     var start = offset,
-        a, b, c, d, e, f,
+        a, b, c, d,
         codePoint;
     //? if (NODE) {
     if (offset+1 > bb.buffer.length)
@@ -25,10 +25,7 @@ function utf8_decode_char(bb, offset) { //? // Also required for node to extract
     //? if (NODE) {
         if (offset+1 > bb.buffer.length)
             throw(new RangeError("Index out of range: "+offset+" + 1 <= "+bb.buffer.length));
-        //? if (INLINE)
         b = bb.buffer[offset++];
-        //? else
-        b = bb.buffer.readUInt8(offset++, true);
     //? } else { // getUint8 asserts on its own
         b = bb.view.getUint8(offset++);
     //? }
@@ -37,13 +34,8 @@ function utf8_decode_char(bb, offset) { //? // Also required for node to extract
     //? if (NODE) {
         if (offset+2 > bb.buffer.length)
             throw(new RangeError("Index out of range: "+offset+" + 2 <= "+bb.buffer.length));
-        //? if (INLINE) {
         b = bb.buffer[offset++];
         c = bb.buffer[offset++];
-        //? } else {
-        b = bb.buffer.readUInt8(offset++, true);
-        c = bb.buffer.readUInt8(offset++, true);
-        //? }
     //? } else {
         b = bb.view.getUint8(offset++);
         c = bb.view.getUint8(offset++);
@@ -94,10 +86,14 @@ function utf8_calc_char(codePoint) {
  * @inner
  */
 function utf8_calc_string(str) {
-    var i = 0, cp, n = 0;
-    while (i < str.length) {
-        n += utf8_calc_char(cp = str.codePointAt(i));
-        i += cp < 0xFFFF ? 1 : 2;
+    var cp, n = 0;
+    for (var i=0; i<str.length; i++) {
+        cp = str.charCodeAt(i);
+        if (cp >= 0xD800 && cp <= 0xDFFF) {
+            cp = str.codePointAt(i);
+            if (cp > 0xFFFF) i++;
+        }
+        n += utf8_calc_char(cp);
     }
     return n;
 }

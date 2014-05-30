@@ -713,7 +713,7 @@ function makeSuite(ByteBuffer) {
         // Aliases
         test.strictEqual(bb.writeUTF8String, bb.writeString);
         test.strictEqual(bb.readUTF8String, bb.readString);
-        var str = "ä☺𠜎", str2;
+        var str = "ä☺𠜎️☁️", str2;
         // Writing 
         test.strictEqual(bb.writeUTF8String(str), bb);
         bb.flip();
@@ -767,11 +767,11 @@ function makeSuite(ByteBuffer) {
         test.equal(bb.offset, 3);
         test.equal(bb.limit, 2);
         bb.flip();
-        test.equal(bb.toString("debug"), "<61 62 00>00");
+        test.equal(bb.toString("debug").substr(0, 10), "<61 62 00>");
         test.deepEqual(bb.readCString(0), {"string": "ab", "length": 3});
-        test.equal(bb.toString("debug"), "<61 62 00>00");
+        test.equal(bb.toString("debug").substr(0, 10), "<61 62 00>");
         test.equal(bb.readCString(), "ab");
-        test.equal(bb.toString("debug"), "61 62 00|00");
+        test.equal(bb.toString("debug").substr(0, 9), "61 62 00|");
         test.done();
     };
     
@@ -869,34 +869,6 @@ function makeSuite(ByteBuffer) {
         }
         test.done();
     };
-    
-    suite.loaders = {};
-    
-    suite.loaders.commonjs = function(test) {
-        var fs = require("fs"),
-            vm = require("vm"),
-            util = require('util');
-
-        var code = fs.readFileSync(__dirname+"/../dist/ByteBufferNB.js");
-        var Long = ByteBuffer.Long;
-        var sandbox = new Sandbox({
-            require: function(moduleName) {
-                switch (moduleName) {
-                    case 'long': return Long;
-                    case 'buffer': return require("buffer");
-                }
-            },
-            module: {
-                exports: {}
-            },
-            DataView: DataView
-        });
-        vm.runInNewContext(code, sandbox, "commonjs-sandbox");
-        // console.log(util.inspect(sandbox));
-        test.ok(typeof sandbox.module.exports == 'function');
-        test.ok(sandbox.module.exports.Long && sandbox.module.exports.Long == ByteBuffer.Long);
-        test.done();
-    };
 
     suite.misc = {};
     
@@ -936,7 +908,7 @@ function makeSuite(ByteBuffer) {
 
         test.done();
     };
-
+    
     suite.loaders = {};
 
     suite.loaders.commonjs = function(test) {
@@ -944,7 +916,7 @@ function makeSuite(ByteBuffer) {
             vm = require("vm"),
             util = require('util');
 
-        var code = fs.readFileSync(__dirname+"/../dist/ByteBufferNB.js");
+        var code = fs.readFileSync(__dirname+"/../dist/ByteBuffer"+(type === ArrayBuffer ? "AB" : "NB")+".js");
         var Long = ByteBuffer.Long;
         var sandbox = new Sandbox({
             require: function(moduleName) {
@@ -956,6 +928,7 @@ function makeSuite(ByteBuffer) {
             module: {
                 exports: {}
             },
+            ArrayBuffer: ArrayBuffer,
             DataView: DataView
         });
         vm.runInNewContext(code, sandbox, "commonjs-sandbox");
@@ -964,52 +937,54 @@ function makeSuite(ByteBuffer) {
         test.strictEqual(sandbox.module.exports.Long, ByteBuffer.Long);
         test.done();
     };
-    
-    suite.loaders.amd = function(test) {
-        var fs = require("fs"),
-            vm = require("vm"),
-            util = require('util');
 
-        var code = fs.readFileSync(__dirname+"/../dist/ByteBufferAB.js");
-        var sandbox = new Sandbox({
-            require: function() {},
-            define: (function() {
-                function define(moduleName, dependencies, constructor) {
-                    define.called = [moduleName, dependencies];
-                }
-                define.amd = true;
-                define.called = null;
-                return define;
-            })(),
-            DataView: DataView
-        });
-        vm.runInNewContext(code, sandbox, "amd-sandbox");
-        test.ok(sandbox.define.called);
-        test.equal(sandbox.define.called[0], "ByteBuffer");
-        test.equal(sandbox.define.called[1][0], "Math/Long");
-        test.done();
-    };
+    if (type === ArrayBuffer) {
+        suite.loaders.amd = function(test) {
+            var fs = require("fs"),
+                vm = require("vm"),
+                util = require('util');
     
-    suite.loaders.shim = function(test) {
-        var fs = require("fs"),
-            vm = require("vm"),
-            util = require('util');
-
-        var code = fs.readFileSync(__dirname+"/../dist/ByteBufferAB.js");
-        var sandbox = new Sandbox({
-            dcodeIO: {
-                Long: ByteBuffer.Long
-            },
-            ArrayBuffer: ArrayBuffer,
-            DataView: DataView
-        });
-        vm.runInNewContext(code, sandbox, "shim-sandbox");
-        test.notEqual(typeof sandbox.dcodeIO, 'undefined');
-        test.notEqual(typeof sandbox.dcodeIO.ByteBuffer, 'undefined');
-        test.ok(sandbox.dcodeIO.ByteBuffer.Long);
-        test.strictEqual(sandbox.dcodeIO.ByteBuffer.Long, ByteBuffer.Long);
-        test.done();
-    };
+            var code = fs.readFileSync(__dirname+"/../dist/ByteBufferAB.js");
+            var sandbox = new Sandbox({
+                require: function() {},
+                define: (function() {
+                    function define(moduleName, dependencies, constructor) {
+                        define.called = [moduleName, dependencies];
+                    }
+                    define.amd = true;
+                    define.called = null;
+                    return define;
+                })(),
+                DataView: DataView
+            });
+            vm.runInNewContext(code, sandbox, "amd-sandbox");
+            test.ok(sandbox.define.called);
+            test.equal(sandbox.define.called[0], "ByteBuffer");
+            test.equal(sandbox.define.called[1][0], "Math/Long");
+            test.done();
+        };
+        
+        suite.loaders.shim = function(test) {
+            var fs = require("fs"),
+                vm = require("vm"),
+                util = require('util');
+    
+            var code = fs.readFileSync(__dirname+"/../dist/ByteBufferAB.js");
+            var sandbox = new Sandbox({
+                dcodeIO: {
+                    Long: ByteBuffer.Long
+                },
+                ArrayBuffer: ArrayBuffer,
+                DataView: DataView
+            });
+            vm.runInNewContext(code, sandbox, "shim-sandbox");
+            test.notEqual(typeof sandbox.dcodeIO, 'undefined');
+            test.notEqual(typeof sandbox.dcodeIO.ByteBuffer, 'undefined');
+            test.ok(sandbox.dcodeIO.ByteBuffer.Long);
+            test.strictEqual(sandbox.dcodeIO.ByteBuffer.Long, ByteBuffer.Long);
+            test.done();
+        };
+    }
 
     suite.debug = {};
 

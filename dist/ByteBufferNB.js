@@ -2042,23 +2042,26 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.calculateUTF8Chars = function(str) {
-        var i = 0, n = 0;
-        while (i < str.length) {
-            i += str.codePointAt(i) < 0xFFFF ? 1 : 2;
-            ++n;
+        var n = 0, cp;
+        for (var i=0; i<str.length; i++) {
+            cp = str.charCodeAt(i);
+            if (cp >= 0xD800 && cp <= 0xDFFF) {
+                cp = str.codePointAt(i);
+                if (cp > 0xFFFF) i++;
+            }
+            n++;
         }
         return n;
     };
 
     /**
      * Calculates the number of UTF8 bytes of a string.
+     * @function
      * @param {string} str String to calculate
      * @returns {number} Number of UTF8 bytes
      * @expose
      */
-    ByteBuffer.calculateUTF8Bytes = function(str) {
-        return utf8_calc_string(str);
-    };
+    ByteBuffer.calculateUTF8Bytes = utf8_calc_string;
 
     /**
      * Reads an UTF8 encoded string.
@@ -3303,7 +3306,7 @@ module.exports = (function() {
      */
     function utf8_decode_char(bb, offset) {
         var start = offset,
-            a, b, c, d, e, f,
+            a, b, c, d,
             codePoint;
         if (offset+1 > bb.buffer.length)
             throw(new RangeError("Index out of range: "+offset+" + 1 <= "+bb.buffer.length));
@@ -3360,10 +3363,14 @@ module.exports = (function() {
      * @inner
      */
     function utf8_calc_string(str) {
-        var i = 0, cp, n = 0;
-        while (i < str.length) {
-            n += utf8_calc_char(cp = str.codePointAt(i));
-            i += cp < 0xFFFF ? 1 : 2;
+        var cp, n = 0;
+        for (var i=0; i<str.length; i++) {
+            cp = str.charCodeAt(i);
+            if (cp >= 0xD800 && cp <= 0xDFFF) {
+                cp = str.codePointAt(i);
+                if (cp > 0xFFFF) i++;
+            }
+            n += utf8_calc_char(cp);
         }
         return n;
     }

@@ -42,12 +42,16 @@ ByteBuffer.prototype.writeUTF8String = function(str, offset) {
     return k;
     //? } else {
     var start = offset,
-        i = 0, cp;
+        cp;
     k = utf8_calc_string(str);
     //? ENSURE_CAPACITY('k');
-    while (i < str.length) {       
-        offset += utf8_encode_char(cp = str.codePointAt(i), this, offset);
-        i += cp < 0xFFFF ? 1 : 2;
+    for (var i=0; i<str.length; i++) {
+        cp = str.charCodeAt(i);
+        if (cp >= 0xD800 && cp <= 0xDFFF) {
+            cp = str.codePointAt(i);
+            if (cp > 0xFFFF) i++;
+        }
+        offset += utf8_encode_char(cp, this, offset);
     }
     if (relative) {
         this.offset = offset;
@@ -78,23 +82,26 @@ ByteBuffer.prototype.writeString = ByteBuffer.prototype.writeUTF8String;
  * @expose
  */
 ByteBuffer.calculateUTF8Chars = function(str) {
-    var i = 0, n = 0;
-    while (i < str.length) {
-        i += str.codePointAt(i) < 0xFFFF ? 1 : 2;
-        ++n;
+    var n = 0, cp;
+    for (var i=0; i<str.length; i++) {
+        cp = str.charCodeAt(i);
+        if (cp >= 0xD800 && cp <= 0xDFFF) {
+            cp = str.codePointAt(i);
+            if (cp > 0xFFFF) i++;
+        }
+        n++;
     }
     return n;
 };
 
 /**
  * Calculates the number of UTF8 bytes of a string.
+ * @function
  * @param {string} str String to calculate
  * @returns {number} Number of UTF8 bytes
  * @expose
  */
-ByteBuffer.calculateUTF8Bytes = function(str) {
-    return utf8_calc_string(str);
-};
+ByteBuffer.calculateUTF8Bytes = utf8_calc_string;
 
 /**
  * Reads an UTF8 encoded string.

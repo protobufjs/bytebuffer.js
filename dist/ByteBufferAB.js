@@ -1791,7 +1791,7 @@
             }
             var k;
             var start = offset,
-                i = 0, cp;
+                cp;
             k = utf8_calc_string(str);
             // <ENSURE_CAPACITY size=k>
             offset += k;
@@ -1800,9 +1800,13 @@
                 this.resize((capacity14 *= 2) > offset ? capacity14 : offset);
             offset -= k;
             // </ENSURE_CAPACITY>
-            while (i < str.length) {
-                offset += utf8_encode_char(cp = str.codePointAt(i), this, offset);
-                i += cp < 0xFFFF ? 1 : 2;
+            for (var i=0; i<str.length; i++) {
+                cp = str.charCodeAt(i);
+                if (cp >= 0xD800 && cp <= 0xDFFF) {
+                    cp = str.codePointAt(i);
+                    if (cp > 0xFFFF) i++;
+                }
+                offset += utf8_encode_char(cp, this, offset);
             }
             if (relative) {
                 this.offset = offset;
@@ -1830,23 +1834,26 @@
          * @expose
          */
         ByteBuffer.calculateUTF8Chars = function(str) {
-            var i = 0, n = 0;
-            while (i < str.length) {
-                i += str.codePointAt(i) < 0xFFFF ? 1 : 2;
-                ++n;
+            var n = 0, cp;
+            for (var i=0; i<str.length; i++) {
+                cp = str.charCodeAt(i);
+                if (cp >= 0xD800 && cp <= 0xDFFF) {
+                    cp = str.codePointAt(i);
+                    if (cp > 0xFFFF) i++;
+                }
+                n++;
             }
             return n;
         };
 
         /**
          * Calculates the number of UTF8 bytes of a string.
+         * @function
          * @param {string} str String to calculate
          * @returns {number} Number of UTF8 bytes
          * @expose
          */
-        ByteBuffer.calculateUTF8Bytes = function(str) {
-            return utf8_calc_string(str);
-        };
+        ByteBuffer.calculateUTF8Bytes = utf8_calc_string;
 
         /**
          * Reads an UTF8 encoded string.
@@ -3272,7 +3279,7 @@
          */
         function utf8_decode_char(bb, offset) {
             var start = offset,
-                a, b, c, d, e, f,
+                a, b, c, d,
                 codePoint;
             a = bb.view.getUint8(offset++);
             if ((a&0x80) === 0) {
@@ -3321,10 +3328,14 @@
          * @inner
          */
         function utf8_calc_string(str) {
-            var i = 0, cp, n = 0;
-            while (i < str.length) {
-                n += utf8_calc_char(cp = str.codePointAt(i));
-                i += cp < 0xFFFF ? 1 : 2;
+            var cp, n = 0;
+            for (var i=0; i<str.length; i++) {
+                cp = str.charCodeAt(i);
+                if (cp >= 0xD800 && cp <= 0xDFFF) {
+                    cp = str.codePointAt(i);
+                    if (cp > 0xFFFF) i++;
+                }
+                n += utf8_calc_char(cp);
             }
             return n;
         }
