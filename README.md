@@ -53,7 +53,7 @@ support, you can skip the Long.js include.
 
 ```html
 <script src="Long.min.js"></script>
-<script src="ByteBuffer.min.js"></script>
+<script src="ByteBufferAB.min.js"></script>
 ```
 
 ```javascript
@@ -72,13 +72,13 @@ support, you can skip the Long.js config. [Require.js](http://requirejs.org/) ex
 require.config({
     "paths": {
         "Long": "/path/to/Long.js"
-        "ByteBuffer": "/path/to/ByteBuffer.js"
+        "ByteBuffer": "/path/to/ByteBufferAB.js"
     }
 });
 require(["ByteBuffer"], function(ByteBuffer) {
     var bb = new ByteBuffer();
-    bb.writeLString("Hello world!").flip();
-    alert(bb.readLString()+" from ByteBuffer.js");
+    bb.writeIString("Hello world!").flip();
+    alert(bb.readIString()+" from ByteBuffer.js");
 });
 ```
 

@@ -2034,20 +2034,30 @@ module.exports = (function() {
     ByteBuffer.prototype.writeString = ByteBuffer.prototype.writeUTF8String;
 
     /**
-     * Calculates the length of a string when being encoded as UTF8. JavaScript itself uses UTF-16, so that a string's
-     *  `length` property does not reflect its actual UTF8 length if it contains code points larger than 0xFFFF.
+     * Calculates the number of UTF8 characters of a string. JavaScript itself uses UTF-16, so that a string's
+     *  `length` property does not reflect its actual UTF8 size if it contains code points larger than 0xFFFF.
      * @function
      * @param {string} str String to calculate
-     * @returns {number} UTF8 length
+     * @returns {number} Number of UTF8 characters
      * @expose
      */
-    ByteBuffer.calculateUTF8String = function(str) {
+    ByteBuffer.calculateUTF8Chars = function(str) {
         var i = 0, n = 0;
         while (i < str.length) {
             i += str.codePointAt(i) < 0xFFFF ? 1 : 2;
             ++n;
         }
         return n;
+    };
+
+    /**
+     * Calculates the number of UTF8 bytes of a string.
+     * @param {string} str String to calculate
+     * @returns {number} Number of UTF8 bytes
+     * @expose
+     */
+    ByteBuffer.calculateUTF8Bytes = function(str) {
+        return utf8_calc_string(str);
     };
 
     /**
@@ -3318,29 +3328,44 @@ module.exports = (function() {
             c = bb.buffer[offset++];
             d = bb.buffer[offset++];
             codePoint = ((a&0x07)<<18) | ((b&0x3F)<<12) | ((c&0x3F)<<6) | (d&0x3F);
-        } else if ((a&0xFC) === 0xF8) {
-            if (offset+4 > bb.buffer.length)
-                throw(new RangeError("Index out of range: "+offset+" + 4 <= "+bb.buffer.length));
-            b = bb.buffer[offset++];
-            c = bb.buffer[offset++];
-            d = bb.buffer[offset++];
-            e = bb.buffer[offset++];
-            codePoint = ((a&0x03)<<24) | ((b&0x3F)<<18) | ((c&0x3F)<<12) | ((d&0x3F)<<6) | (e&0x3F);
-        } else if ((a&0xFE) === 0xFC) {
-            if (offset+5 > bb.buffer.length)
-                throw(new RangeError("Index out of range: "+offset+" + 5 <= "+bb.buffer.length));
-            b = bb.buffer[offset++];
-            c = bb.buffer[offset++];
-            d = bb.buffer[offset++];
-            e = bb.buffer[offset++];
-            f = bb.buffer[offset++];
-            codePoint = ((a&0x01)<<30) | ((b&0x3F)<<24) | ((c&0x3F)<<18) | ((d&0x3F)<<12) | ((e&0x3F)<<6) | (f&0x3F);
         } else
             throw(new RangeError("Illegal code point at offset "+offset+": 0x"+a.toString(16)));
         return {
             'codePoint': codePoint,
             'length': offset - start
         };
+    }
+
+    /**
+     * Calculates the actual number of bytes required to encode the specified char code.
+     * @param {number} codePoint Code point to encode
+     * @returns {number} Number of bytes required to encode the specified code point
+     * @inner
+     * @see http://en.wikipedia.org/wiki/UTF-8#Description
+     */
+    function utf8_calc_char(codePoint) {
+        if (codePoint < 0)
+            throw(new RangeError("Illegal code point: -0x"+(-codePoint).toString(16)));
+        if      (codePoint <       0x80) return 1;
+        else if (codePoint <      0x800) return 2;
+        else if (codePoint <    0x10000) return 3;
+        else if (codePoint <   0x110000) return 4;
+        else throw(new RangeError("Illegal code point: 0x"+codePoint.toString(16)));
+    }
+
+    /**
+     * Calculates the number of bytes required to store an UTF8 encoded string.
+     * @param {string} str String to calculate
+     * @returns {number} Number of bytes required
+     * @inner
+     */
+    function utf8_calc_string(str) {
+        var i = 0, cp, n = 0;
+        while (i < str.length) {
+            n += utf8_calc_char(cp = str.codePointAt(i));
+            i += cp < 0xFFFF ? 1 : 2;
+        }
+        return n;
     }
 
     // encodings/utf8

@@ -70,20 +70,30 @@ ByteBuffer.prototype.writeString = ByteBuffer.prototype.writeUTF8String;
 //? }
 
 /**
- * Calculates the length of a string when being encoded as UTF8. JavaScript itself uses UTF-16, so that a string's
- *  `length` property does not reflect its actual UTF8 length if it contains code points larger than 0xFFFF.
+ * Calculates the number of UTF8 characters of a string. JavaScript itself uses UTF-16, so that a string's
+ *  `length` property does not reflect its actual UTF8 size if it contains code points larger than 0xFFFF.
  * @function
  * @param {string} str String to calculate
- * @returns {number} UTF8 length
+ * @returns {number} Number of UTF8 characters
  * @expose
  */
-ByteBuffer.calculateUTF8String = function(str) {
+ByteBuffer.calculateUTF8Chars = function(str) {
     var i = 0, n = 0;
     while (i < str.length) {
         i += str.codePointAt(i) < 0xFFFF ? 1 : 2;
         ++n;
     }
     return n;
+};
+
+/**
+ * Calculates the number of UTF8 bytes of a string.
+ * @param {string} str String to calculate
+ * @returns {number} Number of UTF8 bytes
+ * @expose
+ */
+ByteBuffer.calculateUTF8Bytes = function(str) {
+    return utf8_calc_string(str);
 };
 
 /**

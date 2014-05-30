@@ -719,7 +719,7 @@ function makeSuite(ByteBuffer) {
         bb.flip();
         // bb.printDebug();
         // Reading
-        str2 = bb.readUTF8String(ByteBuffer.calculateUTF8String(str), ByteBuffer.METRICS_CHARS);
+        str2 = bb.readUTF8String(ByteBuffer.calculateUTF8Chars(str), ByteBuffer.METRICS_CHARS);
         // bb.printDebug();
         test.strictEqual(str2, str);
         bb.reset();

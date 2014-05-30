@@ -1590,7 +1590,7 @@
         
             
 <dt>
-    <h4 class="name" id="calculateUTF8String"><span class="type-signature">&lt;static> </span>calculateUTF8String<span class="signature">(str)</span><span class="type-signature"> &rarr; {number}</span></h4>
+    <h4 class="name" id="calculateUTF8Bytes"><span class="type-signature">&lt;static> </span>calculateUTF8Bytes<span class="signature">(str)</span><span class="type-signature"> &rarr; {number}</span></h4>
     
     
 </dt>
@@ -1598,8 +1598,7 @@
     
     
     <div class="description">
-        <p>Calculates the length of a string when being encoded as UTF8. JavaScript itself uses UTF-16, so that a string&#39;s
- <code>length</code> property does not reflect its actual UTF8 length if it contains code points larger than 0xFFFF.</p>
+        <p>Calculates the number of UTF8 bytes of a string.</p>
     </div>
     
 
@@ -1694,7 +1693,136 @@
     
             
 <div class="param-desc">
-    <p>UTF8 length</p>
+    <p>Number of UTF8 bytes</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">number</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="calculateUTF8Chars"><span class="type-signature">&lt;static> </span>calculateUTF8Chars<span class="signature">(str)</span><span class="type-signature"> &rarr; {number}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Calculates the number of UTF8 characters of a string. JavaScript itself uses UTF-16, so that a string&#39;s
+ <code>length</code> property does not reflect its actual UTF8 size if it contains code points larger than 0xFFFF.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>str</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"><p>String to calculate</p></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>Number of UTF8 characters</p>
 </div>
 
 
