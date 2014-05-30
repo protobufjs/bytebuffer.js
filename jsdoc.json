@@ -3,7 +3,7 @@
         "allowUnknownTags": true
     },
     "source": {
-        "include": ["ByteBuffer.js"]
+        "include": ["dist/ByteBufferAB.js"]
     },
     "opts": {
         "template": "templates/esoccer",

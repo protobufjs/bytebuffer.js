@@ -17,25 +17,8 @@
 /**
  * ByteBuffer.js Test Suite.
  * @author Daniel Wirtz <dcode@dcode.io>
- */
-
-/**
- * File to use.
- * @type {string}
- */
-var FILE = "ByteBuffer.min.js";
-
-/**
- * ByteBuffer.
- * @type {ByteBuffer}
- */
-var ByteBuffer = require(__dirname+"/../"+FILE);
-
-/**
- * Long.
- * @type {Long}
- */
-var Long = ByteBuffer.Long;
+ */ //
+var ByteBuffer = require("../index.js");
 
 /**
  * Constructs a new Sandbox for module loaders and shim testing.
@@ -51,6 +34,7 @@ var Sandbox = function(properties) {
     this.Uint32Array = function() {};
     this.Float32Array = function() {};
     this.Float64Array = function() {};
+    this.DataView = function() {};
     for (var i in properties) {
         this[i] = properties[i];
     }
@@ -61,413 +45,567 @@ var Sandbox = function(properties) {
     };
 };
 
-/**
- * Test suite.
- * @type {Object.<string,function>}
- */
-var suite = {
+function makeSuite(ByteBuffer) {
+    var type = ByteBuffer.type(), // Buffer or ArrayBuffer
+        Long = ByteBuffer.Long;
+    var suite = {};
     
-    "init": function(test) {
+    suite.init = function(test) {
+        if (type === Buffer)
+            test.log("\n\n                    --- node Buffer backed ByteBuffer ---\n".bold.white);
+        else
+            test.log("\n\n                    --- ArrayBuffer backed ByteBuffer ---\n".bold.white);
+        test.ok(type === Buffer || type === ArrayBuffer);
         test.ok(typeof ByteBuffer == "function");
-        test.ok(typeof ByteBuffer.encodeUTF8Char == "function");
         test.done();
-    },
-
-    "construct/allocate": function(test) {
-        var bb = new ByteBuffer();
-        test.equal(bb.array.byteLength, ByteBuffer.DEFAULT_CAPACITY);
-        bb = ByteBuffer.allocate();
-        test.equal(bb.array.byteLength, ByteBuffer.DEFAULT_CAPACITY);
-        test.done();
-    },
+    };
     
-    "wrap(ArrayBuffer)": function(test) {
+    suite.base = {};
+    
+    suite.base.allocate = function(test) {
+        var bb = new ByteBuffer();
+        test.ok(bb.buffer instanceof type);
+        test.equal(bb.offset, 0);
+        test.equal(bb.limit, ByteBuffer.DEFAULT_CAPACITY);
+        test.equal(bb.littleEndian, ByteBuffer.DEFAULT_ENDIAN);
+        test.equal(bb.noAssert, ByteBuffer.DEFAULT_NOASSERT);
+        if (type === Buffer)
+            test.equal(bb.buffer.length, bb.capacity());
+        else
+            test.equal(bb.buffer.byteLength, bb.capacity());
+        test.equal(bb.capacity(), ByteBuffer.DEFAULT_CAPACITY);
+        bb = ByteBuffer.allocate(undefined, !ByteBuffer.DEFAULT_ENDIAN, !ByteBuffer.DEFAULT_NOASSERT);
+        test.equal(bb.capacity(), ByteBuffer.DEFAULT_CAPACITY);
+        test.equal(bb.littleEndian, !ByteBuffer.DEFAULT_ENDIAN);
+        test.equal(bb.noAssert, !ByteBuffer.DEFAULT_NOASSERT);
+        test.done();
+    };
+
+    suite.base.clone = function(test) {
+        var bb = new ByteBuffer(1, true, false);
+        var bb2 = bb.clone();
+        test.strictEqual(bb.buffer, bb2.buffer);
+        test.equal(bb.offset, bb2.offset);
+        test.equal(bb.limit, bb2.limit);
+        test.equal(bb.markedOffset, bb2.markedOffset);
+        test.equal(bb.littleEndian, bb2.littleEndian);
+        test.equal(bb.noAssert, bb2.noAssert);
+        test.notStrictEqual(bb, bb2);
+        test.done();
+    };
+    
+    suite.base.assert = function(test) {
+        var bb = new ByteBuffer();
+        test.strictEqual(bb.noAssert, false);
+        test.strictEqual(bb.assert(false), bb);
+        test.strictEqual(bb.noAssert, true);
+        test.strictEqual(bb.assert(true), bb);
+        test.strictEqual(bb.noAssert, false);
+        test.done();
+    };
+    
+    suite.wrap = {};
+    
+    if (type === Buffer) {
+        suite.wrap.Buffer = function(test) {
+            var buf = new Buffer(1);
+            buf[0] = 0x01;
+            var bb = ByteBuffer.wrap(buf);
+            test.strictEqual(bb.capacity(), 1);
+            test.strictEqual(bb.buffer, buf);
+            test.strictEqual(bb.toDebug(), "<01>");
+            test.done();
+        };
+    }
+    
+    suite.wrap.ArrayBuffer = function(test) {
         var buf = new ArrayBuffer(1);
         var bb = ByteBuffer.wrap(buf);
-        test.strictEqual(bb.array, buf);
+        test.strictEqual(bb.capacity(), 1);
+        if (type === ArrayBuffer)
+            test.strictEqual(bb.buffer, buf);
+        else
+            test.ok(bb.buffer instanceof Buffer);
         test.equal(bb.offset, 0);
-        test.equal(bb.length, 1);
+        test.equal(bb.limit, 1);
         test.done();
-    },
+    };
     
-    "wrap(Uint8Array)": function(test) {
+    suite.wrap.Uint8Array = function(test) {
+        // Full view
         var buf = new Uint8Array(1);
+        buf[0] = 0x01;
         var bb = ByteBuffer.wrap(buf);
-        test.strictEqual(bb.array, buf.buffer);
+        test.strictEqual(bb.capacity(), 1);
+        if (type === ArrayBuffer)
+            test.strictEqual(bb.buffer, buf.buffer);
+        else
+            test.ok(bb.buffer instanceof Buffer);
+        test.strictEqual(bb.toDebug(), "<01>");
+
+        // Partial view (not on node, node copies)
+        if (type === ArrayBuffer) {
+            buf = new Uint8Array(3);
+            buf[0] = 0x01; buf[1] = 0x02; buf[2] = 0x03;
+            buf = new Uint8Array(buf.buffer, 1, 1);
+            bb = ByteBuffer.wrap(buf);
+            test.strictEqual(bb.capacity(), 3);
+            test.strictEqual(bb.toDebug(), "01<02>03");
+        }
+        
         test.done();
-    },
-    
-    "wrap(ByteBuffer)": function(test) { // clones
-        var bb2 = new ByteBuffer(4).writeInt32(0x12345678).flip();
+    };
+
+    suite.wrap.ByteBuffer = function(test) {
+        var bb2 = ByteBuffer.wrap("\x12\x34\x56\x78", "binary");
         bb2.offset = 1;
         var bb = ByteBuffer.wrap(bb2);
+        test.strictEqual(bb2.offset, bb.offset);
+        test.strictEqual(bb2.limit, bb.limit);
+        test.strictEqual(bb2.capacity(), bb.capacity());
         test.strictEqual(bb2.toString("debug"), bb.toString("debug"));
         test.done();
-    },
+    };
     
-    "wrap(String)": function(test) {
-        var bb = ByteBuffer.wrap("test");
-        test.equal(bb.offset, 0);
-        test.equal(bb.length, 4);
-        test.equal(bb.readUTF8String(4), "test");
-        
-        bb = ByteBuffer.wrap("6162", "hex");
-        test.equal(bb.toHex(true), "<61 62>");
-        
-        bb = ByteBuffer.wrap("YWI=", "base64");
-        test.equal(bb.toHex(true), "<61 62>");
-        
+    suite.wrap.string = function(test) {
+        var bb = ByteBuffer.wrap("\u0061\u0062");
+        test.equal(bb.toDebug(), "<61 62>");
         test.done();
-    },
+    };
+       
+    suite.encodings = {};
     
-    "wrap(Buffer)": function(test) {
-        var b = new Buffer("abc", "utf8");
-        var bb = ByteBuffer.wrap(b);
-        test.equal(bb.toString("debug"), "<61 62 63>");
+    suite.encodings.UTF8 = function(test) {
+        ["aäöüß€b", ""].forEach(function(str) {
+            var bb = ByteBuffer.wrap(str, "utf8"); // Calls ByteBuffer#fromUTF8
+            test.strictEqual(bb.toUTF8(), str);
+            if (str.length > 2) {
+                bb.offset = 1;
+                bb.limit = bb.capacity()-1;
+                test.strictEqual(bb.toUTF8(), str.substring(1, str.length-1));
+            }
+        });
         test.done();
-    },
+    };
 
-    "resize": function(test) {
+    suite.encodings.debug = function(test) {
+        ["60<61 62]63", "<60 61 62 63]", "|", "|61", "<61>", "!12"].forEach(function(str) {
+            var bb = ByteBuffer.wrap(str, "debug"); // Calls ByteBuffer#fromDebug
+            test.equal(bb.toDebug(), str);
+        });
+        test.done();
+    };
+    
+    suite.encodings.binary = function(test) {
+        ["\x61\x62\x63\x64", "", "  "].forEach(function(str) {
+            var bb = ByteBuffer.wrap(str, "binary"); // Calls ByteBuffer#fromBinary
+            test.strictEqual(bb.toBinary(), str);
+            if (str.length > 2) {
+                bb.offset = 1;
+                bb.limit = bb.capacity()-1;
+                test.strictEqual(bb.toBinary(), str.substring(1, str.length-1));
+            }
+        });
+        test.done();
+    };
+    
+    suite.encodings.hex = function(test) {
+        ["61626364", "61", ""].forEach(function(str) {
+            var bb = ByteBuffer.wrap(str, "hex"); // Calls ByteBuffer#fromHex
+            test.strictEqual(bb.toHex(), str);
+            if (str.length > 2) {
+                bb.offset = 1;
+                bb.limit = bb.capacity()-1;
+                test.strictEqual(bb.toHex(), str.substring(2, str.length-2));
+            }
+        });
+        test.done();
+    };
+    
+    suite.encodings.base64 = function(test) {
+        ["", "YWI=", "YWJjZGVmZw==", "YWJjZGVmZ2g=", "YWJjZGVmZ2hp"].forEach(function(str) {
+            var bb = ByteBuffer.wrap(str, "base64"); // Calls ByteBuffer#fromBase64
+            test.strictEqual(bb.toBase64(), str);
+            if (str.length > 8) {
+                bb.offset = 3;
+                bb.limit = bb.offset + 3;
+                test.strictEqual(bb.toBase64(), str.substr(4, 4));
+            }
+        });
+        test.done();
+    };
+    
+    suite.methods = {};
+    
+    suite.methods.concat = function(test) {
+        var bbs = [
+            new ArrayBuffer(1),
+            ByteBuffer.fromDebug('00<01 02>'),
+            ByteBuffer.fromDebug('00 01 02<03>00'),
+            ByteBuffer.fromDebug('00|'),
+            ByteBuffer.fromDebug('<04>'),
+            type === Buffer ? new Buffer(0) : new ArrayBuffer(0),
+            new Uint8Array(0),
+            '05'
+        ];
+        var bb = ByteBuffer.concat(bbs, 'hex', !ByteBuffer.DEFAULT_ENDIAN, !ByteBuffer.DEFAULT_NOASSERT);
+        test.strictEqual(bb.littleEndian, !ByteBuffer.DEFAULT_ENDIAN);
+        test.strictEqual(bb.noAssert, !ByteBuffer.DEFAULT_NOASSERT);
+        test.equal(bb.toDebug(), '<00 01 02 03 04 05>');
+        bb = ByteBuffer.concat([]);
+        test.strictEqual(bb.buffer, new ByteBuffer(0).buffer); // EMPTY_BUFFER
+        test.done();
+    };
+    
+    suite.methods.resize = function(test) {
         var bb = new ByteBuffer(1);
+        bb.offset = 1;
         bb.resize(2);
-        test.equal(bb.array.byteLength, 2);
-        test.equal(bb.toString("debug"), "|00 00 ");
+        bb.fill(0, 0, 2);
+        test.equal(bb.capacity(), 2);
+        test.equal(bb.toDebug(), "00|00");
         test.done();
-    },
-    
-    "slice": function(test) {
-        var bb = new ByteBuffer(3);
-        bb.writeUint8(0x12).writeUint8(0x34).writeUint8(0x56);
-        var bb2 = bb.slice(1,2);
-        test.strictEqual(bb.array, bb2.array);
-        test.equal(bb.offset, 3);
-        test.equal(bb.length, 0);
-        test.equal(bb2.offset, 1);
-        test.equal(bb2.length, 2);
-        test.done();
-    },
+    };
 
-    "ensureCapacity": function(test) {
+    suite.methods.ensureCapacity = function(test) {
         var bb = new ByteBuffer(5);
-        test.equal(bb.array.byteLength, 5);
-        bb.ensureCapacity(6);
-        test.equal(bb.array.byteLength, 10);
-        bb.ensureCapacity(21);
-        test.equal(bb.array.byteLength, 21);
+        test.equal(bb.capacity(), 5);
+        bb.ensureCapacity(6); // Doubles
+        test.equal(bb.capacity(), 10);
+        bb.ensureCapacity(21); // Uses 21
+        test.equal(bb.capacity(), 21);
         test.done();
-    },
-
-    "flip": function(test) {
-        var bb = new ByteBuffer(4);
-        bb.writeUint32(0x12345678);
+    };
+    
+    suite.methods.slice = function(test) {
+        var bb = new ByteBuffer.wrap("\x12\x34\x56"),
+            bb2 = bb.slice(1,2);
+        test.strictEqual(bb.buffer, bb2.buffer);
+        test.equal(bb.offset, 0);
+        test.equal(bb.limit, 3);
+        test.equal(bb2.offset, 1);
+        test.equal(bb2.limit, 2);
+        test.done();
+    };
+    
+    suite.methods.flip = function(test) {
+        var bb = ByteBuffer.wrap('\x12\x34\x56\x78');
+        bb.offset = 4;
         test.equal(bb.offset, 4);
-        test.equal(bb.length, 0);
+        test.equal(bb.limit, 4);
         bb.flip();
         test.equal(bb.offset, 0);
-        test.equal(bb.length, 4);
+        test.equal(bb.limit, 4);
         test.done();
-    },
-
-    "reset": function(test) {
-        var bb = new ByteBuffer(4);
-        bb.writeUint32(0x12345678);
-        bb.reset();
-        test.equal(bb.offset, 0);
-        test.equal(bb.length, 0);
-        test.done();
-    },
+    };
     
-    "mark": function(test) {
-        var bb = new ByteBuffer(4);
-        bb.writeUint16(0x1234);
-        test.equal(bb.offset, 2);
-        test.equal(bb.length, 0);
+    suite.methods.mark = function(test) {
+        var bb = ByteBuffer.wrap('\x12\x34\x56\x78');
+        test.equal(bb.offset, 0);
+        test.equal(bb.limit, 4);
         test.equal(bb.markedOffset, -1);
         bb.mark();
-        test.equal(bb.markedOffset, 2);
-        bb.writeUint16(0x5678);
-        test.equal(bb.offset, 4);
-        test.equal(bb.markedOffset, 2);
-        bb.reset();
-        test.equal(bb.offset, 2);
-        test.equal(bb.length, 0);
-        test.equal(bb.markedOffset, -1);
+        test.equal(bb.markedOffset, 0);
+        test.done();
+    };
+    
+    suite.methods.reset = function(test) {
+        var bb = ByteBuffer.wrap('\x12\x34\x56\x78');
         bb.reset();
         test.equal(bb.offset, 0);
-        test.equal(bb.length, 0);
+        test.equal(bb.limit, 4);
+        bb.offset = 1;
+        bb.mark();
+        test.equal(bb.markedOffset, 1);
+        bb.reset();
+        test.equal(bb.offset, 1);
         test.equal(bb.markedOffset, -1);
-        bb.mark(2);
-        test.equal(bb.markedOffset, 2);
         test.done();
-    },
-
-    "clone": function(test) {
-        var bb = new ByteBuffer(1);
-        var bb2 = bb.clone();
-        test.strictEqual(bb.array, bb2.array);
-        test.equal(bb.offset, bb2.offset);
-        test.equal(bb.length, bb2.length);
-        test.notStrictEqual(bb, bb2);
-        test.done();
-    },
+    };
     
-    "copy": function(test) {
-        var bb = new ByteBuffer(1);
-        bb.writeUint8(0x12);
-        var bb2 = bb.copy();
+    suite.methods.copy = function(test) {
+        var bb = ByteBuffer.wrap("\x01", !ByteBuffer.DEFAULT_ENDIAN),
+            bb2 = bb.copy();
+        test.equal(bb.offset, 0);
         test.notStrictEqual(bb, bb2);
-        test.notStrictEqual(bb.array, bb2.array);
+        test.notStrictEqual(bb.buffer, bb2.buffer);
         test.equal(bb2.offset, bb.offset);
-        test.equal(bb2.length, bb.length);
+        test.equal(bb2.limit, bb.limit);
+        test.equal(bb2.markedOffset, bb.markedOffset);
+        test.equal(bb2.littleEndian, bb.littleEndian);
+        test.equal(bb2.noAssert, bb.noAssert);
         test.done();
-    },
+    };
     
-    "compact": function(test) {
-        var bb = new ByteBuffer(2);
-        bb.writeUint8(0x12);
-        var prevArray = bb.array;
+    suite.methods.copyTo = function(test) {
+        var bb = ByteBuffer.wrap("\x01"),
+            bb2 = new ByteBuffer(2).fill(0);
+        test.equal(bb.toDebug(), "<01>");
+        // Modifies source and target offsets
+        bb.copyTo(bb2 /* all offsets omitted */);
+        test.equal(bb.toDebug(), "01|"); // Read 1 byte
+        test.equal(bb2.toDebug(), "01<00>"); // Written 1 byte
+        bb.reset();
+        test.equal(bb.toDebug(), "<01>");
+        // Again, but with bb2.offset=1
+        bb.copyTo(bb2 /* all offsets omitted */);
+        test.equal(bb.toDebug(), "01|"); // Read 1 byte
+        test.equal(bb2.toDebug(), "01 01|"); // Written 1 byte at 2
+        bb.reset();
+        bb2.reset().fill(0);
+        // Modifies source offsets only
+        bb.copyTo(bb2, 0 /* source offsets omitted */);
+        test.equal(bb.toDebug(), "01|"); // Read 1 byte
+        test.equal(bb2.toDebug(), "<01 00>"); // Written 1 byte (no change)
+        // Modifies no offsets at all
+        bb.reset();
+        bb2.fill(0);
+        bb.copyTo(bb2, 1, 0, bb.capacity() /* no offsets omitted */);
+        test.equal(bb.toDebug(), "<01>"); // Read 1 byte (no change)
+        test.equal(bb2.toDebug(), "<00 01>"); // Written 1 byte (no change)
+        test.done();
+    };
+    
+    suite.methods.compact = function(test) {
+        var bb = ByteBuffer.wrap("\x01\x02");
+        bb.limit = 1;
+        bb.markedOffset = 2;
+        var prevBuffer = bb.buffer,
+            prevView = bb.view;
         bb.compact();
-        test.notStrictEqual(bb.array, prevArray);
-        test.equal(bb.array.byteLength, 1);
+        test.notStrictEqual(bb.buffer, prevBuffer);
+        if (type === ArrayBuffer) {
+            test.notStrictEqual(bb.buffer, prevView);
+        }
+        test.equal(bb.capacity(), 1);
         test.equal(bb.offset, 0);
-        test.equal(bb.length, 1);
-        test.done();
-    },
-
-    "compactEmpty": function(test) {
-        var bb = new ByteBuffer(2);
+        test.equal(bb.limit, 1);
+        test.equal(bb.markedOffset, 2); // Actually out of bounds
+        
+        // Empty region
+        bb.offset = 1;
+        prevBuffer = bb.buffer;
         bb.compact();
-        test.strictEqual(bb.offset, 0);
-        test.strictEqual(bb.length, 0);
-        test.strictEqual(bb.view, null); // Special case
-        test.strictEqual(bb.array.byteLength, 0);
-        bb.writeInt32(0xFFFFFFFF);
-        bb.flip();
-        test.strictEqual(bb.offset, 0);
-        test.strictEqual(bb.length, 4);
-        test.notStrictEqual(bb.view, null);
-        test.strictEqual(bb.array.byteLength, 4); // Cannot double 0, so it takes 32bits
-        test.done();
-    },
-    
-    "destroy": function(test) {
-        var bb = new ByteBuffer(1);
-        bb.writeUint8(0x12);
-        bb.destroy();
-        test.strictEqual(bb.array, null);
+        test.notStrictEqual(bb.buffer, prevBuffer);
+        test.strictEqual(bb.buffer, new ByteBuffer(0).buffer); // EMPTY_BUFFER
+        if (type === ArrayBuffer) {
+            test.strictEqual(bb.view, null);
+        }
+        test.equal(bb.capacity(), 0);
         test.equal(bb.offset, 0);
-        test.equal(bb.length, 0);
-        test.equal(bb.toString("debug"), "DESTROYED");
+        test.equal(bb.limit, 0);        
         test.done();
-    },
+    };
     
-    "reverse": function(test) {
-        var bb = new ByteBuffer(4);
-        bb.writeUint32(0x12345678);
-        bb.flip();
+    suite.methods.reverse = function(test) {
+        var bb = ByteBuffer.wrap("\x12\x34\x56\x78");
+        bb.reverse(1, 3);
+        test.equal(bb.toString("debug"), "<12 56 34 78>");
         bb.reverse();
-        test.equal(bb.toString("debug"), "<78 56 34 12>");
+        test.equal(bb.toString("debug"), "<78 34 56 12>");
+        bb.offset = 1;
+        bb.limit = 3;
+        bb.reverse();
+        test.equal(bb.toString("debug"), "78<56 34>12");
+        bb.reverse(0, 4).clear();
+        test.equal(bb.toString("debug"), "<12 34 56 78>");
         test.done();
-    },
+    };
     
-    "append": function(test) {
-        var bb = new ByteBuffer(2);
-        bb.writeUint16(0x1234);
-        var bb2 = new ByteBuffer(2);
-        bb2.writeUint16(0x5678);
-        bb2.flip();
-        bb.append(bb2);
-        test.equal(bb.toString("debug"), ">12 34 56 78<");
-        bb.append(bb2, 1);
-        test.equal(bb.toString("debug"), ">12 56 78 78<");
+    suite.methods.append = function(test) {
+        var bb = ByteBuffer.wrap("\x12\x34");
+        var bb2 = ByteBuffer.wrap("\x56\x78");
+        bb.offset = 2;
+        bb.append(bb2); // Modifies offsets of both
+        test.equal(bb.toString("debug"), "12 34>56 78<");
+        test.equal(bb2.toString("debug"), "56 78|");
+        bb2.reset();
+        bb.append(bb2, 1); // Modifies offsets of bb2 only
+        test.equal(bb.toString("debug"), "12 56>78 78<");
+        test.equal(bb2.toString("debug"), "56 78|");
         test.done();
-    },
+    };
     
-    "prepend": function(test) {
-        var bb = new ByteBuffer(2);
-        bb.writeUint16(0x1234);
-        bb.flip();
-        var bb2 = new ByteBuffer(2);
-        bb2.writeUint16(0x5678);
-        bb2.flip();
-        bb.prepend(bb2);
-        test.equal(bb.toString("debug"), "<56 78 12 34>");
+    suite.methods.prepend = function(test) {
+        var bb = ByteBuffer.wrap("\x12\x34"),
+            bb2 = ByteBuffer.wrap("\x56\x78");
+        test.strictEqual(bb.prepend(bb2), bb); // Relative prepend at 0, 2 bytes (2 overflow)
+        test.equal(bb.toDebug(), "<56 78 12 34>");
+        test.equal(bb2.toDebug(), "56 78|");
         bb.offset = 4;
-        bb.prepend(bb2, 3);
-        test.equal(bb.toString("debug"), " 56 56 78 34|")
+        bb2.offset = 1;
+        bb.prepend(bb2, 3); // Absolute prepend at 3, 1 byte
+        test.equal(bb.toDebug(), "56 78 78 34|");
+        test.equal(bb2.toDebug(), "56 78|");
+        bb2.offset = 0;
+        bb.prepend(bb2); // Relative prepend at 4, 2 bytes
+        test.equal(bb.toDebug(), "56 78<56 78>");
+        test.equal(bb2.toDebug(), "56 78|");
+        bb.offset = 3;
+        bb2.offset = 0;
+        test.throws(function() {
+            bb.prepend(bb2, 6); // Absolute out of bounds
+        }, RangeError);
+        bb.prepend("abcde", "utf8"); // Relative prepend at 3, 5 bytes (1 overflow)
+        test.equal(bb.toDebug(), "<61 62 63 64 65 78>");
         test.done();
-    },
+    };
     
-    "write/readInt8": function(test) {
-        var bb = new ByteBuffer(1);
-        bb.writeInt8(0xFF);
-        bb.flip();
-        test.equal(-1, bb.readInt8());
+    suite.methods.prependTo = function(test) {
+        var bb = ByteBuffer.wrap("\x12\x34"),
+            bb2 = ByteBuffer.wrap("\x56\x78");
+        test.strictEqual(bb2.prependTo(bb), bb2);
+        test.equal(bb.toDebug(), "<56 78 12 34>");
+        test.equal(bb2.toDebug(), "56 78|");
         test.done();
-    },
-
-    "write/readByte": function(test) {
-        var bb = new ByteBuffer(1);
-        test.strictEqual(bb.readInt8, bb.readByte);
-        test.strictEqual(bb.writeInt8, bb.writeByte);
-        test.done();
-    },
+    };
     
-    "write/readUint8": function(test) {
-        var bb = new ByteBuffer(1);
-        bb.writeUint8(0xFF);
-        bb.flip();
-        test.equal(0xFF, bb.readUint8());
+    suite.methods.remaining = function(test) {
+        var bb = ByteBuffer.wrap("\x12\x34");
+        test.strictEqual(bb.remaining(), 2);
+        bb.offset = 2;
+        test.strictEqual(bb.remaining(), 0);
+        bb.offset = 3;
+        test.strictEqual(bb.remaining(), -1);
         test.done();
-    },
+    };
     
-    "write/readInt16": function(test) {
+    suite.methods.skip = function(test) {
+        var bb = ByteBuffer.wrap("\x12\x34\x56");
+        test.strictEqual(bb.offset, 0);
+        bb.skip(3);
+        test.strictEqual(bb.offset, 3);
+        test.strictEqual(bb.noAssert, false);
+        test.throws(function() {
+            bb.skip(1);
+        });
+        test.strictEqual(bb.offset, 3);
+        bb.noAssert = true;
+        test.doesNotThrow(function() {
+            bb.skip(1);
+        });
+        test.strictEqual(bb.offset, 4);
+        test.done();
+    };
+    
+    suite.methods.order = function(test) {
+        test.strictEqual(ByteBuffer.LITTLE_ENDIAN, true);
+        test.strictEqual(ByteBuffer.BIG_ENDIAN, false);
         var bb = new ByteBuffer(2);
-        bb.writeInt16(0xFFFF);
+        test.strictEqual(bb.littleEndian, false);
+        bb.writeInt32(0x12345678);
         bb.flip();
-        test.equal(-1, bb.readInt16());
-        test.done();
-    },
-    
-    "write/readShort": function(test) {
-        var bb = new ByteBuffer(1);
-        test.strictEqual(bb.readInt16, bb.readShort);
-        test.strictEqual(bb.writeInt16, bb.writeShort);
-        test.done();
-    },
-
-    "write/readUint16": function(test) {
-        var bb = new ByteBuffer(2);
-        bb.writeUint16(0xFFFF);
+        test.strictEqual(bb.toHex(), "12345678");
+        bb.clear();
+        test.strictEqual(bb.LE(), bb);
+        test.strictEqual(bb.littleEndian, true);
+        bb.writeInt32(0x12345678);
         bb.flip();
-        test.equal(0xFFFF, bb.readUint16());
+        test.strictEqual(bb.toHex(), "78563412");
+        test.strictEqual(bb.BE(), bb);
+        test.strictEqual(bb.littleEndian, false);
+        test.strictEqual(bb.order(ByteBuffer.LITTLE_ENDIAN), bb);
+        test.strictEqual(bb.littleEndian, true);
+        test.strictEqual(bb.order(ByteBuffer.BIG_ENDIAN), bb);
+        test.strictEqual(bb.littleEndian, false);
         test.done();
-    },
+    };
     
-    "write/readInt32": function(test) {
-        var bb = new ByteBuffer(4);
-        bb.writeInt32(0xFFFFFFFF);
-        bb.flip();
-        test.equal(-1, bb.readInt32());
-        test.done();
-    },
-    
-    "write/readInt": function(test) {
-        var bb = new ByteBuffer(1);
-        test.strictEqual(bb.readInt32, bb.readInt);
-        test.strictEqual(bb.writeInt32, bb.writeInt);
-        test.done();
-    },
-    
-    "write/readUint32": function(test) {
-        var bb = new ByteBuffer(4);
-        bb.writeUint32(0x12345678);
-        bb.flip();
-        test.equal(0x12345678, bb.readUint32());
-        test.done();
-    },
-    
-    "write/readFloat32": function(test) {
-        var bb = new ByteBuffer(4);
-        bb.writeFloat32(0.5);
-        bb.flip();
-        test.equal(0.5, bb.readFloat32()); // 0.5 remains 0.5 if Float32
-        test.done();
-    },
-    
-    "write/readFloat": function(test) {
-        var bb = new ByteBuffer(1);
-        test.strictEqual(bb.readFloat32, bb.readFloat);
-        test.strictEqual(bb.writeFloat32, bb.writeFloat);
-        test.done();
-    },
-    
-    "write/readFloat64": function(test) {
-        var bb = new ByteBuffer(8);
-        bb.writeFloat64(0.1);
-        bb.flip();
-        test.equal(0.1, bb.readFloat64()); // would be 0.10000000149011612 if Float32
-        test.done();
-    },
-    
-    "write/readDouble": function(test) {
-        var bb = new ByteBuffer(1);
-        test.strictEqual(bb.readFloat64, bb.readDouble);
-        test.strictEqual(bb.writeFloat64, bb.writeDouble);
-        test.done();
-    },
-    
-    "write/readInt64": function(test) {
-        var bb = new ByteBuffer(8);
+    var types = [
+        // name    | alias   | size | input                                   | output                                  | BE representation
+        ["Int8"    , "Byte"  , 1    , 0xFE                                    , -2                                      , "fe"                  ],
+        ["Uint8"   , null    , 1    , -2                                      , 0xFE                                    , "fe"                  ],
+        ["Int16"   , "Short" , 2    , 0xFFFE                                  , -2                                      , "fffe"                ],
+        ["Uint16"  , null    , 2    , -2                                      , 0xFFFE                                  , "fffe"                ],
+        ["Int32"   , "Int"   , 4    , 0xFFFFFFFE                              , -2                                      , "fffffffe"            ],
+        ["Uint32"  , null    , 4    , -2                                      , 0xFFFFFFFE                              , "fffffffe"            ],
+        ["Float32" , "Float" , 4    , 0.5                                     , 0.5                                     , "3f000000"            ],
+        ["Float64" , "Double", 8    , 0.1                                     , 0.1                                     , "3fb999999999999a"    ],
+        ["Int64"   , "Long"  , 8    , new Long(0xFFFFFFFE, 0xFFFFFFFF, true)  , new Long(0xFFFFFFFE, 0xFFFFFFFF, false) , "fffffffffffffffe"    ],
+        ["Uint64"  , null    , 8    , new Long(0xFFFFFFFE, 0xFFFFFFFF, false) , new Long(0xFFFFFFFE, 0xFFFFFFFF, true)  , "fffffffffffffffe"    ],
         
-        var max = ByteBuffer.Long.MAX_SIGNED_VALUE.toNumber();
-        bb.writeInt64(max).flip();
-        test.equal(bb.toString("debug"), "<7F FF FF FF FF FF FF FF>");
-        test.equal(bb.readInt64(0), max);
-        
-        var min = ByteBuffer.Long.MIN_SIGNED_VALUE.toNumber();
-        bb.writeInt64(min).flip();
-        test.equal(bb.toString("debug"), "<80 00 00 00 00 00 00 00>");
-        test.equal(bb.readInt64(0), min);
-        
-        bb.writeInt64(-1).flip();
-        test.equal(bb.toString("debug"), "<FF FF FF FF FF FF FF FF>");
-        test.equal(bb.readInt64(0), -1);
-        
-        bb.reset();
-        bb.LE().writeInt64(new ByteBuffer.Long(0x89ABCDEF, 0x01234567)).flip();
-        test.equal(bb.toString("debug"), "<EF CD AB 89 67 45 23 01>");
-        
-        test.done();
-    },
+        // name    | alias   | size | input                                   | output                                  | representation
+        ["Varint32", null    , 5    , 0xFFFFFFFE                              , -2                                      , "feffffff7f"          ],
+        ["Varint64", null    , 10   , new Long(0xFFFFFFFE, 0xFFFFFFFF, true)  , new Long(0xFFFFFFFE, 0xFFFFFFFF, false) , "feffffffffffffffff01"]
+    ];
     
-    "write/readUint64": function(test) {
-        var bb = new ByteBuffer(8);
-
-        var max = ByteBuffer.Long.MAX_UNSIGNED_VALUE.toNumber();
-        bb.writeUint64(max).flip();
-        test.equal(bb.toString("debug"), "<FF FF FF FF FF FF FF FF>");
-        test.equal(bb.readUint64(0), max);
-
-        var min = ByteBuffer.Long.MIN_UNSIGNED_VALUE.toNumber();
-        bb.writeLong(min).flip();
-        test.equal(bb.toString("debug"), "<00 00 00 00 00 00 00 00>");
-        test.equal(bb.readUint64(0), min);
-
-        bb.writeUint64(-1).flip();
-        test.equal(bb.toString("debug"), "<00 00 00 00 00 00 00 00>");
-        test.equal(bb.readUint64(0), 0);
-
-        bb.reset();
-        bb.LE().writeUint64(new ByteBuffer.Long(0x89ABCDEF, 0x01234567, true)).flip();
-        test.equal(bb.toString("debug"), "<EF CD AB 89 67 45 23 01>");
-
-        test.done();
-    },
+    suite.types = {};
     
-    "write/readLong": function(test) {
-        var bb = new ByteBuffer(1);
-        test.strictEqual(bb.readInt64, bb.readLong);
-        test.strictEqual(bb.writeInt64, bb.writeLong);
-        test.done();
-    },
+    types.forEach(function(type) {
+        var name = type[0],
+            varint = name.indexOf("Varint") >= 0,
+            alias = type[1],
+            size = type[2],
+            input = type[3],
+            output = type[4],
+            be = type[5],
+            le = "";
+        for (var i=be.length; i>0; i-=2) {
+            le += be.substr(i-2, 2);
+        }
+        suite.types[name.toLowerCase()] = function(test) {
+            var bb = new ByteBuffer(size);
+            // Relative BE (always LE for varints)
+            test.strictEqual(bb["write"+name](input), bb);
+            bb.flip();
+            var val = bb["read"+name]();
+            if (output instanceof Long) {
+                test.deepEqual(val, output);
+            } else {
+                test.strictEqual(val, output);
+            }
+            bb.flip();
+            test.strictEqual(bb.toHex(), be);
+            if (!varint) {
+                // Relative LE
+                bb.LE();
+                bb["write"+name](input);
+                bb.flip();
+                val = bb["read"+name]();
+                if (output instanceof Long) {
+                    test.deepEqual(val, output);
+                } else {
+                    test.strictEqual(val, output);
+                }
+                bb.flip();
+                test.strictEqual(bb.toHex(), le);
+            }
+            test.throws(function() { // OOB
+                bb.offset = bb.capacity() - size + 1;
+                bb["read"+name](input);
+            });
+            test.doesNotThrow(function() { // OOB, automatic resizing * 2
+                bb["write"+name](input);
+            });
+            test.strictEqual(bb.capacity(), size * 2);
+            // Absolute
+            bb.clear();
+            if (!varint)
+                test.strictEqual(bb["write"+name](input, 1), bb);
+            else
+                test.strictEqual(bb["write"+name](input, 1), size);
+            val = bb["read"+name](1);
+            if (output instanceof Long) {
+                if (!varint)
+                    test.deepEqual(val, output);
+                else
+                    test.deepEqual(val, {value: output, length: size});
+            } else {
+                if (!varint)
+                    test.strictEqual(val, output);
+                else
+                    test.deepEqual(val, {value: output, length: size});
+            }
+            // Alias
+            if (alias) {
+                test.strictEqual(bb["write"+name], bb["write"+alias]);
+                test.strictEqual(bb["read"+name], bb["read"+alias]);
+            }
+            test.done();
+        };
+    });
     
-    "writeVarint64/readVarint32": function(test) {
-        var bb = new ByteBuffer();
-        bb.writeVarint64(Long.fromNumber(-1));
-        bb.flip();
-        var n = bb.readVarint32();
-        test.equal(n, -1);
-        test.done();
-    },
-    
-    "LE/BE": function(test) {
-        var bb = new ByteBuffer(8).LE().writeInt(1).BE().writeInt(2).flip();
-        test.equal(bb.toString("debug"), "<01 00 00 00 00 00 00 02>");
-        test.done();
-    },
-    
-    "calculateVarint32/64": function(test) {
+    suite.types.calculateVarint = function(test) {
         test.equal(ByteBuffer.MAX_VARINT32_BYTES, 5);
         test.equal(ByteBuffer.MAX_VARINT64_BYTES, 10);
         var values = [
@@ -498,9 +636,9 @@ var suite = {
             test.equal(ByteBuffer.calculateVarint64(values[i][0]), values[i][1]);
         }
         test.done();
-    },
+    };
     
-    "zigZagEncode/Decode32/64": function(test) {
+    suite.types.zigZagVarint = function(test) {
         var Long = ByteBuffer.Long;
         var values = [
             [ 0, 0],
@@ -528,69 +666,28 @@ var suite = {
             test.equal(ByteBuffer.zigZagEncode64(values[i][0]).toString(), values[i][1].toString());
             test.equal(ByteBuffer.zigZagDecode64(values[i][1]).toString(), values[i][0].toString());
         }
-        test.done();
-    },
-    
-    "write/readVarint32": function(test) {
-        var values = [
-            [1,1],
-            [300,300],
-            [0x7FFFFFFF, 0x7FFFFFFF],
-            [0xFFFFFFFF, -1],
-            [0x80000000, -2147483648]
-        ];
-        var bb = new ByteBuffer(5);
-        for (var i=0; i<values.length; i++) {
-            var encLen = bb.writeVarint32(values[i][0], 0);
-            var dec = bb.readVarint32(0);
-            test.equal(values[i][1], dec['value']);
-            test.equal(encLen, dec['length']);
-        }
-        test.done();
-    },
-
-    "write/readVarint64": function(test) {
-        var Long = ByteBuffer.Long;
-        var values = [
-            [Long.ONE],
-            [Long.fromNumber(300)],
-            [Long.fromNumber(0x7FFFFFFF)],
-            [Long.fromNumber(0xFFFFFFFF)],
-            [Long.fromBits(0xFFFFFFFF, 0x7FFFFFFF)],
-            [Long.fromBits(0xFFFFFFFF, 0xFFFFFFFF)]
-        ];
-        var bb = new ByteBuffer(10);
-        for (var i=0; i<values.length; i++) {
-            var encLen = bb.writeVarint64(values[i][0], 0);
-            var dec = bb.readVarint64(0);
-            test.equal((values[i].length > 1 ? values[i][1] : values[i][0]).toString(), dec['value'].toString());
-            test.equal(encLen, dec['length']);
-        }
-        test.done();
-    },
-
-    "write/readZigZagVarint32": function(test) {
-        var values = [
+        
+        // 32 bit ZZ
+        values = [
             0,
             1,
-             300,
+            300,
             -300,
-             2147483647,
+            2147483647,
             -2147483648
         ];
-        var bb = new ByteBuffer(10);
-        for (var i=0; i<values.length; i++) {
-            var encLen = bb.writeZigZagVarint32(values[i], 0);
-            var dec = bb.readZigZagVarint32(0);
-            test.equal(values[i], dec['value']);
+        bb = new ByteBuffer(10);
+        for (i=0; i<values.length; i++) {
+            var encLen = bb.writeVarint32ZigZag(values[i], 0);
+            bb.limit = encLen;
+            var dec = bb.readVarint32ZigZag(0);
+            test.equal(dec['value'], values[i]);
             test.equal(encLen, dec['length']);
+            bb.clear();
         }
-        test.done();
-    },
-
-    "write/readZigZagVarint64": function(test) {
-        var Long = ByteBuffer.Long;
-        var values = [
+        
+        // 64 bit ZZ
+        values = [
             Long.ONE, 1,
             Long.fromNumber(-3),
             Long.fromNumber(300),
@@ -602,160 +699,208 @@ var suite = {
             Long.fromBits(0xFFFFFFFF, 0xFFFFFFFF)
         ];
         var bb = new ByteBuffer(10);
-        for (var i=0; i<values.length; i++) {
-            var encLen = bb.writeZigZagVarint64(values[i], 0);
-            var dec = bb.readZigZagVarint64(0);
+        for (i=0; i<values.length; i++) {
+            encLen = bb.writeVarint64ZigZag(values[i], 0);
+            dec = bb.readVarint64ZigZag(0);
             test.equal(values[i].toString(), dec['value'].toString());
             test.equal(encLen, dec['length']);
         }
         test.done();
-    },
+    };
     
-    "write/readVarint": function(test) {
-        var bb = new ByteBuffer(1);
-        test.strictEqual(bb.readVarint32, bb.readVarint);
-        test.strictEqual(bb.writeVarint32, bb.writeVarint);
-        test.done();
-    },
-    
-    "write/readLString": function(test) {
+    suite.types.utf8string = function(test) {        
         var bb = new ByteBuffer(2);
-        bb.writeLString("ab"); // resizes to 4
-        test.equal(bb.array.byteLength, 4);
-        test.equal(bb.offset, 3);
-        test.equal(bb.length, 0);
+        // Aliases
+        test.strictEqual(bb.writeUTF8String, bb.writeString);
+        test.strictEqual(bb.readUTF8String, bb.readString);
+        var str = "ä☺𠜎", str2;
+        // Writing 
+        test.strictEqual(bb.writeUTF8String(str), bb);
         bb.flip();
-        test.equal(bb.toString("debug"), "<02 61 62>00 ");
-        test.deepEqual({"string": "ab", "length": 3}, bb.readLString(0));
-        test.equal(bb.toString("debug"), "<02 61 62>00 ");
-        test.equal("ab", bb.readLString());
-        test.equal(bb.toString("debug"), " 02 61 62|00 ");
+        // bb.printDebug();
+        // Reading
+        str2 = bb.readUTF8String(ByteBuffer.calculateUTF8String(str), ByteBuffer.METRICS_CHARS);
+        // bb.printDebug();
+        test.strictEqual(str2, str);
+        bb.reset();
+        str2 = bb.readUTF8String(bb.limit, ByteBuffer.METRICS_BYTES);
+        test.strictEqual(str2, str);
         test.done();
-    },
+    };
 
-    "write/readVString": function(test) {
+    suite.types.istring = function(test) {
         var bb = new ByteBuffer(2);
-        bb.writeVString("ab"); // resizes to 4
-        test.equal(bb.array.byteLength, 4);
-        test.equal(bb.offset, 3);
-        test.equal(bb.length, 0);
+        test.strictEqual(bb.writeIString("ab"), bb); // resizes to 4+2=6
+        test.strictEqual(bb.capacity(), 6);
+        test.strictEqual(bb.offset, 6);
+        test.strictEqual(bb.limit, 2);
         bb.flip();
-        test.equal(bb.toString("debug"), "<02 61 62>00 ");
-        test.deepEqual({"string": "ab", "length": 3}, bb.readVString(0));
-        test.equal(bb.toString("debug"), "<02 61 62>00 ");
-        test.equal("ab", bb.readLString());
-        test.equal(bb.toString("debug"), " 02 61 62|00 ");
+        test.equal(bb.toString("debug"), "<00 00 00 02 61 62>");
+        test.deepEqual(bb.readIString(0), {"string": "ab", "length": 6});
+        test.strictEqual(bb.readIString(), "ab");
+        bb.reset();
+        test.equal(bb.toString("debug"), "<00 00 00 02 61 62>");
+        test.strictEqual(bb.readIString(), "ab");
+        test.equal(bb.toString("debug"), "00 00 00 02 61 62|");
         test.done();
-    },
+    };
     
-    "write/readCString": function(test) {
+    suite.types.vstring = function(test) {
+        var bb = new ByteBuffer(2);
+        bb.writeVString("ab"); // resizes to 2*2=4
+        test.strictEqual(bb.capacity(), 4);
+        test.strictEqual(bb.offset, 3);
+        test.strictEqual(bb.limit, 2);
+        bb.flip();
+        test.equal(bb.toString("debug").substr(0, 10), "<02 61 62>");
+        test.deepEqual(bb.readVString(0), {"string": "ab", "length": 3});
+        test.equal(bb.toString("debug").substr(0, 10), "<02 61 62>");
+        test.equal(bb.readVString(), "ab");
+        test.equal(bb.toString("debug").substr(0, 9), "02 61 62|");
+        test.done();
+    };
+    
+    suite.types.cstring = function(test) {
         var bb = new ByteBuffer(2);
         bb.writeCString("ab"); // resizes to 4
-        test.equal(bb.array.byteLength, 4);
+        test.equal(bb.capacity(), 4);
         test.equal(bb.offset, 3);
-        test.equal(bb.length, 0);
+        test.equal(bb.limit, 2);
         bb.flip();
-        test.equal(bb.toString("debug"), "<61 62 00>00 ");
-        test.deepEqual({"string": "ab", "length": 3}, bb.readCString(0));
-        test.equal(bb.toString("debug"), "<61 62 00>00 ");
-        test.equal("ab", bb.readCString());
-        test.equal(bb.toString("debug"), " 61 62 00|00 ");
+        test.equal(bb.toString("debug"), "<61 62 00>00");
+        test.deepEqual(bb.readCString(0), {"string": "ab", "length": 3});
+        test.equal(bb.toString("debug"), "<61 62 00>00");
+        test.equal(bb.readCString(), "ab");
+        test.equal(bb.toString("debug"), "61 62 00|00");
         test.done();
-    },
+    };
     
-    "write/readJSON": function(test) {
-        var bb = new ByteBuffer();
-        var data = {"x":1};
-        bb.writeJSON(data);
-        bb.flip();
-        test.deepEqual(data, bb.readJSON());
-        test.done();
-    },
+    suite.convert = {};
     
-    "toHex": function(test) {
-        var bb = new ByteBuffer(3);
+    suite.convert.toHex = function(test) {
+        var bb = new ByteBuffer(4);
         bb.writeUint16(0x1234);
-        test.equal(bb.flip().toHex(), "1234");
+        bb.writeUint8(0x56);
+        bb.flip();
+        test.equal(bb.toHex(), "123456");
+        test.strictEqual(bb.offset, 0);
+        test.equal(bb.toHex(1), "3456");
+        test.equal(bb.toHex(1,2), "34");
+        test.equal(bb.toHex(1,1), "");
+        test.throws(function() {
+            bb.toHex(1,0);
+        });
         test.done();
-    },
+    };
     
-    "toString": function(test) {
+    suite.convert.toBase64 = function(test) {
+        var bb = new ByteBuffer(8);
+        bb.writeUTF8String("abcdefg"); // 7 chars
+        bb.flip();
+        test.equal(bb.toBase64(), "YWJjZGVmZw==");
+        test.strictEqual(bb.offset, 0);
+        test.equal(bb.toBase64(3), "ZGVmZw==");
+        test.equal(bb.toBase64(3,6), "ZGVm");
+        test.equal(bb.toBase64(3,3), "");
+        test.throws(function() {
+            bb.toBase64(1,0);
+        });
+        test.done();
+    };
+    
+    suite.convert.toBinary = function(test) {
+        var bb = new ByteBuffer(5);
+        bb.writeUint32(0x001234FF);
+        bb.flip();
+        test.strictEqual(bb.toBinary(), "\x00\x12\x34\xFF");
+        test.strictEqual(bb.offset, 0);
+        test.done();
+    };
+    
+    suite.convert.toString = function(test) {
         var bb = new ByteBuffer(3);
         bb.writeUint16(0x6162).flip();
-        test.equal(bb.toString(), "ByteBuffer(offset=0,markedOffset=-1,length=2,capacity=3)");
         test.equal(bb.toString("hex"), "6162");
         test.equal(bb.toString("base64"), "YWI=");
         test.equal(bb.toString("utf8"), "ab");
-        test.equal(bb.toString("debug"), "<61 62>00 ");
+        test.equal(bb.toString("debug").substr(0,7), "<61 62>");
+        test.equal(bb.toString(), (type === ArrayBuffer ? "ByteBufferAB" : "ByteBufferNB")+"(offset=0,markedOffset=-1,limit=2,capacity=3)");
+        test.strictEqual(bb.offset, 0);
         test.done();
-    },
+    };
     
-    "toArrayBuffer": function(test) {
-        var bb = new ByteBuffer(3);
-        bb.writeUint16(0x1234);
-        var buf = bb.toArrayBuffer();
-        test.equal(buf.byteLength, 2);
-        test.equal(buf[0], 0x12);
-        test.equal(buf[1], 0x34);
-        test.equal(bb.offset, 2);
-        test.equal(bb.length, 0);
-        test.equal(bb.array.byteLength, 3);
-        test.done();
-    },
-    
-    "toBuffer": function(test) {
-        var bb = new ByteBuffer(3);
-        bb.writeUint16(0x1234);
-        var buf;
-        try {
-            buf = bb.toBuffer();
-        } catch (e) {
-            console.trace(e);
+    suite.convert.toBuffer = function(test) {
+        var bb = new ByteBuffer(2);
+        bb.writeUint16(0x1234).flip();
+        var buf = bb.toBuffer();
+        test.strictEqual(buf, bb.buffer);
+        if (type === ArrayBuffer) {
+            test.ok(buf instanceof ArrayBuffer);
+            test.strictEqual(buf.byteLength, 2);
+        } else {
+            test.ok(buf instanceof Buffer);
+            test.strictEqual(buf.length, 2);
         }
-        test.equal(buf.length, 2);
-        test.equal(buf[0], 0x12);
-        test.equal(buf[1], 0x34);
-        test.equal(bb.offset, 2);
-        test.equal(bb.length, 0);
-        test.equal(bb.array.byteLength, 3);
-        test.done();
-    },
-    
-    "printDebug": function(test) {
-        var bb = new ByteBuffer(3);
-        function callMe() { callMe.called = true; };
-        bb.printDebug(callMe);
-        test.ok(callMe.called);
-        test.done();
-    },
-    
-    "encode/decode/calculateUTF8Char": function(test) {
-        var bb = new ByteBuffer(6)
-          , chars = [0x00, 0x7F, 0x80, 0x7FF, 0x800, 0xFFFF, 0x10000, 0x1FFFFF, 0x200000, 0x3FFFFFF, 0x4000000, 0x7FFFFFFF]
-          , dec;
-        for (var i=0; i<chars.length;i++) {
-            ByteBuffer.encodeUTF8Char(chars[i], bb, 0);
-            dec = ByteBuffer.decodeUTF8Char(bb, 0);
-            test.equal(chars[i], dec['char']);
-            test.equal(ByteBuffer.calculateUTF8Char(chars[i]), dec["length"]);
-            test.equal(String.fromCharCode(chars[i]), String.fromCharCode(dec['char']));
+        bb.limit = 1;
+        buf = bb.toBuffer();
+        test.notStrictEqual(buf, bb.buffer);
+        if (type === ArrayBuffer) {
+            test.ok(buf instanceof ArrayBuffer);
+            test.strictEqual(buf.byteLength, 1);
+        } else {
+            test.ok(buf instanceof Buffer);
+            test.strictEqual(buf.length, 1);
         }
-        test.throws(function() {
-            ByteBuffer.encodeUTF8Char(-1, bb, 0);
-        });
-        test.throws(function() {
-            ByteBuffer.encodeUTF8Char(0x80000000, bb, 0);
-        });
-        bb.reset();
-        bb.writeByte(0xFE).writeByte(0).writeByte(0).writeByte(0).writeByte(0).writeByte(0);
-        bb.flip();
-        test.throws(function() {
-            ByteBuffer.decodeUTF8Char(bb, 0);
-        });
         test.done();
-    },
+    };
+    
+    suite.convert.toArrayBuffer = function(test) {
+        var bb = new ByteBuffer(3);
+        if (type === ArrayBuffer) {
+            test.strictEqual(bb.toArrayBuffer, bb.toBuffer);
+        } else {
+            test.ok(bb.buffer instanceof Buffer);
+            bb.writeUint16(0x1234);
+            bb.flip();
+            bb.offset = 1;
+            var ab = bb.toArrayBuffer();
+            test.ok(ab instanceof ArrayBuffer);
+            test.strictEqual(ab.byteLength, 1);
+        }
+        test.done();
+    };
+    
+    suite.loaders = {};
+    
+    suite.loaders.commonjs = function(test) {
+        var fs = require("fs"),
+            vm = require("vm"),
+            util = require('util');
 
-    "pbjsi19": function(test) {
+        var code = fs.readFileSync(__dirname+"/../dist/ByteBufferNB.js");
+        var Long = ByteBuffer.Long;
+        var sandbox = new Sandbox({
+            require: function(moduleName) {
+                switch (moduleName) {
+                    case 'long': return Long;
+                    case 'buffer': return require("buffer");
+                }
+            },
+            module: {
+                exports: {}
+            },
+            DataView: DataView
+        });
+        vm.runInNewContext(code, sandbox, "commonjs-sandbox");
+        // console.log(util.inspect(sandbox));
+        test.ok(typeof sandbox.module.exports == 'function');
+        test.ok(sandbox.module.exports.Long && sandbox.module.exports.Long == ByteBuffer.Long);
+        test.done();
+    };
+
+    suite.misc = {};
+    
+    suite.misc.pbjsi19 = function(test) {
         // test that this issue is fixed: https://github.com/dcodeIO/ProtoBuf.js/issues/19
         var bb = new ByteBuffer(9); // Trigger resize to 18 in writeVarint64
         bb.writeVarint32(16);
@@ -766,49 +911,12 @@ var suite = {
         bb.writeVarint64(ByteBuffer.Long.fromString("1368057600000"));
         bb.writeVarint32(40);
         bb.writeVarint64(ByteBuffer.Long.fromString("1235455123"));
-        test.equal(bb.toString("debug"), ">10 02 18 00 20 80 B0 D9 B4 E8 27 28 93 99 8E CD 04<00 ");
+        bb.flip();
+        test.equal(bb.toString("debug").substr(0,52), "<10 02 18 00 20 80 B0 D9 B4 E8 27 28 93 99 8E CD 04>");
         test.done();
-    },
+    };
     
-    "encode/decode64": function(test) {
-        var values = [
-            ["ProtoBuf.js", "UHJvdG9CdWYuanM="],
-            ["ProtoBuf.j", "UHJvdG9CdWYuag=="],
-            ["ProtoBuf.", "UHJvdG9CdWYu"],
-            ["ProtoBuf", "UHJvdG9CdWY="]
-        ];
-        for (var i=0; i<values.length; i++) {
-            var str = values[i][0],
-                b64 = values[i][1];
-            var bb = ByteBuffer.decode64(b64);
-            test.strictEqual(bb.readUTF8String(str.length, 0).string, str);
-            test.strictEqual(ByteBuffer.encode64(bb), b64);
-            test.strictEqual(bb.toBase64(), b64);
-            test.strictEqual(bb.toString("base64"), b64);
-        }
-        test.done();
-    },
-
-    "encode/decodeHex": function(test) {
-        var bb = new ByteBuffer(4).writeInt32(0x12345678).flip(),
-            str = bb.toString("hex");
-        test.strictEqual(str, "12345678");
-        var bb2 = ByteBuffer.wrap(str, "hex");
-        test.deepEqual(bb.array, bb2.array);
-        test.done();
-    },
-
-    "encode/decodeBinary": function(test) {
-        var bb = new ByteBuffer(4).writeInt32(0x12345678).flip(),
-            str = bb.toString("binary");
-        test.strictEqual(str.length, 4);
-        test.strictEqual(str, String.fromCharCode(0x12)+String.fromCharCode(0x34)+String.fromCharCode(0x56)+String.fromCharCode(0x78));
-        var bb2 = ByteBuffer.wrap(str, "binary");
-        test.deepEqual(bb.array, bb2.array);
-        test.done();
-    },
-
-    "NaN": function(test) {
+    suite.misc.NaN = function(test) {
         var bb = new ByteBuffer(4);
         test.ok(isNaN(bb.writeFloat(NaN).flip().readFloat(0)));
         test.strictEqual(bb.writeFloat(+Infinity).flip().readFloat(0), +Infinity);
@@ -827,60 +935,42 @@ var suite = {
         test.strictEqual(-Infinity | 0, 0);
 
         test.done();
-    },
+    };
 
-    "ByteBuffer-like": function(test) {
-        var bb = new ByteBuffer(4);
-        var bbLike = {
-            array: bb.array,
-            view: bb.view,
-            offset: bb.offset,
-            markedOffset: bb.markedOffset,
-            length: bb.length,
-            littleEndian: bb.littleEndian
-        };
-        test.ok(ByteBuffer.isByteBuffer(bbLike));
-        var bb2 = ByteBuffer.wrap(bbLike);
-        test.ok(bb2 instanceof ByteBuffer);
-        test.strictEqual(bbLike.array, bb2.array);
-        test.strictEqual(bbLike.view, bb2.view);
-        test.strictEqual(bbLike.offset, bb2.offset);
-        test.strictEqual(bbLike.markedOffset, bb2.markedOffset);
-        test.strictEqual(bbLike.length, bb2.length);
-        test.strictEqual(bbLike.littleEndian, bb2.littleEndian);
-        test.done();
-    },
-    
-    "commonjs": function(test) {
-        var fs = require("fs")
-          , vm = require("vm")
-          , util = require('util');
-        
-        var code = fs.readFileSync(__dirname+"/../"+FILE);
+    suite.loaders = {};
+
+    suite.loaders.commonjs = function(test) {
+        var fs = require("fs"),
+            vm = require("vm"),
+            util = require('util');
+
+        var code = fs.readFileSync(__dirname+"/../dist/ByteBufferNB.js");
         var Long = ByteBuffer.Long;
         var sandbox = new Sandbox({
             require: function(moduleName) {
-                if (moduleName == 'long') {
-                    return Long;
+                switch (moduleName) {
+                    case 'long': return Long;
+                    case 'buffer': return require("buffer");
                 }
             },
             module: {
                 exports: {}
-            }
+            },
+            DataView: DataView
         });
-        vm.runInNewContext(code, sandbox, "ByteBuffer.js in CommonJS-VM");
-        // console.log(util.inspect(sandbox));
-        test.ok(typeof sandbox.module.exports == 'function');
-        test.ok(sandbox.module.exports.Long && sandbox.module.exports.Long == ByteBuffer.Long);
+        vm.runInNewContext(code, sandbox, "commonjs-sandbox");
+        test.equal(typeof sandbox.module.exports, 'function');
+        test.ok(sandbox.module.exports.Long);
+        test.strictEqual(sandbox.module.exports.Long, ByteBuffer.Long);
         test.done();
-    },
+    };
     
-    "amd": function(test) {
-        var fs = require("fs")
-          , vm = require("vm")
-          , util = require('util');
+    suite.loaders.amd = function(test) {
+        var fs = require("fs"),
+            vm = require("vm"),
+            util = require('util');
 
-        var code = fs.readFileSync(__dirname+"/../"+FILE);
+        var code = fs.readFileSync(__dirname+"/../dist/ByteBufferAB.js");
         var sandbox = new Sandbox({
             require: function() {},
             define: (function() {
@@ -890,40 +980,64 @@ var suite = {
                 define.amd = true;
                 define.called = null;
                 return define;
-            })()
+            })(),
+            DataView: DataView
         });
-        vm.runInNewContext(code, sandbox, "ByteBuffer.js in AMD-VM");
-        // console.log(util.inspect(sandbox));
-        test.ok(sandbox.define.called && sandbox.define.called[0] == "ByteBuffer" && sandbox.define.called[1][0] == "Math/Long");
+        vm.runInNewContext(code, sandbox, "amd-sandbox");
+        test.ok(sandbox.define.called);
+        test.equal(sandbox.define.called[0], "ByteBuffer");
+        test.equal(sandbox.define.called[1][0], "Math/Long");
         test.done();
-    },
+    };
     
-    "shim": function(test) {
-        var fs = require("fs")
-            , vm = require("vm")
-            , util = require('util');
+    suite.loaders.shim = function(test) {
+        var fs = require("fs"),
+            vm = require("vm"),
+            util = require('util');
 
-        var code = fs.readFileSync(__dirname+"/../"+FILE);
+        var code = fs.readFileSync(__dirname+"/../dist/ByteBufferAB.js");
         var sandbox = new Sandbox({
             dcodeIO: {
                 Long: ByteBuffer.Long
-            }
+            },
+            ArrayBuffer: ArrayBuffer,
+            DataView: DataView
         });
-        vm.runInNewContext(code, sandbox, "ByteBuffer.js in shim-VM");
-        // console.log(util.inspect(sandbox));
-        test.ok(typeof sandbox.dcodeIO != 'undefined' && typeof sandbox.dcodeIO.ByteBuffer != 'undefined');
-        test.ok(sandbox.dcodeIO.ByteBuffer.Long && sandbox.dcodeIO.ByteBuffer.Long == ByteBuffer.Long);
+        vm.runInNewContext(code, sandbox, "shim-sandbox");
+        test.notEqual(typeof sandbox.dcodeIO, 'undefined');
+        test.notEqual(typeof sandbox.dcodeIO.ByteBuffer, 'undefined');
+        test.ok(sandbox.dcodeIO.ByteBuffer.Long);
+        test.strictEqual(sandbox.dcodeIO.ByteBuffer.Long, ByteBuffer.Long);
+        test.done();
+    };
+
+    suite.debug = {};
+
+    suite.debug.printDebug = function(test) {
+        var bb = new ByteBuffer(3);
+        function callMe() { callMe.called = true; }
+        bb.printDebug(callMe);
+        test.ok(callMe.called);
+        test.done();
+    };
+    
+    if (type === ArrayBuffer) {
+        suite.debug.printDebugVisual = function(test) {
+            var bb = ByteBuffer.wrap("Hello world! from ByteBuffer.js. This is just a last visual test of ByteBuffer#printDebug.");
+            console.log("");
+            bb.printDebug(console.log);
+            test.done();
+        };
+    }
+    
+    return suite;
+}
+
+module.exports = {
+    "info": function(test) {
+        test.log("Version "+ByteBuffer.VERSION+", "+new Date().toISOString()+"\n");
         test.done();
     },
-    
-    "helloworld": function(test) {
-        var bb = new ByteBuffer();
-        bb.writeUTF8String("Hello world! from ByteBuffer.js. This is just a last visual test of ByteBuffer#printDebug.");
-        bb.flip();
-        console.log("");
-        bb.printDebug(console.log);
-        test.done();
-    }
+    "NB": makeSuite(ByteBuffer.ByteBufferNB),
+    "AB": makeSuite(ByteBuffer.ByteBufferAB)
 };
-
-module.exports = suite;

@@ -1,6 +1,6 @@
 {
     "name": "bytebuffer",
-    "version": // #put '"'+VERSION+'",'
+    "version": "/*?= VERSION */",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "description": "A full-featured ByteBuffer implementation using typed arrays.",
     "main": "ByteBuffer.js",

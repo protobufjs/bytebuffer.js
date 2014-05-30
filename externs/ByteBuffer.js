@@ -52,7 +52,7 @@ ByteBuffer.prototype.markedOffset;
 /**
  * @type {number}
  */
-ByteBuffer.prototype.length;
+ByteBuffer.prototype.limit;
 
 /**
  * @type {boolean}
@@ -100,13 +100,6 @@ ByteBuffer.allocate = function(capacity, littleEndian) {};
  * @nosideeffects
  */
 ByteBuffer.wrap = function(buffer, enc, littleEndian) {};
-
-/**
- * @param {*} bb
- * @returns {boolean}
- * @nosideeffects
- */
-ByteBuffer.isByteBuffer = function(bb) {};
 
 /**
  * @param {boolean=} littleEndian
@@ -196,11 +189,6 @@ ByteBuffer.prototype.capacity = function() {};
  * @throws {Error}
  */
 ByteBuffer.prototype.compact = function() {};
-
-/**
- * @returns {!ByteBuffer}
- */
-ByteBuffer.prototype.destroy = function() {};
 
 /**
  * @returns {!ByteBuffer}
@@ -620,22 +608,6 @@ ByteBuffer.prototype.writeCString = function(str, offset) {};
  * @throws {Error}
  */
 ByteBuffer.prototype.readCString = function(offset) {};
-
-/**
- * @param {*} data
- * @param {number=} offset
- * @param {(function(*):string)=} stringify
- * @returns {!ByteBuffer|number}
- */
-ByteBuffer.prototype.writeJSON = function(data, offset, stringify) {};
-
-/**
- * @param {number=} offset
- * @param {(function(string):*)=} parse
- * @returns {*|!{data: *, length: number}}
- * @throws {Error}
- */
-ByteBuffer.prototype.readJSON = function(offset, parse) {};
 
 /**
  * @param {number=} wrap

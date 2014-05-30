@@ -1,8 +1,8 @@
 {
     "name": "bytebuffer",
-    "version": "2.3.1",
+    "version": "3.0.0-pre",
     "author": "Daniel Wirtz <dcode@dcode.io>",
-    "description": "A full-featured ByteBuffer implementation using typed arrays.",
+    "description": "A full-featured, zero-copy aware ByteBuffer implementation for both typed arrays and node buffers.",
     "main": "ByteBuffer.js",
     "repository": {
         "type": "git",
@@ -13,12 +13,16 @@
     },
     "keywords": ["net", "array", "buffer", "arraybuffer", "typed array", "bytebuffer", "json", "websocket", "webrtc"],
     "dependencies": {
-        "long": "latest"
+        "long": "~1",
+        "bufferview": "~1"
+    },
+    "optionalDependencies": {
+        "memcpy": "~0.4"
     },
     "devDependencies": {
-        "testjs": "latest",
-        "preprocessor": "latest",
-        "closurecompiler": "latest"
+        "testjs": "~1",
+        "metascript": "~0",
+        "closurecompiler": "~1"
     },
     "license": "Apache-2.0",
     "engines": {
@@ -27,11 +31,9 @@
     "scripts": {
         "prepublish": "npm test",
         "test": "node node_modules/testjs/bin/testjs tests/suite.js",
-
-        "make": "npm run-script build && npm run-script compile && npm run-script noexpose && npm test && npm run-script jsdoc",
-        "build": "node build.js",
-        "compile": "ccjs ByteBuffer.js --create_source_map=ByteBuffer.min.map --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --externs=externs/Long.js > ByteBuffer.min.js",
-        "noexpose": "cat ByteBuffer.js | grep -v @expose > ByteBuffer.noexpose.js",
+        "make": "npm run-script build && npm run-script compile && npm test && npm run-script jsdoc",
+        "build": "node scripts/build.js",
+        "compile": "ccjs dist/ByteBufferAB.js --create_source_map=dist/ByteBufferAB.min.map --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --externs=externs/Long.js > dist/ByteBufferAB.min.js",
         "jsdoc": "jsdoc -c jsdoc.json"
     }
 }

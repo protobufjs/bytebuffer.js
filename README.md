@@ -1,51 +1,49 @@
-![ByteBuffer.js - A full-featured ByteBuffer implementation in JavaScript](https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.png)
+![ByteBuffer.js - A full-featured and highly optimized ByteBuffer in JavaScript](https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.png)
 ======================================
-Provides a full-featured ByteBuffer implementation using typed arrays. It's one of the core components driving
-[ProtoBuf.js](https://github.com/dcodeIO/ProtoBuf.js) and the [PSON](https://github.com/dcodeIO/PSON) reference
-implementation.
+ByteBuffer.js provides a full-featured and highly optimized ByteBuffer implementation in JavaScript, since version 3
+either backed by an ArrayBuffer for browser environments (ByteBufferAB) or, alternatively, a node Buffer (ByteBufferNB)
+to make use of the performance benefits when running under node.js. Both versions are API-compatible and generated from
+a single source tree using [MetaScript](https://github.com/dcodeIO/MetaScript).
 
-*Note:* The API behind #toHex and #toString has changed with ByteBuffer 2, which is a generally revised release, in
-favor of making this more intuitive.
+If you are looking for ByteBuffer.js 2, [that's the branch](https://github.com/dcodeIO/ByteBuffer.js/tree/ByteBuffer2).
+
+**Please note**: Though all old and new test cases are passing, ByteBuffer.js 3 still needs to be tested in real world
+scenarios. Also, the API has changed a bit to make things more straight forward.
 
 What can it do?
 ---------------
 * Mimics Java ByteBuffers as close as reasonable while using typed array terms
-* Signed and unsigned integers (8, 16, 32, 64 bit through [Long.js](https://github.com/dcodeIO/Long.js)) with endianness support
+* 8, 16, 32 and 64 bit signed and unsigned integers
 * 32 and 64 bit floats
-* Varints as known from protobuf including zig-zag encoding
-* Includes an UTF8 and Base64 en-/decoder
-* C-strings, V(arint-prefixed)-strings and UTF8 L(ength-prefixed)-strings 
-* Rich string toolset (to hex, base64, binary, utf8, debug, columns)
-* Relative and absolute zero-copy operations
+* Big and little endianness
+* Variable length integers as used in protobuf (32 and 64 bit, including zig zag encoding)
+* Base64, binary, debug, hex and utf8 encodings
+* Handy string and debugging utilities
+* Relative and absolute zero-copy operations wherever possible
 * Manual and automatic resizing (efficiently doubles capacity)
 * Chaining of all operations that do not return a specific value
 * Slicing, appending, prepending, reversing, flip, mark, reset, etc.
 
-And much more...
-
-Features
---------
-* [CommonJS](http://www.commonjs.org/) compatible
-* [RequireJS](http://requirejs.org/)/AMD compatible
-* [node.js](http://nodejs.org) compatible, also available via [npm](https://npmjs.org/package/bytebuffer)
-* Browser compatible
-* [Closure Compiler](https://developers.google.com/closure/compiler/) ADVANCED_OPTIMIZATIONS compatible (fully annotated,
-  `ByteBuffer.min.js` has been compiled this way, `ByteBuffer.min.map` is the source map)
+More
+----
+* CommonJS, AMD and shim compatible
+* Also available via [npm](https://npmjs.org/package/bytebuffer)
+* Compiled through [Closure Compiler](https://developers.google.com/closure/compiler/) using ADVANCED_OPTIMIZATIONS 
+ (fully annotated, includes externs and source map)
 * Fully documented using [jsdoc3](https://github.com/jsdoc3/jsdoc)
-* Well tested through [nodeunit](https://github.com/caolan/nodeunit)
+* Well tested through [test.js](https://github.com/dcodeIO/test.js)
 * Zero production dependencies (Long.js is optional)
-* Small footprint
 
 Usage
 -----
-### Node.js / CommonJS ###
+### Node.js ###
 * Install: `npm install bytebuffer`
 
 ```javascript
 var ByteBuffer = require("bytebuffer");
 var bb = new ByteBuffer();
-bb.writeLString("Hello world!").flip();
-console.log(bb.readLString()+" from ByteBuffer.js");
+bb.writeIString("Hello world!").flip();
+console.log(bb.readIString()+" from ByteBuffer.js");
 ```
 
 ### Browser ###
@@ -61,11 +59,11 @@ support, you can skip the Long.js include.
 ```javascript
 var ByteBuffer = dcodeIO.ByteBuffer;
 var bb = new ByteBuffer();
-bb.writeLString("Hello world!").flip();
-alert(bb.readLString()+" from ByteBuffer.js");
+bb.writeIString("Hello world!").flip();
+alert(bb.readIString()+" from ByteBuffer.js");
 ```
 
-### Require.js / AMD ###
+### AMD ###
 
 Optionally depends on [Long.js](https://github.com/dcodeIO/Long.js) for long (int64) support. If you do not require long
 support, you can skip the Long.js config. [Require.js](http://requirejs.org/) example:
@@ -79,20 +77,10 @@ require.config({
 });
 require(["ByteBuffer"], function(ByteBuffer) {
     var bb = new ByteBuffer();
-    bb.writeLString("Hello world!");
-    bb.flip();
+    bb.writeLString("Hello world!").flip();
     alert(bb.readLString()+" from ByteBuffer.js");
 });
 ```
-
-On long (int64) support
------------------------
-As of the [ECMAScript specification](http://ecma262-5.com/ELS5_HTML.htm#Section_8.5), number types have a maximum value
-of 2^53. Beyond that, behaviour might be unexpected. However, real long support requires the full 64 bits
-with the possibility to perform bitwise operations on the value for varint en-/decoding. So, to enable true long support
-in ByteBuffer.js, it optionally depends on [Long.js](https://github.com/dcodeIO/Long.js), which actually utilizes two
-32 bit numbers internally. If you do not require long support at all, you can skip it and save the additional bandwidth.
-On node, long support is available by default through the [long](https://npmjs.org/package/long) dependency.
 
 Downloads
 ---------
