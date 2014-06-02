@@ -28,8 +28,8 @@ ByteBuffer.prototype.writeVString = function(str, offset) {
     buffer.copy(this.buffer, offset);
     offset += buffer.length;
     //? } else {
-    l = ByteBuffer.calculateVarint32(k);
     k = utf8_calc_string(str);
+    l = ByteBuffer.calculateVarint32(k);
     //? ENSURE_CAPACITY('l+k');
     offset += this.writeVarint32(k, offset);
     k = str.length;

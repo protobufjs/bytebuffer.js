@@ -1756,8 +1756,8 @@
             }
             var start = offset,
                 k, l;
-            l = ByteBuffer.calculateVarint32(k);
             k = utf8_calc_string(str);
+            l = ByteBuffer.calculateVarint32(k);
             offset += l+k;
             var capacity15 = this.buffer.byteLength;
             if (offset > capacity15)
