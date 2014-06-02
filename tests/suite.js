@@ -721,6 +721,7 @@ function makeSuite(ByteBuffer) {
         // Reading
         str2 = bb.readUTF8String(ByteBuffer.calculateUTF8Chars(str), ByteBuffer.METRICS_CHARS);
         // bb.printDebug();
+        test.strictEqual(str2.length, str.length);
         test.strictEqual(str2, str);
         bb.reset();
         str2 = bb.readUTF8String(bb.limit, ByteBuffer.METRICS_BYTES);

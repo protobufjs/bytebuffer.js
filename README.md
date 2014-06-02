@@ -1,26 +1,20 @@
-![ByteBuffer.js - A full-featured and highly optimized ByteBuffer in JavaScript](https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.png)
+![ByteBuffer.js - The swiss army knife for binary data in JavaScript.](https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.png)
 ======================================
-ByteBuffer.js provides a full-featured and highly optimized ByteBuffer implementation in JavaScript, since version 3
-either backed by an ArrayBuffer for browser environments (ByteBufferAB) or, alternatively, a node Buffer (ByteBufferNB)
-to make use of the performance benefits when running under node.js. Both versions are API-compatible and generated from
-a single source tree using [MetaScript](https://github.com/dcodeIO/MetaScript).
+A fast and complete ByteBuffer implementation using either ArrayBuffers in the browser or node Buffers under node.js,
+generated from a single source tree through [MetaScript](https://github.com/dcodeIO/MetaScript).
 
 If you are looking for ByteBuffer.js 2, [that's the branch](https://github.com/dcodeIO/ByteBuffer.js/tree/ByteBuffer2).
 
-**Please note**: Though all old and new test cases are passing, ByteBuffer.js 3 still needs to be tested in real world
-scenarios. Also, the API has changed a bit to make things more straight forward.
-
 What can it do?
 ---------------
-* Mimics Java ByteBuffers as close as reasonable while using typed array terms
 * 8, 16, 32 and 64 bit signed and unsigned integers
 * 32 and 64 bit floats
 * Big and little endianness
-* Variable length integers as used in protobuf (32 and 64 bit, including zig zag encoding)
+* Varints as used in protobuf (32 and 64 bit, zig-zag)
 * Base64, binary, debug, hex and utf8 encodings
 * Handy string and debugging utilities
 * Relative and absolute zero-copy operations wherever possible
-* Manual and automatic resizing (efficiently doubles capacity)
+* Transparent resizing when using unknown-length data
 * Chaining of all operations that do not return a specific value
 * Slicing, appending, prepending, reversing, flip, mark, reset, etc.
 
@@ -89,7 +83,7 @@ Downloads
 
 Documentation
 -------------
-* [View the API documentation](http://htmlpreview.github.com/?http://github.com/dcodeIO/ByteBuffer.js/master/docs/ByteBuffer.html)
+* [View the API documentation](http://htmlpreview.github.com/?http://github.com/dcodeIO/ByteBuffer.js/master/docs/module-ByteBuffer.html)
 
 Tests (& Examples) [![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.png?branch=master)](https://travis-ci.org/dcodeIO/ByteBuffer.js)
 ------------------

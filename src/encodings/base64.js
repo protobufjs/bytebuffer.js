@@ -63,9 +63,9 @@ ByteBuffer.prototype.toBase64 = function(begin, end) {
 ByteBuffer.fromBase64 = function(str, littleEndian, noAssert) {
     if (!noAssert) {
         if (typeof str !== 'string')
-            throw(new TypeError("Illegal str: Not a string"));
+            throw TypeError("Illegal str: Not a string");
         if (str.length % 4 !== 0)
-            throw(new TypeError("Illegal str: Length not a multiple of 4"));
+            throw TypeError("Illegal str: Length not a multiple of 4");
     }
     //? if (NODE) {
     var bb = new ByteBuffer(0, littleEndian, noAssert);
@@ -82,7 +82,7 @@ ByteBuffer.fromBase64 = function(str, littleEndian, noAssert) {
         else break;
     }
     if (suffix > 2)
-        throw(new TypeError("Illegal str: Suffix is too large"));
+        throw TypeError("Illegal str: Suffix is too large");
     if (len === 0)
         return new ByteBuffer(0, littleEndian, noAssert);
     var b1, b2, b3, b4, // input bytes
@@ -95,7 +95,7 @@ ByteBuffer.fromBase64 = function(str, littleEndian, noAssert) {
         b4 = (h4 = i < len) ? B64.indexOf(str.charAt(i++)) : 0;
         if (!noAssert) {
             if (b1 < 0 || b2 < 0 || b3 < 0 || b4 < 0)
-                throw(new TypeError("Illegal str: Contains non-base64 characters"));
+                throw TypeError("Illegal str: Contains non-base64 characters");
         }
         bb.view.setUint8(j++, (b1 << 2) | (b2 >> 4));
         if (b3 !== 64) {

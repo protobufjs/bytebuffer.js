@@ -325,35 +325,25 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.writeInt8 = function(value, offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_INTEGER>
             if (typeof value !== 'number' || value % 1 !== 0)
                 throw(new TypeError("Illegal value: "+value+" (not an integer)"));
             value |= 0;
-            // </ASSERT_INTEGER>
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
-        // <ENSURE_CAPACITY size=1>
         offset += 1;
         var capacity0 = this.buffer.length;
         if (offset > capacity0)
             this.resize((capacity0 *= 2) > offset ? capacity0 : offset);
         offset -= 1;
-        // </ENSURE_CAPACITY>
         this.buffer[offset] = value;
-        // <RELATIVE size=1>
         if (relative) this.offset += 1;
-        // </RELATIVE>
         return this;
     };
 
@@ -374,24 +364,18 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.readInt8 = function(offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 1 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var value = this.buffer[offset];
         if ((value & 0x80) === 0x80) value = -(0xFF - value + 1); // Cast to signed
-        // <RELATIVE size=1>
         if (relative) this.offset += 1;
-        // </RELATIVE>
         return value;
     };
 
@@ -412,35 +396,25 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.writeUint8 = function(value, offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_INTEGER>
             if (typeof value !== 'number' || value % 1 !== 0)
                 throw(new TypeError("Illegal value: "+value+" (not an integer)"));
             value >>>= 0;
-            // </ASSERT_INTEGER>
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
-        // <ENSURE_CAPACITY size=1>
         offset += 1;
         var capacity1 = this.buffer.length;
         if (offset > capacity1)
             this.resize((capacity1 *= 2) > offset ? capacity1 : offset);
         offset -= 1;
-        // </ENSURE_CAPACITY>
         this.buffer[offset] = value;
-        // <RELATIVE size=1>
         if (relative) this.offset += 1;
-        // </RELATIVE>
         return this;
     };
 
@@ -451,23 +425,17 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.readUint8 = function(offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 1 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var value = this.buffer[offset];
-        // <RELATIVE size=1>
         if (relative) this.offset += 1;
-        // </RELATIVE>
         return value;
     };
 
@@ -482,31 +450,23 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.writeInt16 = function(value, offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_INTEGER>
             if (typeof value !== 'number' || value % 1 !== 0)
                 throw(new TypeError("Illegal value: "+value+" (not an integer)"));
             value |= 0;
-            // </ASSERT_INTEGER>
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
-        // <ENSURE_CAPACITY size=2>
         offset += 2;
         var capacity2 = this.buffer.length;
         if (offset > capacity2)
             this.resize((capacity2 *= 2) > offset ? capacity2 : offset);
         offset -= 2;
-        // </ENSURE_CAPACITY>
         if (this.littleEndian) {
             this.buffer[offset+1] = (value & 0xFF00) >>> 8;
             this.buffer[offset  ] =  value & 0x00FF;
@@ -514,9 +474,7 @@ module.exports = (function() {
             this.buffer[offset]   = (value & 0xFF00) >>> 8;
             this.buffer[offset+1] =  value & 0x00FF;
         }
-        // <RELATIVE size=2>
         if (relative) this.offset += 2;
-        // </RELATIVE>
         return this;
     };
 
@@ -540,18 +498,14 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.readInt16 = function(offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 2 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+2+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var value = 0;
         if (this.littleEndian) {
@@ -562,9 +516,7 @@ module.exports = (function() {
             value |= this.buffer[offset+1];
         }
         if ((value & 0x8000) === 0x8000) value = -(0xFFFF - value + 1); // Cast to signed
-        // <RELATIVE size=2>
         if (relative) this.offset += 2;
-        // </RELATIVE>
         return value;
     };
 
@@ -588,31 +540,23 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.writeUint16 = function(value, offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_INTEGER>
             if (typeof value !== 'number' || value % 1 !== 0)
                 throw(new TypeError("Illegal value: "+value+" (not an integer)"));
             value >>>= 0;
-            // </ASSERT_INTEGER>
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
-        // <ENSURE_CAPACITY size=2>
         offset += 2;
         var capacity3 = this.buffer.length;
         if (offset > capacity3)
             this.resize((capacity3 *= 2) > offset ? capacity3 : offset);
         offset -= 2;
-        // </ENSURE_CAPACITY>
         if (this.littleEndian) {
             this.buffer[offset+1] = (value & 0xFF00) >>> 8;
             this.buffer[offset  ] =  value & 0x00FF;
@@ -620,9 +564,7 @@ module.exports = (function() {
             this.buffer[offset]   = (value & 0xFF00) >>> 8;
             this.buffer[offset+1] =  value & 0x00FF;
         }
-        // <RELATIVE size=2>
         if (relative) this.offset += 2;
-        // </RELATIVE>
         return this;
     };
 
@@ -635,18 +577,14 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.readUint16 = function(offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 2 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+2+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var value = 0;
         if (this.littleEndian) {
@@ -656,9 +594,7 @@ module.exports = (function() {
             value  = this.buffer[offset  ] << 8;
             value |= this.buffer[offset+1];
         }
-        // <RELATIVE size=2>
         if (relative) this.offset += 2;
-        // </RELATIVE>
         return value;
     };
 
@@ -671,32 +607,23 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.writeInt32 = function(value, offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_INTEGER>
             if (typeof value !== 'number' || value % 1 !== 0)
                 throw(new TypeError("Illegal value: "+value+" (not an integer)"));
             value |= 0;
-            // </ASSERT_INTEGER>
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
-        // <ENSURE_CAPACITY size=4>
         offset += 4;
         var capacity4 = this.buffer.length;
         if (offset > capacity4)
             this.resize((capacity4 *= 2) > offset ? capacity4 : offset);
         offset -= 4;
-        // </ENSURE_CAPACITY>
-        // <WRITE_UINT32>
         if (this.littleEndian) {
             this.buffer[offset+3] = (value >>> 24) & 0xFF;
             this.buffer[offset+2] = (value >>> 16) & 0xFF;
@@ -708,10 +635,7 @@ module.exports = (function() {
             this.buffer[offset+2] = (value >>>  8) & 0xFF;
             this.buffer[offset+3] =  value         & 0xFF;
         }
-        // </WRITE_UINT32>
-        // <RELATIVE size=4>
         if (relative) this.offset += 4;
-        // </RELATIVE>
         return this;
     };
 
@@ -730,21 +654,16 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.readInt32 = function(offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 4 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var value = 0;
-        // <READ_UINT32>
         if (this.littleEndian) {
             value  = this.buffer[offset+2] << 16;
             value |= this.buffer[offset+1] <<  8;
@@ -756,11 +675,8 @@ module.exports = (function() {
             value |= this.buffer[offset+3];
             value += this.buffer[offset  ] << 24 >>> 0;
         }
-        // </READ_UINT32>
         value |= 0; // Cast to signed
-        // <RELATIVE size=4>
         if (relative) this.offset += 4;
-        // </RELATIVE>
         return value;
     };
 
@@ -779,32 +695,23 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.writeUint32 = function(value, offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_INTEGER>
             if (typeof value !== 'number' || value % 1 !== 0)
                 throw(new TypeError("Illegal value: "+value+" (not an integer)"));
             value >>>= 0;
-            // </ASSERT_INTEGER>
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
-        // <ENSURE_CAPACITY size=4>
         offset += 4;
         var capacity5 = this.buffer.length;
         if (offset > capacity5)
             this.resize((capacity5 *= 2) > offset ? capacity5 : offset);
         offset -= 4;
-        // </ENSURE_CAPACITY>
-        // <WRITE_UINT32>
         if (this.littleEndian) {
             this.buffer[offset+3] = (value >>> 24) & 0xFF;
             this.buffer[offset+2] = (value >>> 16) & 0xFF;
@@ -816,10 +723,7 @@ module.exports = (function() {
             this.buffer[offset+2] = (value >>>  8) & 0xFF;
             this.buffer[offset+3] =  value         & 0xFF;
         }
-        // </WRITE_UINT32>
-        // <RELATIVE size=4>
         if (relative) this.offset += 4;
-        // </RELATIVE>
         return this;
     };
 
@@ -830,21 +734,16 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.readUint32 = function(offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 4 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var value = 0;
-        // <READ_UINT32>
         if (this.littleEndian) {
             value  = this.buffer[offset+2] << 16;
             value |= this.buffer[offset+1] <<  8;
@@ -856,10 +755,7 @@ module.exports = (function() {
             value |= this.buffer[offset+3];
             value += this.buffer[offset  ] << 24 >>> 0;
         }
-        // </READ_UINT32>
-        // <RELATIVE size=4>
         if (relative) this.offset += 4;
-        // </RELATIVE>
         return value;
     };
 
@@ -875,70 +771,50 @@ module.exports = (function() {
          * @expose
          */
         ByteBuffer.prototype.writeInt64 = function(value, offset) {
-            // <RELATIVE>
             var relative = typeof offset === 'undefined';
             if (relative) offset = this.offset;
-            // </RELATIVE>
             if (!this.noAssert) {
-                // <ASSERT_LONG>
                 if (typeof value === 'number' && value % 1 === 0)
                     value |= 0;
                 else if (!(value && value instanceof Long))
                     throw(new TypeError("Illegal value: "+value+" (not an integer or Long)"));
-                // </ASSERT_LONG>
-                // <ASSERT_OFFSET>
                 if (typeof offset !== 'number' || offset % 1 !== 0)
                     throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.length)
                     throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-                // </ASSERT_OFFSET>
             }
-            // <LONG>
             if (typeof value === 'number')
                 value = Long.fromNumber(value);
-            // </LONG>
-            // <ENSURE_CAPACITY size=8>
             offset += 8;
             var capacity6 = this.buffer.length;
             if (offset > capacity6)
                 this.resize((capacity6 *= 2) > offset ? capacity6 : offset);
             offset -= 8;
-            // </ENSURE_CAPACITY>
             var lo = value.low,
                 hi = value.high;
             if (this.littleEndian) {
-                // <WRITE_UINT32 le=true>
                 this.buffer[offset+3] = (lo >>> 24) & 0xFF;
                 this.buffer[offset+2] = (lo >>> 16) & 0xFF;
                 this.buffer[offset+1] = (lo >>>  8) & 0xFF;
                 this.buffer[offset  ] =  lo         & 0xFF;
-                // </WRITE_UINT32>
                 offset += 4;
-                // <WRITE_UINT32 le=true>
                 this.buffer[offset+3] = (hi >>> 24) & 0xFF;
                 this.buffer[offset+2] = (hi >>> 16) & 0xFF;
                 this.buffer[offset+1] = (hi >>>  8) & 0xFF;
                 this.buffer[offset  ] =  hi         & 0xFF;
-                // </WRITE_UINT32>
             } else {
-                // <WRITE_UINT32 le=false>
                 this.buffer[offset  ] = (hi >>> 24) & 0xFF;
                 this.buffer[offset+1] = (hi >>> 16) & 0xFF;
                 this.buffer[offset+2] = (hi >>>  8) & 0xFF;
                 this.buffer[offset+3] =  hi         & 0xFF;
-                // </WRITE_UINT32>
                 offset += 4;
-                // <WRITE_UINT32 le=false>
                 this.buffer[offset  ] = (lo >>> 24) & 0xFF;
                 this.buffer[offset+1] = (lo >>> 16) & 0xFF;
                 this.buffer[offset+2] = (lo >>>  8) & 0xFF;
                 this.buffer[offset+3] =  lo         & 0xFF;
-                // </WRITE_UINT32>
             }
-            // <RELATIVE size=8>
             if (relative) this.offset += 8;
-            // </RELATIVE>
             return this;
         };
 
@@ -958,54 +834,40 @@ module.exports = (function() {
          * @expose
          */
         ByteBuffer.prototype.readInt64 = function(offset) {
-            // <RELATIVE>
             var relative = typeof offset === 'undefined';
             if (relative) offset = this.offset;
-            // </RELATIVE>
             if (!this.noAssert) {
-                // <ASSERT_OFFSET>
                 if (typeof offset !== 'number' || offset % 1 !== 0)
                     throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
                 offset >>>= 0;
                 if (offset < 0 || offset + 8 > this.buffer.length)
                     throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.length));
-                // </ASSERT_OFFSET>
             }
             var lo = 0,
                 hi = 0;
             if (this.littleEndian) {
-                // <READ_UINT32 le=true>
                 lo  = this.buffer[offset+2] << 16;
                 lo |= this.buffer[offset+1] <<  8;
                 lo |= this.buffer[offset  ];
                 lo += this.buffer[offset+3] << 24 >>> 0;
-                // </READ_UINT32>
                 offset += 4;
-                // <READ_UINT32 le=true>
                 hi  = this.buffer[offset+2] << 16;
                 hi |= this.buffer[offset+1] <<  8;
                 hi |= this.buffer[offset  ];
                 hi += this.buffer[offset+3] << 24 >>> 0;
-                // </READ_UINT32>
             } else {
-                // <READ_UINT32 le=false>
                 hi  = this.buffer[offset+1] << 16;
                 hi |= this.buffer[offset+2] <<  8;
                 hi |= this.buffer[offset+3];
                 hi += this.buffer[offset  ] << 24 >>> 0;
-                // </READ_UINT32>
                 offset += 4;
-                // <READ_UINT32 le=false>
                 lo  = this.buffer[offset+1] << 16;
                 lo |= this.buffer[offset+2] <<  8;
                 lo |= this.buffer[offset+3];
                 lo += this.buffer[offset  ] << 24 >>> 0;
-                // </READ_UINT32>
             }
             var value = new Long(lo, hi, false);
-            // <RELATIVE size=8>
             if (relative) this.offset += 8;
-            // </RELATIVE>
             return value;
         };
 
@@ -1025,70 +887,50 @@ module.exports = (function() {
          * @expose
          */
         ByteBuffer.prototype.writeUint64 = function(value, offset) {
-            // <RELATIVE>
             var relative = typeof offset === 'undefined';
             if (relative) offset = this.offset;
-            // </RELATIVE>
             if (!this.noAssert) {
-                // <ASSERT_LONG>
                 if (typeof value === 'number' && value % 1 === 0)
                     value |= 0;
                 else if (!(value && value instanceof Long))
                     throw(new TypeError("Illegal value: "+value+" (not an integer or Long)"));
-                // </ASSERT_LONG>
-                // <ASSERT_OFFSET>
                 if (typeof offset !== 'number' || offset % 1 !== 0)
                     throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.length)
                     throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-                // </ASSERT_OFFSET>
             }
-            // <LONG>
             if (typeof value === 'number')
                 value = Long.fromNumber(value);
-            // </LONG>
-            // <ENSURE_CAPACITY size=8>
             offset += 8;
             var capacity7 = this.buffer.length;
             if (offset > capacity7)
                 this.resize((capacity7 *= 2) > offset ? capacity7 : offset);
             offset -= 8;
-            // </ENSURE_CAPACITY>
             var lo = value.low,
                 hi = value.high;
             if (this.littleEndian) {
-                // <WRITE_UINT32 le=true>
                 this.buffer[offset+3] = (lo >>> 24) & 0xFF;
                 this.buffer[offset+2] = (lo >>> 16) & 0xFF;
                 this.buffer[offset+1] = (lo >>>  8) & 0xFF;
                 this.buffer[offset  ] =  lo         & 0xFF;
-                // </WRITE_UINT32>
                 offset += 4;
-                // <WRITE_UINT32 le=true>
                 this.buffer[offset+3] = (hi >>> 24) & 0xFF;
                 this.buffer[offset+2] = (hi >>> 16) & 0xFF;
                 this.buffer[offset+1] = (hi >>>  8) & 0xFF;
                 this.buffer[offset  ] =  hi         & 0xFF;
-                // </WRITE_UINT32>
             } else {
-                // <WRITE_UINT32 le=false>
                 this.buffer[offset  ] = (hi >>> 24) & 0xFF;
                 this.buffer[offset+1] = (hi >>> 16) & 0xFF;
                 this.buffer[offset+2] = (hi >>>  8) & 0xFF;
                 this.buffer[offset+3] =  hi         & 0xFF;
-                // </WRITE_UINT32>
                 offset += 4;
-                // <WRITE_UINT32 le=false>
                 this.buffer[offset  ] = (lo >>> 24) & 0xFF;
                 this.buffer[offset+1] = (lo >>> 16) & 0xFF;
                 this.buffer[offset+2] = (lo >>>  8) & 0xFF;
                 this.buffer[offset+3] =  lo         & 0xFF;
-                // </WRITE_UINT32>
             }
-            // <RELATIVE size=8>
             if (relative) this.offset += 8;
-            // </RELATIVE>
             return this;
         };
 
@@ -1099,54 +941,40 @@ module.exports = (function() {
          * @expose
          */
         ByteBuffer.prototype.readUint64 = function(offset) {
-            // <RELATIVE>
             var relative = typeof offset === 'undefined';
             if (relative) offset = this.offset;
-            // </RELATIVE>
             if (!this.noAssert) {
-                // <ASSERT_OFFSET>
                 if (typeof offset !== 'number' || offset % 1 !== 0)
                     throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
                 offset >>>= 0;
                 if (offset < 0 || offset + 8 > this.buffer.length)
                     throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.length));
-                // </ASSERT_OFFSET>
             }
             var lo = 0,
                 hi = 0;
             if (this.littleEndian) {
-                // <READ_UINT32 le=true>
                 lo  = this.buffer[offset+2] << 16;
                 lo |= this.buffer[offset+1] <<  8;
                 lo |= this.buffer[offset  ];
                 lo += this.buffer[offset+3] << 24 >>> 0;
-                // </READ_UINT32>
                 offset += 4;
-                // <READ_UINT32 le=true>
                 hi  = this.buffer[offset+2] << 16;
                 hi |= this.buffer[offset+1] <<  8;
                 hi |= this.buffer[offset  ];
                 hi += this.buffer[offset+3] << 24 >>> 0;
-                // </READ_UINT32>
             } else {
-                // <READ_UINT32 le=false>
                 hi  = this.buffer[offset+1] << 16;
                 hi |= this.buffer[offset+2] <<  8;
                 hi |= this.buffer[offset+3];
                 hi += this.buffer[offset  ] << 24 >>> 0;
-                // </READ_UINT32>
                 offset += 4;
-                // <READ_UINT32 le=false>
                 lo  = this.buffer[offset+1] << 16;
                 lo |= this.buffer[offset+2] <<  8;
                 lo |= this.buffer[offset+3];
                 lo += this.buffer[offset  ] << 24 >>> 0;
-                // </READ_UINT32>
             }
             var value = new Long(lo, hi, true);
-            // <RELATIVE size=8>
             if (relative) this.offset += 8;
-            // </RELATIVE>
             return value;
         };
 
@@ -1163,34 +991,26 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.writeFloat32 = function(value, offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
             if (typeof value !== 'number')
                 throw(new TypeError("Illegal value: "+value+" (not a number)"));
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
-        // <ENSURE_CAPACITY size=4>
         offset += 4;
         var capacity8 = this.buffer.length;
         if (offset > capacity8)
             this.resize((capacity8 *= 2) > offset ? capacity8 : offset);
         offset -= 4;
-        // </ENSURE_CAPACITY>
         this.littleEndian
             ? this.buffer.writeFloatLE(value, offset, true)
             : this.buffer.writeFloatBE(value, offset, true);
-        // <RELATIVE size=4>
         if (relative) this.offset += 4;
-        // </RELATIVE>
         return this;
     };
 
@@ -1211,25 +1031,19 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.readFloat32 = function(offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 4 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var value = this.littleEndian
             ? this.buffer.readFloatLE(offset, true)
             : this.buffer.readFloatBE(offset, true);
-        // <RELATIVE size=4>
         if (relative) this.offset += 4;
-        // </RELATIVE>
         return value;
     };
 
@@ -1252,34 +1066,26 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.writeFloat64 = function(value, offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
             if (typeof value !== 'number')
                 throw(new TypeError("Illegal value: "+value+" (not a number)"));
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
-        // <ENSURE_CAPACITY size=8>
         offset += 8;
         var capacity9 = this.buffer.length;
         if (offset > capacity9)
             this.resize((capacity9 *= 2) > offset ? capacity9 : offset);
         offset -= 8;
-        // </ENSURE_CAPACITY>
         this.littleEndian
             ? this.buffer.writeDoubleLE(value, offset, true)
             : this.buffer.writeDoubleBE(value, offset, true);
-        // <RELATIVE size=8>
         if (relative) this.offset += 8;
-        // </RELATIVE>
         return this;
     };
 
@@ -1300,25 +1106,19 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.readFloat64 = function(offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 8 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var value = this.littleEndian
             ? this.buffer.readDoubleLE(offset, true)
             : this.buffer.readDoubleBE(offset, true);
-        // <RELATIVE size=8>
         if (relative) this.offset += 8;
-        // </RELATIVE>
         return value;
     };
 
@@ -1387,33 +1187,25 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.writeVarint32 = function(value, offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_INTEGER>
             if (typeof value !== 'number' || value % 1 !== 0)
                 throw(new TypeError("Illegal value: "+value+" (not an integer)"));
             value |= 0;
-            // </ASSERT_INTEGER>
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var size = ByteBuffer.calculateVarint32(value),
             b;
-        // <ENSURE_CAPACITY size=size>
         offset += size;
         var capacity10 = this.buffer.length;
         if (offset > capacity10)
             this.resize((capacity10 *= 2) > offset ? capacity10 : offset);
         offset -= size;
-        // </ENSURE_CAPACITY>
         // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
         this.buffer[offset] = b = value | 0x80;
         value >>>= 0;
@@ -1474,18 +1266,14 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.readVarint32 = function(offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 1 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         // ref: src/google/protobuf/io/coded_stream.cc
         var size = 0,
@@ -1545,10 +1333,8 @@ module.exports = (function() {
          * @expose
          */
         ByteBuffer.calculateVarint64 = function(value) {
-            // <LONG>
             if (typeof value === 'number')
                 value = Long.fromNumber(value);
-            // </LONG>
             // ref: src/google/protobuf/io/coded_stream.cc
             var part0 = value.toInt() >>> 0,
                 part1 = value.shiftRightUnsigned(28).toInt() >>> 0,
@@ -1576,11 +1362,9 @@ module.exports = (function() {
          * @expose
          */
         ByteBuffer.zigZagEncode64 = function(value) {
-            // <LONG unsigned=false>
             if (typeof value === 'number')
                 value = Long.fromNumber(value, false);
             else if (value.unsigned !== false) value = value.toSigned();
-            // </LONG>
             // ref: src/google/protobuf/wire_format_lite.h
             return value.shiftLeft(1).xor(value.shiftRight(63)).toUnsigned();
         };
@@ -1592,11 +1376,9 @@ module.exports = (function() {
          * @expose
          */
         ByteBuffer.zigZagDecode64 = function(value) {
-            // <LONG unsigned=false>
             if (typeof value === 'number')
                 value = Long.fromNumber(value, false);
             else if (value.unsigned !== false) value = value.toSigned();
-            // </LONG>
             // ref: src/google/protobuf/wire_format_lite.h
             return value.shiftRightUnsigned(1).xor(value.and(Long.ONE).toSigned().negate()).toSigned();
         };
@@ -1610,41 +1392,31 @@ module.exports = (function() {
          * @expose
          */
         ByteBuffer.prototype.writeVarint64 = function(value, offset) {
-            // <RELATIVE>
             var relative = typeof offset === 'undefined';
             if (relative) offset = this.offset;
-            // </RELATIVE>
             if (!this.noAssert) {
-                // <ASSERT_LONG>
                 if (typeof value === 'number' && value % 1 === 0)
                     value |= 0;
                 else if (!(value && value instanceof Long))
                     throw(new TypeError("Illegal value: "+value+" (not an integer or Long)"));
-                // </ASSERT_LONG>
-                // <ASSERT_OFFSET>
                 if (typeof offset !== 'number' || offset % 1 !== 0)
                     throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.length)
                     throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-                // </ASSERT_OFFSET>
             }
-            // <LONG unsigned=false>
             if (typeof value === 'number')
                 value = Long.fromNumber(value, false);
             else if (value.unsigned !== false) value = value.toSigned();
-            // </LONG>
             var size = ByteBuffer.calculateVarint64(value),
                 part0 = value.toInt() >>> 0,
                 part1 = value.shiftRightUnsigned(28).toInt() >>> 0,
                 part2 = value.shiftRightUnsigned(56).toInt() >>> 0;
-            // <ENSURE_CAPACITY size=size>
             offset += size;
             var capacity11 = this.buffer.length;
             if (offset > capacity11)
                 this.resize((capacity11 *= 2) > offset ? capacity11 : offset);
             offset -= size;
-            // </ENSURE_CAPACITY>
             switch (size) {
                 case 10: this.buffer[offset+9] = (part2 >>>  7) | 0x80;
                 case 9 : this.buffer[offset+8] = (part2       ) | 0x80;
@@ -1689,18 +1461,14 @@ module.exports = (function() {
          * @expose
          */
         ByteBuffer.prototype.readVarint64 = function(offset) {
-            // <RELATIVE>
             var relative = typeof offset === 'undefined';
             if (relative) offset = this.offset;
-            // </RELATIVE>
             if (!this.noAssert) {
-                // <ASSERT_OFFSET>
                 if (typeof offset !== 'number' || offset % 1 !== 0)
                     throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
                 offset >>>= 0;
                 if (offset < 0 || offset + 1 > this.buffer.length)
                     throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.length));
-                // </ASSERT_OFFSET>
             }
             // ref: src/google/protobuf/io/coded_stream.cc
             var start = offset,
@@ -1764,10 +1532,8 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.writeCString = function(str, offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         var i,
             k = str.length;
         if (!this.noAssert) {
@@ -1777,25 +1543,21 @@ module.exports = (function() {
                 if (str.codePointAt(i) === 0)
                     throw(new RangeError("Illegal str: Contains NULL-characters"));
             }
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var start = offset;
         // UTF8 strings do not contain zero bytes in between except for the zero character, so:
         var buffer = new Buffer(str, 'utf8');
         k = buffer.length;
-        // <ENSURE_CAPACITY size=k+1>
         offset += k+1;
         var capacity12 = this.buffer.length;
         if (offset > capacity12)
             this.resize((capacity12 *= 2) > offset ? capacity12 : offset);
         offset -= k+1;
-        // </ENSURE_CAPACITY>
         buffer.copy(this.buffer, offset);
         offset += k;
         this.buffer[offset++] = 0;
@@ -1817,18 +1579,14 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.readCString = function(offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 1 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var start = offset,
             temp;
@@ -1862,33 +1620,26 @@ module.exports = (function() {
      * @see ByteBuffer#writeVarint32
      */
     ByteBuffer.prototype.writeIString = function(str, offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
             if (typeof str !== 'string')
                 throw(new TypeError("Illegal str: Not a string"));
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var start = offset,
             k;
         var buffer = new Buffer(str, "utf8");
         k = buffer.length;
-        // <ENSURE_CAPACITY size=4+k>
         offset += 4+k;
         var capacity13 = this.buffer.length;
         if (offset > capacity13)
             this.resize((capacity13 *= 2) > offset ? capacity13 : offset);
         offset -= 4+k;
-        // </ENSURE_CAPACITY>
-        // <WRITE_UINT32>
         if (this.littleEndian) {
             this.buffer[offset+3] = (k >>> 24) & 0xFF;
             this.buffer[offset+2] = (k >>> 16) & 0xFF;
@@ -1900,7 +1651,6 @@ module.exports = (function() {
             this.buffer[offset+2] = (k >>>  8) & 0xFF;
             this.buffer[offset+3] =  k         & 0xFF;
         }
-        // </WRITE_UINT32>
         offset += 4;
         buffer.copy(this.buffer, offset);
         offset += k;
@@ -1921,23 +1671,18 @@ module.exports = (function() {
      * @see ByteBuffer#readVarint32
      */
     ByteBuffer.prototype.readIString = function(offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 4 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var temp = 0,
             start = offset,
             str;
-        // <READ_UINT32>
         if (this.littleEndian) {
             temp  = this.buffer[offset+2] << 16;
             temp |= this.buffer[offset+1] <<  8;
@@ -1949,7 +1694,6 @@ module.exports = (function() {
             temp |= this.buffer[offset+3];
             temp += this.buffer[offset  ] << 24 >>> 0;
         }
-        // </READ_UINT32>
         offset += 4;
         if (offset + temp > this.buffer.length)
             throw(new RangeError("Index out of bounds: "+offset+" + "+temp+" <= "+this.buffer.length));
@@ -1992,29 +1736,23 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.prototype.writeUTF8String = function(str, offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var k;
         var buffer = new Buffer(str, 'utf8');
         k = buffer.length;
-        // <ENSURE_CAPACITY size=k>
         offset += k;
         var capacity14 = this.buffer.length;
         if (offset > capacity14)
             this.resize((capacity14 *= 2) > offset ? capacity14 : offset);
         offset -= k;
-        // </ENSURE_CAPACITY>
         buffer.copy(this.buffer, offset);
         if (relative) {
             this.offset += k;
@@ -2079,24 +1817,18 @@ module.exports = (function() {
             offset = metrics;
             metrics = undefined;
         }
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (typeof metrics === 'undefined') metrics = ByteBuffer.METRICS_CHARS;
         if (!this.noAssert) {
-            // <ASSERT_INTEGER>
             if (typeof length !== 'number' || length % 1 !== 0)
                 throw(new TypeError("Illegal length: "+length+" (not an integer)"));
             length |= 0;
-            // </ASSERT_INTEGER>
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var out,
             i = 0,
@@ -2121,13 +1853,11 @@ module.exports = (function() {
             }
         } else if (metrics === ByteBuffer.METRICS_BYTES) {
             if (!this.noAssert) {
-                // <ASSERT_OFFSET>
                 if (typeof offset !== 'number' || offset % 1 !== 0)
                     throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
                 offset >>>= 0;
                 if (offset < 0 || offset + length > this.buffer.length)
                     throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+length+") <= "+this.buffer.length));
-                // </ASSERT_OFFSET>
             }
             temp = this.buffer.slice(offset, offset+length).toString("utf8");
             if (relative) {
@@ -2169,33 +1899,27 @@ module.exports = (function() {
      * @see ByteBuffer#writeVarint32
      */
     ByteBuffer.prototype.writeVString = function(str, offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
             if (typeof str !== 'string')
                 throw(new TypeError("Illegal str: Not a string"));
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var start = offset,
             k, l;
         var buffer = new Buffer(str, "utf8");
         l = ByteBuffer.calculateVarint32(buffer.length);
         k = buffer.length;
-        // <ENSURE_CAPACITY size=l+k>
         offset += l+k;
         var capacity15 = this.buffer.length;
         if (offset > capacity15)
             this.resize((capacity15 *= 2) > offset ? capacity15 : offset);
         offset -= l+k;
-        // </ENSURE_CAPACITY>
         offset += this.writeVarint32(buffer.length, offset);
         buffer.copy(this.buffer, offset);
         offset += buffer.length;
@@ -2216,18 +1940,14 @@ module.exports = (function() {
      * @see ByteBuffer#readVarint32
      */
     ByteBuffer.prototype.readVString = function(offset) {
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 1 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         var temp = this.readVarint32(offset),
             start = offset,
@@ -2268,35 +1988,27 @@ module.exports = (function() {
             offset = encoding;
             encoding = undefined;
         }
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         if (!(source instanceof ByteBuffer))
             source = ByteBuffer.wrap(source, encoding);
         var length = source.limit - source.offset;
         if (length <= 0) return this; // Nothing to append
-        // <ENSURE_CAPACITY size=length>
         offset += length;
         var capacity16 = this.buffer.length;
         if (offset > capacity16)
             this.resize((capacity16 *= 2) > offset ? capacity16 : offset);
         offset -= length;
-        // </ENSURE_CAPACITY>
         source.buffer.copy(this.buffer, offset, source.offset, source.limit);
         source.offset += length;
-        // <RELATIVE size=length>
         if (relative) this.offset += length;
-        // </RELATIVE>
         return this;
     };
 
@@ -2384,7 +2096,6 @@ module.exports = (function() {
         if (typeof begin === 'undefined') begin = this.offset;
         if (typeof end === 'undefined') end = this.limit;
         if (!this.noAssert) {
-            // <ASSERT_RANGE>
             if (typeof begin !== 'number' || begin % 1 !== 0)
                 throw(new TypeError("Illegal begin: Not an integer"));
             begin >>>= 0;
@@ -2393,7 +2104,6 @@ module.exports = (function() {
             end >>>= 0;
             if (begin < 0 || begin > end || end > this.buffer.length)
                 throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length));
-            // </ASSERT_RANGE>
         }
         if (begin === 0 && end === this.buffer.length)
             return this; // Already compacted
@@ -2426,7 +2136,6 @@ module.exports = (function() {
         if (typeof begin === 'undefined') begin = this.offset;
         if (typeof end === 'undefined') end = this.limit;
         if (!this.noAssert) {
-            // <ASSERT_RANGE>
             if (typeof begin !== 'number' || begin % 1 !== 0)
                 throw(new TypeError("Illegal begin: Not an integer"));
             begin >>>= 0;
@@ -2435,7 +2144,6 @@ module.exports = (function() {
             end >>>= 0;
             if (begin < 0 || begin > end || end > this.buffer.length)
                 throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length));
-            // </ASSERT_RANGE>
         }
         if (begin === end)
             return new ByteBuffer(0, this.littleEndian, this.noAssert);
@@ -2521,12 +2229,9 @@ module.exports = (function() {
         if (typeof begin === 'undefined') begin = this.offset;
         if (typeof end === 'undefined') end = this.limit;
         if (!this.noAssert) {
-            // <ASSERT_INTEGER>
             if (typeof value !== 'number' || value % 1 !== 0)
                 throw(new TypeError("Illegal value: "+value+" (not an integer)"));
             value |= 0;
-            // </ASSERT_INTEGER>
-            // <ASSERT_RANGE>
             if (typeof begin !== 'number' || begin % 1 !== 0)
                 throw(new TypeError("Illegal begin: Not an integer"));
             begin >>>= 0;
@@ -2535,7 +2240,6 @@ module.exports = (function() {
             end >>>= 0;
             if (begin < 0 || begin > end || end > this.buffer.length)
                 throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length));
-            // </ASSERT_RANGE>
         }
         if (begin >= end) return this; // Nothing to fill
         this.buffer.fill(value, begin, end);
@@ -2565,13 +2269,11 @@ module.exports = (function() {
     ByteBuffer.prototype.mark = function(offset) {
         offset = typeof offset === 'undefined' ? this.offset : offset;
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         this.markedOffset = offset;
         return this;
@@ -2631,18 +2333,14 @@ module.exports = (function() {
             offset = encoding;
             encoding = undefined;
         }
-        // <RELATIVE>
         var relative = typeof offset === 'undefined';
         if (relative) offset = this.offset;
-        // </RELATIVE>
         if (!this.noAssert) {
-            // <ASSERT_OFFSET>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
             offset >>>= 0;
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length));
-            // </ASSERT_OFFSET>
         }
         if (!(source instanceof ByteBuffer))
             source = ByteBuffer.wrap(source, encoding);
@@ -2730,11 +2428,9 @@ module.exports = (function() {
      */
     ByteBuffer.prototype.resize = function(capacity) {
         if (!this.noAssert) {
-            // <ASSERT_INTEGER>
             if (typeof capacity !== 'number' || capacity % 1 !== 0)
                 throw(new TypeError("Illegal capacity: "+capacity+" (not an integer)"));
             capacity |= 0;
-            // </ASSERT_INTEGER>
             if (capacity < 0)
                 throw(new RangeError("Illegal capacity: 0 <= "+capacity));
         }
@@ -2756,7 +2452,6 @@ module.exports = (function() {
         if (typeof begin === 'undefined') begin = this.offset;
         if (typeof end === 'undefined') end = this.limit;
         if (!this.noAssert) {
-            // <ASSERT_RANGE>
             if (typeof begin !== 'number' || begin % 1 !== 0)
                 throw(new TypeError("Illegal begin: Not an integer"));
             begin >>>= 0;
@@ -2765,7 +2460,6 @@ module.exports = (function() {
             end >>>= 0;
             if (begin < 0 || begin > end || end > this.buffer.length)
                 throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length));
-            // </ASSERT_RANGE>
         }
         if (begin === end)
             return this; // Nothing to reverse
@@ -2780,11 +2474,9 @@ module.exports = (function() {
      */
     ByteBuffer.prototype.skip = function(length) {
         if (!this.noAssert) {
-            // <ASSERT_INTEGER>
             if (typeof length !== 'number' || length % 1 !== 0)
                 throw(new TypeError("Illegal length: "+length+" (not an integer)"));
             length |= 0;
-            // </ASSERT_INTEGER>
         }
         var offset = this.offset + length;
         if (!this.noAssert) {
@@ -2806,7 +2498,6 @@ module.exports = (function() {
         if (typeof begin === 'undefined') begin = this.offset;
         if (typeof end === 'undefined') end = this.limit;
         if (!this.noAssert) {
-            // <ASSERT_RANGE>
             if (typeof begin !== 'number' || begin % 1 !== 0)
                 throw(new TypeError("Illegal begin: Not an integer"));
             begin >>>= 0;
@@ -2815,7 +2506,6 @@ module.exports = (function() {
             end >>>= 0;
             if (begin < 0 || begin > end || end > this.buffer.length)
                 throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length));
-            // </ASSERT_RANGE>
         }
         var bb = this.clone();
         bb.offset = begin;
@@ -2840,7 +2530,6 @@ module.exports = (function() {
             limit = t;
         }
         if (!this.noAssert) {
-            // <ASSERT_RANGE>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: Not an integer"));
             offset >>>= 0;
@@ -2849,7 +2538,6 @@ module.exports = (function() {
             limit >>>= 0;
             if (offset < 0 || offset > limit || limit > this.buffer.length)
                 throw(new RangeError("Illegal range: 0 <= "+offset+" <= "+limit+" <= "+this.buffer.length));
-            // </ASSERT_RANGE>
         }
         if (forceCopy) {
             var buffer = new Buffer(limit - offset);
@@ -2879,7 +2567,6 @@ module.exports = (function() {
             limit = t;
         }
         if (!this.noAssert) {
-            // <ASSERT_RANGE>
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw(new TypeError("Illegal offset: Not an integer"));
             offset >>>= 0;
@@ -2888,7 +2575,6 @@ module.exports = (function() {
             limit >>>= 0;
             if (offset < 0 || offset > limit || limit > this.buffer.length)
                 throw(new RangeError("Illegal range: 0 <= "+offset+" <= "+limit+" <= "+this.buffer.length));
-            // </ASSERT_RANGE>
         }
         var ab = new ArrayBuffer(limit - offset);
         if (memcpy) { // Fast
@@ -2946,7 +2632,6 @@ module.exports = (function() {
         if (typeof begin === 'undefined') begin = this.offset;
         if (typeof end === 'undefined') end = this.limit;
         if (!this.noAssert) {
-            // <ASSERT_RANGE>
             if (typeof begin !== 'number' || begin % 1 !== 0)
                 throw(new TypeError("Illegal begin: Not an integer"));
             begin >>>= 0;
@@ -2955,7 +2640,6 @@ module.exports = (function() {
             end >>>= 0;
             if (begin < 0 || begin > end || end > this.buffer.length)
                 throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length));
-            // </ASSERT_RANGE>
         }
         return this.buffer.slice(begin, end).toString("base64");
     };
@@ -2973,9 +2657,9 @@ module.exports = (function() {
     ByteBuffer.fromBase64 = function(str, littleEndian, noAssert) {
         if (!noAssert) {
             if (typeof str !== 'string')
-                throw(new TypeError("Illegal str: Not a string"));
+                throw TypeError("Illegal str: Not a string");
             if (str.length % 4 !== 0)
-                throw(new TypeError("Illegal str: Length not a multiple of 4"));
+                throw TypeError("Illegal str: Length not a multiple of 4");
         }
         var bb = new ByteBuffer(0, littleEndian, noAssert);
         bb.buffer = new Buffer(str, "base64");
@@ -3030,7 +2714,6 @@ module.exports = (function() {
         begin = typeof begin === 'undefined' ? this.offset : begin;
         end = typeof end === 'undefined' ? this.limit : end;
         if (!this.noAssert) {
-            // <ASSERT_RANGE>
             if (typeof begin !== 'number' || begin % 1 !== 0)
                 throw(new TypeError("Illegal begin: Not an integer"));
             begin >>>= 0;
@@ -3039,7 +2722,6 @@ module.exports = (function() {
             end >>>= 0;
             if (begin < 0 || begin > end || end > this.buffer.length)
                 throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length));
-            // </ASSERT_RANGE>
         }
         return this.buffer.slice(begin, end).toString("binary");
     };
@@ -3257,7 +2939,6 @@ module.exports = (function() {
         begin = typeof begin === 'undefined' ? this.offset : begin;
         end = typeof end === 'undefined' ? this.limit : end;
         if (!this.noAssert) {
-            // <ASSERT_RANGE>
             if (typeof begin !== 'number' || begin % 1 !== 0)
                 throw(new TypeError("Illegal begin: Not an integer"));
             begin >>>= 0;
@@ -3266,7 +2947,6 @@ module.exports = (function() {
             end >>>= 0;
             if (begin < 0 || begin > end || end > this.buffer.length)
                 throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length));
-            // </ASSERT_RANGE>
         }
         return this.buffer.slice(begin, end).toString("hex");
     };
@@ -3309,30 +2989,30 @@ module.exports = (function() {
             a, b, c, d,
             codePoint;
         if (offset+1 > bb.buffer.length)
-            throw(new RangeError("Index out of range: "+offset+" + 1 <= "+bb.buffer.length));
+            throw RangeError("Index out of range: "+offset+" + 1 <= "+bb.buffer.length);
         a = bb.buffer[offset++];
         if ((a&0x80) === 0) {
             codePoint = a;
         } else if ((a&0xE0) === 0xC0) {
             if (offset+1 > bb.buffer.length)
-                throw(new RangeError("Index out of range: "+offset+" + 1 <= "+bb.buffer.length));
+                throw RangeError("Index out of range: "+offset+" + 1 <= "+bb.buffer.length);
             b = bb.buffer[offset++];
             codePoint = ((a&0x1F)<<6) | (b&0x3F);
         } else if ((a&0xF0) === 0xE0) {
             if (offset+2 > bb.buffer.length)
-                throw(new RangeError("Index out of range: "+offset+" + 2 <= "+bb.buffer.length));
+                throw RangeError("Index out of range: "+offset+" + 2 <= "+bb.buffer.length);
             b = bb.buffer[offset++];
             c = bb.buffer[offset++];
             codePoint = ((a&0x0F)<<12) | ((b&0x3F)<<6) | (c&0x3F);
         } else if ((a&0xF8) === 0xF0) {
             if (offset+3 > bb.buffer.length)
-                throw(new RangeError("Index out of range: "+offset+" + 3 <= "+bb.buffer.length));
+                throw RangeError("Index out of range: "+offset+" + 3 <= "+bb.buffer.length);
             b = bb.buffer[offset++];
             c = bb.buffer[offset++];
             d = bb.buffer[offset++];
             codePoint = ((a&0x07)<<18) | ((b&0x3F)<<12) | ((c&0x3F)<<6) | (d&0x3F);
         } else
-            throw(new RangeError("Illegal code point at offset "+offset+": 0x"+a.toString(16)));
+            throw RangeError("Illegal code point at offset "+offset+": "+a);
         return {
             'codePoint': codePoint,
             'length': offset - start
@@ -3348,12 +3028,12 @@ module.exports = (function() {
      */
     function utf8_calc_char(codePoint) {
         if (codePoint < 0)
-            throw(new RangeError("Illegal code point: -0x"+(-codePoint).toString(16)));
+            throw RangeError("Illegal code point: "+codePoint);
         if      (codePoint <       0x80) return 1;
         else if (codePoint <      0x800) return 2;
         else if (codePoint <    0x10000) return 3;
         else if (codePoint <   0x110000) return 4;
-        else throw(new RangeError("Illegal code point: 0x"+codePoint.toString(16)));
+        else throw RangeError("Illegal code point: "+codePoint);
     }
 
     /**
@@ -3388,7 +3068,6 @@ module.exports = (function() {
         if (typeof begin === 'undefined') begin = this.offset;
         if (typeof end === 'undefined') end = this.limit;
         if (!this.noAssert) {
-            // <ASSERT_RANGE>
             if (typeof begin !== 'number' || begin % 1 !== 0)
                 throw(new TypeError("Illegal begin: Not an integer"));
             begin >>>= 0;
@@ -3397,7 +3076,6 @@ module.exports = (function() {
             end >>>= 0;
             if (begin < 0 || begin > end || end > this.buffer.length)
                 throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length));
-            // </ASSERT_RANGE>
         }
         return this.buffer.slice(begin, end).toString("utf8");
     };
