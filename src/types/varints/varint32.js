@@ -88,9 +88,9 @@ ByteBuffer.prototype.writeVarint32 = function(value, offset) {
                 this.view.setUint8(offset+3, b);
                 if (value >= 1 << 28) {
                     //? if (NODE)
-                    this.buffer[offset+4] = (value >> 28) & 0x7F;
+                    this.buffer[offset+4] = (value >> 28) & 0x0F;
                     //? else
-                    this.view.setUint8(offset+4, (value >> 28) & 0x7F);
+                    this.view.setUint8(offset+4, (value >> 28) & 0x0F);
                     size = 5;
                 } else {
                     //? if (NODE)

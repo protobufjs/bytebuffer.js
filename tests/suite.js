@@ -525,7 +525,7 @@ function makeSuite(ByteBuffer) {
         ["Uint64"  , null    , 8    , new Long(0xFFFFFFFE, 0xFFFFFFFF, false) , new Long(0xFFFFFFFE, 0xFFFFFFFF, true)  , "fffffffffffffffe"    ],
         
         // name    | alias   | size | input                                   | output                                  | representation
-        ["Varint32", null    , 5    , 0xFFFFFFFE                              , -2                                      , "feffffff7f"          ],
+        ["Varint32", null    , 5    , 0xFFFFFFFE                              , -2                                      , "feffffff0f"          ],
         ["Varint64", null    , 10   , new Long(0xFFFFFFFE, 0xFFFFFFFF, true)  , new Long(0xFFFFFFFE, 0xFFFFFFFF, false) , "feffffffffffffffff01"]
     ];
     
