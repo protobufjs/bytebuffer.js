@@ -1418,19 +1418,17 @@ module.exports = (function() {
                 this.resize((capacity11 *= 2) > offset ? capacity11 : offset);
             offset -= size;
             switch (size) {
-                case 10: this.buffer[offset+9] = (part2 >>>  7) | 0x80;
-                case 9 : this.buffer[offset+8] = (part2       ) | 0x80;
-                case 8 : this.buffer[offset+7] = (part1 >>> 21) | 0x80;
-                case 7 : this.buffer[offset+6] = (part1 >>> 14) | 0x80;
-                case 6 : this.buffer[offset+5] = (part1 >>>  7) | 0x80;
-                case 5 : this.buffer[offset+4] = (part1       ) | 0x80;
-                case 4 : this.buffer[offset+3] = (part0 >>> 21) | 0x80;
-                case 3 : this.buffer[offset+2] = (part0 >>> 14) | 0x80;
-                case 2 : this.buffer[offset+1] = (part0 >>>  7) | 0x80;
-                case 1 : this.buffer[offset  ] = (part0       ) | 0x80;
+                case 10: this.buffer[offset+9] = (part2 >>>  7) & 0x01;
+                case 9 : this.buffer[offset+8] = size !== 9 ? (part2       ) | 0x80 : (part2       ) & 0x7F;
+                case 8 : this.buffer[offset+7] = size !== 8 ? (part1 >>> 21) | 0x80 : (part1 >>> 21) & 0x7F;
+                case 7 : this.buffer[offset+6] = size !== 7 ? (part1 >>> 14) | 0x80 : (part1 >>> 14) & 0x7F;
+                case 6 : this.buffer[offset+5] = size !== 6 ? (part1 >>>  7) | 0x80 : (part1 >>>  7) & 0x7F;
+                case 5 : this.buffer[offset+4] = size !== 5 ? (part1       ) | 0x80 : (part1       ) & 0x7F;
+                case 4 : this.buffer[offset+3] = size !== 4 ? (part0 >>> 21) | 0x80 : (part0 >>> 21) & 0x7F;
+                case 3 : this.buffer[offset+2] = size !== 3 ? (part0 >>> 14) | 0x80 : (part0 >>> 14) & 0x7F;
+                case 2 : this.buffer[offset+1] = size !== 2 ? (part0 >>>  7) | 0x80 : (part0 >>>  7) & 0x7F;
+                case 1 : this.buffer[offset  ] = size !== 1 ? (part0       ) | 0x80 : (part0       ) & 0x7F;
             }
-            offset += size-1;
-            this.buffer[offset] &= 0x7F;
             if (relative) {
                 this.offset += size;
                 return this;
