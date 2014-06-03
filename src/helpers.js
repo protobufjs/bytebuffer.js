@@ -39,8 +39,8 @@ function assertInteger(value, unsigned) {
  * @inner
  */
 function assertLong(value, unsigned) {
-    if (typeof value === 'number' && value % 1 !== 0) {
-        return unsigned ? value >>> 0 : value | 0;
+    if (typeof value === 'number') {
+        return Long.fromNumber(value);
     } else if (value && value instanceof Long) {
         if (typeof unsigned !== 'undefined') {
             if (unsigned && !value.unsigned) return value.toUnsigned();

@@ -33,7 +33,7 @@ ASSERT_LONG = function(varValue, unsigned) {
             }
             writeln(__+'else');
         } else {
-            writeln(__+'if (typeof '+varValue+' !== \'number\' && !('+varValue+' && '+varValue+' instanceof Long))');
+            writeln(__+'else if (!('+varValue+' && '+varValue+' instanceof Long))');
         }
         writeln(__+'    throw(new TypeError("Illegal '+varValue+': "+'+varValue+'+" (not an integer or Long)"));');
     } else {
