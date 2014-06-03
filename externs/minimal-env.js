@@ -38,3 +38,15 @@ console.log = function(s) {};
  * @type {*}
  */
 var module = {};
+
+/**
+ * @param {...*} var_args
+ * @returns {string}
+ */
+String.fromCodePoint = function(var_args) {};
+
+/**
+ * @param {number} offset
+ * @returns {number}
+ */
+String.prototype.codePointAt = function(offset) {};
