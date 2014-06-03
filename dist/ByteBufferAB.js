@@ -700,9 +700,9 @@
                 var relative = typeof offset === 'undefined';
                 if (relative) offset = this.offset;
                 if (!this.noAssert) {
-                    if (typeof value === 'number' && value % 1 === 0)
-                        value |= 0;
-                    else if (!(value && value instanceof Long))
+                    if (typeof value === 'number')
+                        value = Long.fromNumber(value);
+                    if (typeof value !== 'number' && !(value && value instanceof Long))
                         throw(new TypeError("Illegal value: "+value+" (not an integer or Long)"));
                     if (typeof offset !== 'number' || offset % 1 !== 0)
                         throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
@@ -779,9 +779,9 @@
                 var relative = typeof offset === 'undefined';
                 if (relative) offset = this.offset;
                 if (!this.noAssert) {
-                    if (typeof value === 'number' && value % 1 === 0)
-                        value |= 0;
-                    else if (!(value && value instanceof Long))
+                    if (typeof value === 'number')
+                        value = Long.fromNumber(value);
+                    if (typeof value !== 'number' && !(value && value instanceof Long))
                         throw(new TypeError("Illegal value: "+value+" (not an integer or Long)"));
                     if (typeof offset !== 'number' || offset % 1 !== 0)
                         throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
@@ -1239,9 +1239,9 @@
                 var relative = typeof offset === 'undefined';
                 if (relative) offset = this.offset;
                 if (!this.noAssert) {
-                    if (typeof value === 'number' && value % 1 === 0)
-                        value |= 0;
-                    else if (!(value && value instanceof Long))
+                    if (typeof value === 'number')
+                        value = Long.fromNumber(value);
+                    if (typeof value !== 'number' && !(value && value instanceof Long))
                         throw(new TypeError("Illegal value: "+value+" (not an integer or Long)"));
                     if (typeof offset !== 'number' || offset % 1 !== 0)
                         throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));

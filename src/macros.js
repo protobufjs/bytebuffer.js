@@ -22,8 +22,8 @@ ASSERT_LONG = function(varValue, unsigned) {
     if (typeof varValue === 'undefined') varValue = 'value';
     if (VERBOSE_MS) writeln(__+'// <ASSERT_LONG>');
     if (INLINE) {
-        writeln(__+'if (typeof '+varValue+' === \'number\' && '+varValue+' % 1 === 0)');
-        writeln(__+'    '+varValue+' '+(unsigned ? '>>>' : '|')+'= 0;');
+        writeln(__+'if (typeof '+varValue+' === \'number\')');
+        writeln(__+'    '+varValue+' = Long.fromNumber('+varValue+');');
         if (typeof unsigned !== 'undefined') { // When explicitly specified only
             writeln(__+'else if ('+varValue+' && '+varValue+' instanceof Long)');
             if (unsigned) {
@@ -33,7 +33,7 @@ ASSERT_LONG = function(varValue, unsigned) {
             }
             writeln(__+'else');
         } else {
-            writeln(__+'else if (!('+varValue+' && '+varValue+' instanceof Long))');
+            writeln(__+'if (typeof '+varValue+' !== \'number\' && !('+varValue+' && '+varValue+' instanceof Long))');
         }
         writeln(__+'    throw(new TypeError("Illegal '+varValue+': "+'+varValue+'+" (not an integer or Long)"));');
     } else {
