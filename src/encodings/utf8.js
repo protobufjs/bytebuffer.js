@@ -56,9 +56,15 @@ ByteBuffer.fromUTF8 = function(str, littleEndian, noAssert) {
     bb.view = new BufferView(bb.buffer);
     bb.limit = bb.buffer.length;
     //? } else {
-    var bb = new ByteBuffer(utf8_calc_string(str), littleEndian, noAssert);
+    var bb = new ByteBuffer(utf8_calc_string(str), littleEndian, noAssert),
+        cp;
     for (var i=0, j=0, k=str.length; i<k; ++i) {
-        j += utf8_encode_char(str.codePointAt(i), bb, j);
+        cp = str.charCodeAt(i);
+        if (cp >= 0xD800 && cp <= 0xDFFF) {
+            cp = str.codePointAt(i);
+            if (cp > 0xFFFF) i++;
+        }
+        j += utf8_encode_char(cp, bb, j);
     }
     bb.limit = j;
     //? }

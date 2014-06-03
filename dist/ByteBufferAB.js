@@ -3148,9 +3148,15 @@
                 if (typeof str !== 'string')
                     throw(new TypeError("Illegal str: Not a string"));
             }
-            var bb = new ByteBuffer(utf8_calc_string(str), littleEndian, noAssert);
+            var bb = new ByteBuffer(utf8_calc_string(str), littleEndian, noAssert),
+                cp;
             for (var i=0, j=0, k=str.length; i<k; ++i) {
-                j += utf8_encode_char(str.codePointAt(i), bb, j);
+                cp = str.charCodeAt(i);
+                if (cp >= 0xD800 && cp <= 0xDFFF) {
+                    cp = str.codePointAt(i);
+                    if (cp > 0xFFFF) i++;
+                }
+                j += utf8_encode_char(cp, bb, j);
             }
             bb.limit = j;
             return bb;
