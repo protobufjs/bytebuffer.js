@@ -3,7 +3,7 @@
 A fast and complete ByteBuffer implementation using either ArrayBuffers in the browser or node Buffers under node.js,
 generated from a single source tree through [MetaScript](https://github.com/dcodeIO/MetaScript).
 
-If you are looking for ByteBuffer.js 2, [that's the branch](https://github.com/dcodeIO/ByteBuffer.js/tree/ByteBuffer2).
+If you are looking for ByteBuffer.js 2 (ArrayBuffers only), [that's the branch](https://github.com/dcodeIO/ByteBuffer.js/tree/ByteBuffer2).
 
 What can it do?
 ---------------

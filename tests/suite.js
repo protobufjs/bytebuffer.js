@@ -19,6 +19,7 @@
  * @author Daniel Wirtz <dcode@dcode.io>
  */ //
 var ByteBuffer = require("../index.js");
+ByteBuffer.ByteBufferAB = require("../dist/ByteBufferAB.min.js"); // Test minified version
 
 /**
  * Constructs a new Sandbox for module loaders and shim testing.
@@ -339,7 +340,7 @@ function makeSuite(ByteBuffer) {
     
     suite.methods.copyTo = function(test) {
         var bb = ByteBuffer.wrap("\x01"),
-            bb2 = new ByteBuffer(2).fill(0);
+            bb2 = new ByteBuffer(2).fill(0).flip();
         test.equal(bb.toDebug(), "<01>");
         // Modifies source and target offsets
         bb.copyTo(bb2 /* all offsets omitted */);
@@ -352,14 +353,14 @@ function makeSuite(ByteBuffer) {
         test.equal(bb.toDebug(), "01|"); // Read 1 byte
         test.equal(bb2.toDebug(), "01 01|"); // Written 1 byte at 2
         bb.reset();
-        bb2.reset().fill(0);
+        bb2.clear().fill(0).flip();
         // Modifies source offsets only
         bb.copyTo(bb2, 0 /* source offsets omitted */);
         test.equal(bb.toDebug(), "01|"); // Read 1 byte
         test.equal(bb2.toDebug(), "<01 00>"); // Written 1 byte (no change)
         // Modifies no offsets at all
         bb.reset();
-        bb2.fill(0);
+        bb2.fill(0).flip();
         bb.copyTo(bb2, 1, 0, bb.capacity() /* no offsets omitted */);
         test.equal(bb.toDebug(), "<01>"); // Read 1 byte (no change)
         test.equal(bb2.toDebug(), "<00 01>"); // Written 1 byte (no change)

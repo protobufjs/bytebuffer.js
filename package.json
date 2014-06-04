@@ -2,7 +2,7 @@
     "name": "bytebuffer",
     "version": "3.0.0-pre",
     "author": "Daniel Wirtz <dcode@dcode.io>",
-    "description": "A full-featured, zero-copy aware ByteBuffer implementation for both typed arrays and node buffers.",
+    "description": "The swiss army knife for binary data in JavaScript.",
     "main": "ByteBuffer.js",
     "repository": {
         "type": "git",

@@ -1978,8 +1978,8 @@ module.exports = (function() {
      *  read if omitted.
      * @returns {!ByteBuffer} this
      * @expose
-     * @example `A relative `<01 02>03.append(<04 05>)` will result in `<01 02 04 05>, 04 05|`
-     * @example `An absolute `<01 02>03.append(04 05>, 1)` will result in `<01 04>05, 04 05|`
+     * @example A relative `<01 02>03.append(<04 05>)` will result in `<01 02 04 05>, 04 05|`
+     * @example An absolute `<01 02>03.append(04 05>, 1)` will result in `<01 04>05, 04 05|`
      */
     ByteBuffer.prototype.append = function(source, encoding, offset) {
         if (typeof encoding === 'number' || typeof encoding !== 'string') {
@@ -2222,6 +2222,8 @@ module.exports = (function() {
      * @example `someByteBuffer.clear().fill(0)` fills the entire backing buffer with zeroes
      */
     ByteBuffer.prototype.fill = function(value, begin, end) {
+        var relative = typeof begin === 'undefined';
+        if (relative) begin = this.offset;
         if (typeof value === 'string' && value.length > 0)
             value = value.charCodeAt(0);
         if (typeof begin === 'undefined') begin = this.offset;
@@ -2241,6 +2243,10 @@ module.exports = (function() {
         }
         if (begin >= end) return this; // Nothing to fill
         this.buffer.fill(value, begin, end);
+        begin = end;
+        if (relative) {
+            this.offset = begin;
+        }
         return this;
     };
 

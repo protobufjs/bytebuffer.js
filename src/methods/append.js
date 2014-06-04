@@ -13,8 +13,8 @@
  *  read if omitted.
  * @returns {!ByteBuffer} this
  * @expose
- * @example `A relative `<01 02>03.append(<04 05>)` will result in `<01 02 04 05>, 04 05|`
- * @example `An absolute `<01 02>03.append(04 05>, 1)` will result in `<01 04>05, 04 05|`
+ * @example A relative `<01 02>03.append(<04 05>)` will result in `<01 02 04 05>, 04 05|`
+ * @example An absolute `<01 02>03.append(04 05>, 1)` will result in `<01 04>05, 04 05|`
  */
 ByteBuffer.prototype.append = function(source, encoding, offset) {
     if (typeof encoding === 'number' || typeof encoding !== 'string') {
