@@ -109,7 +109,7 @@ module.exports = (function() {
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "3.0.0-pre";
+    ByteBuffer.VERSION = "3.0.0-RC1";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -2215,7 +2215,8 @@ module.exports = (function() {
      * Overwrites this ByteBuffer's contents with the specified value. Contents are the bytes between
      *  {@link ByteBuffer#offset} and {@link ByteBuffer#limit}.
      * @param {number|string} value Byte value to fill with. If given as a string, the first character is used.
-     * @param {number=} begin Begin offset, defaults to {@link ByteBuffer#offset}.
+     * @param {number=} begin Begin offset. Will use and increase {@link ByteBuffer#offset} by the number of bytes
+     *  written if omitted. defaults to {@link ByteBuffer#offset}.
      * @param {number=} end End offset, defaults to {@link ByteBuffer#limit}.
      * @returns {!ByteBuffer} this
      * @expose
