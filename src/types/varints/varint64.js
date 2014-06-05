@@ -210,7 +210,7 @@ if (Long) {
      */
     ByteBuffer.prototype.readVarint64ZigZag = function(offset) {
         var val = this.readVarint64(offset);
-        if (typeof val === 'object')
+        if (val && val['value'] instanceof Long)
             val["value"] = ByteBuffer.zigZagDecode64(val["value"]);
         else
             val = ByteBuffer.zigZagDecode64(val);

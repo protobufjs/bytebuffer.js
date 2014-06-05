@@ -513,21 +513,23 @@ function makeSuite(ByteBuffer) {
     };
     
     var types = [
-        // name    | alias   | size | input                                   | output                                  | BE representation
-        ["Int8"    , "Byte"  , 1    , 0xFE                                    , -2                                      , "fe"                  ],
-        ["Uint8"   , null    , 1    , -2                                      , 0xFE                                    , "fe"                  ],
-        ["Int16"   , "Short" , 2    , 0xFFFE                                  , -2                                      , "fffe"                ],
-        ["Uint16"  , null    , 2    , -2                                      , 0xFFFE                                  , "fffe"                ],
-        ["Int32"   , "Int"   , 4    , 0xFFFFFFFE                              , -2                                      , "fffffffe"            ],
-        ["Uint32"  , null    , 4    , -2                                      , 0xFFFFFFFE                              , "fffffffe"            ],
-        ["Float32" , "Float" , 4    , 0.5                                     , 0.5                                     , "3f000000"            ],
-        ["Float64" , "Double", 8    , 0.1                                     , 0.1                                     , "3fb999999999999a"    ],
-        ["Int64"   , "Long"  , 8    , new Long(0xFFFFFFFE, 0xFFFFFFFF, true)  , new Long(0xFFFFFFFE, 0xFFFFFFFF, false) , "fffffffffffffffe"    ],
-        ["Uint64"  , null    , 8    , new Long(0xFFFFFFFE, 0xFFFFFFFF, false) , new Long(0xFFFFFFFE, 0xFFFFFFFF, true)  , "fffffffffffffffe"    ],
+        // name          | alias   | size | input                                   | output                                  | BE representation
+        ["Int8"          , "Byte"  , 1    , 0xFE                                    , -2                                      , "fe"                  ],
+        ["Uint8"         , null    , 1    , -2                                      , 0xFE                                    , "fe"                  ],
+        ["Int16"         , "Short" , 2    , 0xFFFE                                  , -2                                      , "fffe"                ],
+        ["Uint16"        , null    , 2    , -2                                      , 0xFFFE                                  , "fffe"                ],
+        ["Int32"         , "Int"   , 4    , 0xFFFFFFFE                              , -2                                      , "fffffffe"            ],
+        ["Uint32"        , null    , 4    , -2                                      , 0xFFFFFFFE                              , "fffffffe"            ],
+        ["Float32"       , "Float" , 4    , 0.5                                     , 0.5                                     , "3f000000"            ],
+        ["Float64"       , "Double", 8    , 0.1                                     , 0.1                                     , "3fb999999999999a"    ],
+        ["Int64"         , "Long"  , 8    , new Long(0xFFFFFFFE, 0xFFFFFFFF, true)  , new Long(0xFFFFFFFE, 0xFFFFFFFF, false) , "fffffffffffffffe"    ],
+        ["Uint64"        , null    , 8    , new Long(0xFFFFFFFE, 0xFFFFFFFF, false) , new Long(0xFFFFFFFE, 0xFFFFFFFF, true)  , "fffffffffffffffe"    ],
         
-        // name    | alias   | size | input                                   | output                                  | representation
-        ["Varint32", null    , 5    , 0xFFFFFFFE                              , -2                                      , "feffffff0f"          ],
-        ["Varint64", null    , 10   , new Long(0xFFFFFFFE, 0xFFFFFFFF, true)  , new Long(0xFFFFFFFE, 0xFFFFFFFF, false) , "feffffffffffffffff01"]
+        // name          | alias   | size | input                                   | output                                  | representation
+        ["Varint32"      , null    , 5    , 0xFFFFFFFE                              , -2                                      , "feffffff0f"          ],
+        ["Varint32ZigZag", null    , 1    , -1                                      , -1                                      , "01"                  ],
+        ["Varint64"      , null    , 10   , new Long(0xFFFFFFFE, 0xFFFFFFFF, true)  , new Long(0xFFFFFFFE, 0xFFFFFFFF, false) , "feffffffffffffffff01"],
+        ["Varint64ZigZag", null    , 1    , Long.fromNumber(-1)                     , Long.fromNumber(-1)                     , "01"                  ]
     ];
     
     suite.types = {};

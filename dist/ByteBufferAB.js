@@ -117,7 +117,7 @@
          * @const
          * @expose
          */
-        ByteBuffer.VERSION = "3.0.0-RC1";
+        ByteBuffer.VERSION = "3.0.0-RC2";
 
         /**
          * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -1352,7 +1352,7 @@
              */
             ByteBuffer.prototype.readVarint64ZigZag = function(offset) {
                 var val = this.readVarint64(offset);
-                if (typeof val === 'object')
+                if (val && val['value'] instanceof Long)
                     val["value"] = ByteBuffer.zigZagDecode64(val["value"]);
                 else
                     val = ByteBuffer.zigZagDecode64(val);
