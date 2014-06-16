@@ -18,8 +18,9 @@
  * ByteBuffer.js Test Suite.
  * @author Daniel Wirtz <dcode@dcode.io>
  */ //
-var ByteBuffer = require("../index.js");
-ByteBuffer.ByteBufferAB = require("../dist/ByteBufferAB.min.js"); // Test minified version
+var ByteBuffer = require("../dist/ByteBufferNB.js");
+ByteBuffer.ByteBufferNB = ByteBuffer;
+ByteBuffer.ByteBufferAB = require("../dist/ByteBufferAB.min.js");
 
 /**
  * Constructs a new Sandbox for module loaders and shim testing.
@@ -154,6 +155,14 @@ function makeSuite(ByteBuffer) {
             test.strictEqual(bb.toDebug(), "01<02>03");
         }
         
+        test.done();
+    };
+    
+    suite.wrap.Array = function(test) {
+        var arr = [1,255,-1];
+        var bb = ByteBuffer.wrap(arr);
+        test.strictEqual(bb.capacity(), 3);
+        test.strictEqual(bb.toDebug(), "<01 FF FF>");
         test.done();
     };
 
@@ -948,7 +957,7 @@ function makeSuite(ByteBuffer) {
                 vm = require("vm"),
                 util = require('util');
     
-            var code = fs.readFileSync(__dirname+"/../dist/ByteBufferAB.js");
+            var code = fs.readFileSync(__dirname+"/../dist/ByteBufferAB.min.js");
             var sandbox = new Sandbox({
                 require: function() {},
                 define: (function() {
@@ -973,7 +982,7 @@ function makeSuite(ByteBuffer) {
                 vm = require("vm"),
                 util = require('util');
     
-            var code = fs.readFileSync(__dirname+"/../dist/ByteBufferAB.js");
+            var code = fs.readFileSync(__dirname+"/../dist/ByteBufferAB.min.js");
             var sandbox = new Sandbox({
                 dcodeIO: {
                     Long: ByteBuffer.Long

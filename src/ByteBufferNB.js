@@ -36,8 +36,14 @@ module.exports = (function() {
 
     /**
      * node-memcpy. This is an optional binding dependency and may not be present.
-     * @type {?function(!(Buffer|ArrayBuffer|Uint8Array), number|!(Buffer|ArrayBuffer), (!(Buffer|ArrayBuffer|Uint8Array)|number)=, number=, number=):number}
-     * @see https://npmjs.org/package/memcpy
+     * @function
+     * @param {!(Buffer|ArrayBuffer|Uint8Array)} target Destination
+     * @param {number|!(Buffer|ArrayBuffer)} targetStart Destination start, defaults to 0.
+     * @param {(!(Buffer|ArrayBuffer|Uint8Array)|number)=} source Source
+     * @param {number=} sourceStart Source start, defaults to 0.
+     * @param {number=} sourceEnd Source end, defaults to capacity.
+     * @returns {number} Number of bytes copied
+     * @throws {Error} If any index is out of bounds
      * @expose
      */
     ByteBuffer.memcpy = memcpy;

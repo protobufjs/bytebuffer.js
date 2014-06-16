@@ -34,6 +34,7 @@
          * Constructs a new ByteBuffer.
          * @class The swiss army knife for binary data in JavaScript.
          * @exports ByteBuffer
+         * @constructor
          * @param {number=} capacity Initial capacity. Defaults to {@link ByteBuffer.DEFAULT_CAPACITY}.
          * @param {boolean=} littleEndian Whether to use little or big endian byte order. Defaults to
          *  {@link ByteBuffer.DEFAULT_ENDIAN}.
@@ -117,7 +118,7 @@
          * @const
          * @expose
          */
-        ByteBuffer.VERSION = "3.0.0-RC2";
+        ByteBuffer.VERSION = "3.0.0";
 
         /**
          * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -308,7 +309,13 @@
                     bb.limit = buffer.byteLength;
                     bb.view = buffer.byteLength > 0 ? new DataView(buffer) : null;
                 }
-            } else throw(new TypeError("Illegal buffer"));
+            } else if (Object.prototype.toString.call(buffer) === "[object Array]") { // Create from octets
+                bb = new ByteBuffer(buffer.length, littleEndian, noAssert);
+                bb.limit = buffer.length;
+                for (i=0; i<buffer.length; ++i)
+                    bb.view.setUint8(i, buffer[i]);
+            } else
+                throw(new TypeError("Illegal buffer")); // Otherwise fail
             return bb;
         };
 

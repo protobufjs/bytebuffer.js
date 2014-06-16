@@ -33,6 +33,7 @@ module.exports = (function() {
      * Constructs a new ByteBuffer.
      * @class The swiss army knife for binary data in JavaScript.
      * @exports ByteBuffer
+     * @constructor
      * @param {number=} capacity Initial capacity. Defaults to {@link ByteBuffer.DEFAULT_CAPACITY}.
      * @param {boolean=} littleEndian Whether to use little or big endian byte order. Defaults to
      *  {@link ByteBuffer.DEFAULT_ENDIAN}.
@@ -109,7 +110,7 @@ module.exports = (function() {
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "3.0.0-RC2";
+    ByteBuffer.VERSION = "3.0.0";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -305,8 +306,11 @@ module.exports = (function() {
                 }
             }
             buffer = b;
-        } else if (!(buffer instanceof Buffer))
-            throw(new TypeError("Illegal buffer"));
+        } else if (!(buffer instanceof Buffer)) { // Create from octets if it is an error, otherwise fail
+            if (Object.prototype.toString.call(buffer) !== "[object Array]")
+                throw(new TypeError("Illegal buffer"));
+            buffer = new Buffer(buffer);
+        }
         bb = new ByteBuffer(0, littleEndian, noAssert);
         if (buffer.length > 0) { // Avoid references to more than one EMPTY_BUFFER
             bb.buffer = buffer;
@@ -3109,8 +3113,14 @@ module.exports = (function() {
 
     /**
      * node-memcpy. This is an optional binding dependency and may not be present.
-     * @type {?function(!(Buffer|ArrayBuffer|Uint8Array), number|!(Buffer|ArrayBuffer), (!(Buffer|ArrayBuffer|Uint8Array)|number)=, number=, number=):number}
-     * @see https://npmjs.org/package/memcpy
+     * @function
+     * @param {!(Buffer|ArrayBuffer|Uint8Array)} target Destination
+     * @param {number|!(Buffer|ArrayBuffer)} targetStart Destination start, defaults to 0.
+     * @param {(!(Buffer|ArrayBuffer|Uint8Array)|number)=} source Source
+     * @param {number=} sourceStart Source start, defaults to 0.
+     * @param {number=} sourceEnd Source end, defaults to capacity.
+     * @returns {number} Number of bytes copied
+     * @throws {Error} If any index is out of bounds
      * @expose
      */
     ByteBuffer.memcpy = memcpy;

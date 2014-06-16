@@ -3,6 +3,7 @@
  * Constructs a new ByteBuffer.
  * @class The swiss army knife for binary data in JavaScript.
  * @exports ByteBuffer
+ * @constructor
  * @param {number=} capacity Initial capacity. Defaults to {@link ByteBuffer.DEFAULT_CAPACITY}.
  * @param {boolean=} littleEndian Whether to use little or big endian byte order. Defaults to
  *  {@link ByteBuffer.DEFAULT_ENDIAN}.
@@ -178,7 +179,7 @@ ByteBuffer.Long = Long || null;
 //? }
 //? if (FLOATS) {
 
-//? include("types/floats/*.js");
+//? include("types/floats/float*.js");
 //? }
 //? if (VARINTS) {
 

@@ -76,8 +76,11 @@ ByteBuffer.wrap = function(buffer, encoding, littleEndian, noAssert) {
             }
         }
         buffer = b;
-    } else if (!(buffer instanceof Buffer))
-        throw(new TypeError("Illegal buffer"));
+    } else if (!(buffer instanceof Buffer)) { // Create from octets if it is an error, otherwise fail
+        if (Object.prototype.toString.call(buffer) !== "[object Array]")
+            throw(new TypeError("Illegal buffer"));
+        buffer = new Buffer(buffer);
+    }
     bb = new ByteBuffer(0, littleEndian, noAssert);
     if (buffer.length > 0) { // Avoid references to more than one EMPTY_BUFFER
         bb.buffer = buffer;
@@ -102,7 +105,13 @@ ByteBuffer.wrap = function(buffer, encoding, littleEndian, noAssert) {
             bb.limit = buffer.byteLength;
             bb.view = buffer.byteLength > 0 ? new DataView(buffer) : null;
         }
-    } else throw(new TypeError("Illegal buffer"));
+    } else if (Object.prototype.toString.call(buffer) === "[object Array]") { // Create from octets
+        bb = new ByteBuffer(buffer.length, littleEndian, noAssert);
+        bb.limit = buffer.length;
+        for (i=0; i<buffer.length; ++i)
+            bb.view.setUint8(i, buffer[i]);
+    } else
+        throw(new TypeError("Illegal buffer")); // Otherwise fail
     //? }
     return bb;
 };
