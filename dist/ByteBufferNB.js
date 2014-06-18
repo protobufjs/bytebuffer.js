@@ -110,7 +110,7 @@ module.exports = (function() {
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "3.0.0";
+    ByteBuffer.VERSION = "3.0.1";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -242,7 +242,7 @@ module.exports = (function() {
     /**
      * Wraps a buffer or a string. Sets the allocated ByteBuffer's {@link ByteBuffer#offset} to `0` and its
      *  {@link ByteBuffer#limit} to the length of the wrapped data.
-     * @param {!ByteBuffer|!Buffer|!ArrayBuffer|!Uint8Array|string} buffer Anything that can be wrapped
+     * @param {!ByteBuffer|!Buffer|!ArrayBuffer|!Uint8Array|string|!Array.<number>} buffer Anything that can be wrapped
      * @param {(string|boolean)=} encoding String encoding if `buffer` is a string ("base64", "hex", "binary", defaults to
      *  "utf8")
      * @param {boolean=} littleEndian Whether to use little or big endian byte order. Defaults to

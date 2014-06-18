@@ -2,9 +2,9 @@
  * Wraps a buffer or a string. Sets the allocated ByteBuffer's {@link ByteBuffer#offset} to `0` and its
  *  {@link ByteBuffer#limit} to the length of the wrapped data.
 //? if (NODE) {
- * @param {!ByteBuffer|!Buffer|!ArrayBuffer|!Uint8Array|string} buffer Anything that can be wrapped
+ * @param {!ByteBuffer|!Buffer|!ArrayBuffer|!Uint8Array|string|!Array.<number>} buffer Anything that can be wrapped
 //? } else {
- * @param {!ByteBuffer|!ArrayBuffer|!Uint8Array|string} buffer Anything that can be wrapped
+ * @param {!ByteBuffer|!ArrayBuffer|!Uint8Array|string|!Array.<number>} buffer Anything that can be wrapped
 //? }
  * @param {(string|boolean)=} encoding String encoding if `buffer` is a string ("base64", "hex", "binary", defaults to
  *  "utf8")

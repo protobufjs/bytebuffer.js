@@ -1,6 +1,6 @@
 {
     "name": "bytebuffer",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "description": "The swiss army knife for binary data in JavaScript.",
     "main": "ByteBuffer.js",
@@ -15,9 +15,6 @@
     "dependencies": {
         "long": "~1",
         "bufferview": "~1"
-    },
-    "optionalDependencies": {
-        "memcpy": "~0.4"
     },
     "devDependencies": {
         "testjs": "~1",
