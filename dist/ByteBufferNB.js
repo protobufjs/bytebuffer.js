@@ -110,7 +110,7 @@ module.exports = (function() {
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "3.0.1";
+    ByteBuffer.VERSION = "3.0.2";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -1715,16 +1715,16 @@ module.exports = (function() {
     // types/strings/utf8string
 
     /**
-     * Metrics representing number of UTF8 characters. Evaluates to `1`.
-     * @type {number}
+     * Metrics representing number of UTF8 characters. Evaluates to `c`.
+     * @type {string}
      * @const
      * @expose
      */
     ByteBuffer.METRICS_CHARS = 'c';
 
     /**
-     * Metrics representing number of bytes. Evaluates to `2`.
-     * @type {number}
+     * Metrics representing number of bytes. Evaluates to `b`.
+     * @type {string}
      * @const
      * @expose
      */
@@ -1805,7 +1805,7 @@ module.exports = (function() {
 
     /**
      * Reads an UTF8 encoded string.
-     * @param {number} length Number of characters or bytes to read
+     * @param {number} length Number of characters or bytes to read.
      * @param {number=} metrics Metrics specifying what `n` is meant to count. Defaults to
      *  {@link ByteBuffer.METRICS_CHARS}.
      * @param {number=} offset Offset to read from. Will use and increase {@link ByteBuffer#offset} by the number of bytes

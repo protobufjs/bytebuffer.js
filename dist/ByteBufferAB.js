@@ -118,7 +118,7 @@
          * @const
          * @expose
          */
-        ByteBuffer.VERSION = "3.0.1";
+        ByteBuffer.VERSION = "3.0.2";
 
         /**
          * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -1406,8 +1406,15 @@
             if (offset > capacity12)
                 this.resize((capacity12 *= 2) > offset ? capacity12 : offset);
             offset -= k+1;
-            for (i=0, k=str.length; i<k; ++i)
-                offset += utf8_encode_char(str.codePointAt(i), this, offset);
+            var cp; k = str.length;
+            for (i=0; i<k; i++) {
+                cp = str.charCodeAt(i);
+                if (cp >= 0xD800 && cp <= 0xDFFF) {
+                    cp = str.codePointAt(i);
+                    if (cp > 0xFFFF) i++;
+                }
+                offset += utf8_encode_char(cp, this, offset);
+            }
             this.view.setUint8(offset++, 0);
             if (relative) {
                 this.offset = offset;
@@ -1490,8 +1497,13 @@
             this.view.setUint32(offset, k, this.littleEndian);
             offset += 4;
             k = str.length;
-            for (var i=0; i<k; ++i) {
-                offset += utf8_encode_char(str.codePointAt(i), this, offset);
+            for (var i=0, cp; i<k; i++) {
+                cp = str.charCodeAt(i);
+                if (cp >= 0xD800 && cp <= 0xDFFF) {
+                    cp = str.codePointAt(i);
+                    if (cp > 0xFFFF) i++;
+                }
+                offset += utf8_encode_char(cp, this, offset);
             }
             if (relative) {
                 this.offset = offset;
@@ -1546,16 +1558,16 @@
         // types/strings/utf8string
 
         /**
-         * Metrics representing number of UTF8 characters. Evaluates to `1`.
-         * @type {number}
+         * Metrics representing number of UTF8 characters. Evaluates to `c`.
+         * @type {string}
          * @const
          * @expose
          */
         ByteBuffer.METRICS_CHARS = 'c';
 
         /**
-         * Metrics representing number of bytes. Evaluates to `2`.
-         * @type {number}
+         * Metrics representing number of bytes. Evaluates to `b`.
+         * @type {string}
          * @const
          * @expose
          */
@@ -1644,7 +1656,7 @@
 
         /**
          * Reads an UTF8 encoded string.
-         * @param {number} length Number of characters or bytes to read
+         * @param {number} length Number of characters or bytes to read.
          * @param {number=} metrics Metrics specifying what `n` is meant to count. Defaults to
          *  {@link ByteBuffer.METRICS_CHARS}.
          * @param {number=} offset Offset to read from. Will use and increase {@link ByteBuffer#offset} by the number of bytes
@@ -1770,8 +1782,13 @@
             offset -= l+k;
             offset += this.writeVarint32(k, offset);
             k = str.length;
-            for (var i=0; i<k; ++i) {
-                offset += utf8_encode_char(str.codePointAt(i), this, offset);
+            for (var i=0, cp; i<k; i++) {
+                cp = str.charCodeAt(i);
+                if (cp >= 0xD800 && cp <= 0xDFFF) {
+                    cp = str.codePointAt(i);
+                    if (cp > 0xFFFF) i++;
+                }
+                offset += utf8_encode_char(cp, this, offset);
             }
             if (relative) {
                 this.offset = offset;

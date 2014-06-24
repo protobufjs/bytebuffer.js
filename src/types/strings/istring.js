@@ -33,8 +33,13 @@ ByteBuffer.prototype.writeIString = function(str, offset) {
     this.view.setUint32(offset, k, this.littleEndian);
     offset += 4;
     k = str.length;
-    for (var i=0; i<k; ++i) {
-        offset += utf8_encode_char(str.codePointAt(i), this, offset);
+    for (var i=0, cp; i<k; i++) {
+        cp = str.charCodeAt(i);
+        if (cp >= 0xD800 && cp <= 0xDFFF) {
+            cp = str.codePointAt(i);
+            if (cp > 0xFFFF) i++;
+        }
+        offset += utf8_encode_char(cp, this, offset);
     }
     //? }
     if (relative) {

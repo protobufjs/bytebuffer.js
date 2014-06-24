@@ -36,8 +36,15 @@ ByteBuffer.prototype.writeCString = function(str, offset) {
     //? } else {
     k = utf8_calc_string(str);
     //? ENSURE_CAPACITY('k+1');
-    for (i=0, k=str.length; i<k; ++i)
-        offset += utf8_encode_char(str.codePointAt(i), this, offset);
+    var cp; k = str.length;
+    for (i=0; i<k; i++) {
+        cp = str.charCodeAt(i);
+        if (cp >= 0xD800 && cp <= 0xDFFF) {
+            cp = str.codePointAt(i);
+            if (cp > 0xFFFF) i++;
+        }
+        offset += utf8_encode_char(cp, this, offset);
+    }
     this.view.setUint8(offset++, 0);
     //? }
     if (relative) {
