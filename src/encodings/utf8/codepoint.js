@@ -33,7 +33,7 @@ if (!String.fromCodePoint) {
                         codePoint > 0x10FFFF || // not a valid Unicode code point
                         floor(codePoint) != codePoint // not an integer
                     ) {
-                    throw RangeError('Invalid code point: ' + codePoint);
+                    throw new RangeError('Invalid code point: ' + codePoint);
                 }
                 if (codePoint <= 0xFFFF) { // BMP code point
                     codeUnits.push(codePoint);
@@ -68,8 +68,8 @@ if (!String.prototype.codePointAt) {
     (function() {
         'use strict'; // needed to support `apply`/`call` with `undefined`/`null`
         var codePointAt = function(position) {
-            if (this == null) {
-                throw TypeError();
+            if (this === null) {
+                throw new TypeError();
             }
             var string = String(this);
             var size = string.length;

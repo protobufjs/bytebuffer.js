@@ -55,7 +55,7 @@ ByteBuffer.prototype.toBinary = function(begin, end) {
 ByteBuffer.fromBinary = function(str, littleEndian, noAssert) {
     if (!noAssert) {
         if (typeof str !== 'string')
-            throw(new TypeError("Illegal str: Not a string"));
+            throw new TypeError("Illegal str: Not a string");
     }
     //? if (NODE) {
     var bb = new ByteBuffer(0, littleEndian, noAssert);
@@ -70,7 +70,7 @@ ByteBuffer.fromBinary = function(str, littleEndian, noAssert) {
     while (i<k) {
         charCode = str.charCodeAt(i);
         if (!noAssert && charCode > 255)
-            throw(new TypeError("Illegal charCode at "+i+": 0 <= "+charCode+" <= 255"));
+            throw new TypeError("Illegal charCode at "+i+": 0 <= "+charCode+" <= 255");
         //? if (NODE)
         bb.buffer[i++] = charCode;
         //? else

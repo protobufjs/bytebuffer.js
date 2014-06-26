@@ -41,9 +41,9 @@ ByteBuffer.prototype.toHex = function(begin, end) {
 ByteBuffer.fromHex = function(str, littleEndian, noAssert) {
     if (!noAssert) {
         if (typeof str !== 'string')
-            throw(new TypeError("Illegal str: Not a string"));
+            throw new TypeError("Illegal str: Not a string");
         if (str.length % 2 !== 0)
-            throw(new TypeError("Illegal str: Length not a multiple of 2"));
+            throw new TypeError("Illegal str: Length not a multiple of 2");
     }
     //? if (NODE) {
     var bb = new ByteBuffer(0, littleEndian, true);
@@ -59,7 +59,7 @@ ByteBuffer.fromHex = function(str, littleEndian, noAssert) {
         b = parseInt(str.substring(i, i+2), 16);
         if (!noAssert) {
             if (!isFinite(b) || b < 0 || b > 255)
-                throw(new TypeError("Illegal str: Contains non-hex characters"));
+                throw new TypeError("Illegal str: Contains non-hex characters");
         }
         bb.view.setUint8(j++, b);
     }

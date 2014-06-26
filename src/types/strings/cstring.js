@@ -16,10 +16,10 @@ ByteBuffer.prototype.writeCString = function(str, offset) {
         k = str.length;
     if (!this.noAssert) {
         if (typeof str !== 'string')
-            throw(new TypeError("Illegal str: Not a string"));
+            throw new TypeError("Illegal str: Not a string");
         for (i=0; i<k; ++i) {
             if (str.codePointAt(i) === 0)
-                throw(new RangeError("Illegal str: Contains NULL-characters"));
+                throw new RangeError("Illegal str: Contains NULL-characters");
         }
         //? ASSERT_OFFSET();
     }
@@ -74,7 +74,7 @@ ByteBuffer.prototype.readCString = function(offset) {
     //? if (NODE) {
     do {
         if (offset >= this.buffer.length)
-            throw(new RangeError("Index out of range: "+offset+" <= "+this.buffer.length));
+            throw new RangeError("Index out of range: "+offset+" <= "+this.buffer.length);
         temp = this.buffer[offset++];
     } while (temp !== 0);
     var str = this.buffer.slice(start, offset-1).toString("utf8");

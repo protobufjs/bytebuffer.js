@@ -53,6 +53,7 @@ function makeSuite(ByteBuffer) {
     var suite = {};
     
     suite.init = function(test) {
+        test.ok(require("../index.js"));
         if (type === Buffer)
             test.log("\n\n                    --- node Buffer backed ByteBuffer ---\n".bold.white);
         else

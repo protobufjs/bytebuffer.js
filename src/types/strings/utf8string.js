@@ -106,7 +106,7 @@ ByteBuffer.calculateUTF8Bytes = utf8_calc_string;
 /**
  * Reads an UTF8 encoded string.
  * @param {number} length Number of characters or bytes to read.
- * @param {number=} metrics Metrics specifying what `n` is meant to count. Defaults to
+ * @param {string=} metrics Metrics specifying what `length` is meant to count. Defaults to
  *  {@link ByteBuffer.METRICS_CHARS}.
  * @param {number=} offset Offset to read from. Will use and increase {@link ByteBuffer#offset} by the number of bytes
  *  read if omitted.
@@ -170,7 +170,7 @@ ByteBuffer.prototype.readUTF8String = function(length, metrics, offset) {
             out.push(temp['codePoint']);
         }
         if (offset !== k)
-            throw(new RangeError("Illegal range: Truncated character at "+k));
+            throw new RangeError("Illegal range: Truncated character at "+k);
         if (relative) {
             this.offset = offset;
             return String.fromCodePoint.apply(String, out);
@@ -182,7 +182,7 @@ ByteBuffer.prototype.readUTF8String = function(length, metrics, offset) {
         }
         //? }
     } else
-        throw(new TypeError("Unsupported metrics: "+metrics));
+        throw new TypeError("Unsupported metrics: "+metrics);
 };
 //? if (ALIASES) {
 

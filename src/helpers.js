@@ -26,7 +26,7 @@ var EMPTY_BUFFER = new ArrayBuffer(0);
  */
 function assertInteger(value, unsigned) {
     if (typeof value !== 'number' || value % 1 !== 0)
-        throw(new TypeError("Illegal value: "+offset+" (not an integer)"));
+        throw new TypeError("Illegal value: "+offset+" (not an integer)");
     return unsigned ? value >>> 0 : value | 0;
 }
 
@@ -48,7 +48,7 @@ function assertLong(value, unsigned) {
         }
         return value;
     } else
-        throw(new TypeError("Illegal value: "+value+" (not an integer or Long)"));
+        throw new TypeError("Illegal value: "+value+" (not an integer or Long)");
 }
 
 /**
@@ -64,10 +64,10 @@ function assertLong(value, unsigned) {
  */
 function assertOffset(offset, min, cap, size) {
     if (typeof offset !== 'number' || offset % 1 !== 0)
-        throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+        throw new TypeError("Illegal offset: "+offset+" (not an integer)");
     offset = offset | 0;
     if (offset < min || offset > cap-size)
-        throw(new RangeError("Illegal offset: "+min+" <= "+value+" <= "+cap+"-"+size));
+        throw new RangeError("Illegal offset: "+min+" <= "+value+" <= "+cap+"-"+size);
     return offset;
 }
 
@@ -89,13 +89,13 @@ var rangeVal = new Array(2);
  */
 function assertRange(begin, end, min, cap) {
     if (typeof begin !== 'number' || begin % 1 !== 0)
-        throw(new TypeError("Illegal begin: "+begin+" (not a number)"));
+        throw new TypeError("Illegal begin: "+begin+" (not a number)");
     begin = begin | 0;
     if (typeof end !== 'number' || end % 1 !== 0)
-        throw(new TypeError("Illegal end: "+range[1]+" (not a number)"));
+        throw new TypeError("Illegal end: "+range[1]+" (not a number)");
     end = end | 0;
     if (begin < min || begin > end || end > cap)
-        throw(new RangeError("Illegal range: "+min+" <= "+begin+" <= "+end+" <= "+cap));
+        throw new RangeError("Illegal range: "+min+" <= "+begin+" <= "+end+" <= "+cap);
     rangeVal[0] = begin; rangeVal[1] = end;
 }
 //? }

@@ -28,7 +28,7 @@ ByteBuffer.prototype.toUTF8 = function(begin, end) {
     }
     if (!this.noAssert) {
         if (begin !== end)
-            throw(new RangeError("Illegal range: Truncated data"));
+            throw new RangeError("Illegal range: Truncated data");
     }
     return String.fromCodePoint.apply(String, out);
     //? }
@@ -47,7 +47,7 @@ ByteBuffer.prototype.toUTF8 = function(begin, end) {
 ByteBuffer.fromUTF8 = function(str, littleEndian, noAssert) {
     if (!noAssert) {
         if (typeof str !== 'string')
-            throw(new TypeError("Illegal str: Not a string"));
+            throw new TypeError("Illegal str: Not a string");
     }
     //? if (NODE) {
     var bb = new ByteBuffer(0, littleEndian, noAssert);

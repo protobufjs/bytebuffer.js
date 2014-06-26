@@ -160,7 +160,7 @@ if (Long) {
         b = this.buffer[offset++]; part1 |= (b & 0x7F) << 21; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
         b = this.buffer[offset++]; part2  = (b & 0x7F)      ; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
         b = this.buffer[offset++]; part2 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-        throw(new Error("Data must be corrupt: Buffer overrun")); }}}}}}}}}}
+        throw new Error("Data must be corrupt: Buffer overrun"); }}}}}}}}}}
         //? } else { // Assert as usual
         b = this.buffer.readUint8(offset++, true         ); part0  = (b & 0x7F)      ; if (b & 0x80) {
         b = this.buffer.readUint8(offset++, this.noAssert); part0 |= (b & 0x7F) <<  7; if (b & 0x80) {
@@ -172,7 +172,7 @@ if (Long) {
         b = this.buffer.readUint8(offset++, this.noAssert); part1 |= (b & 0x7F) << 21; if (b & 0x80) {
         b = this.buffer.readUint8(offset++, this.noAssert); part2  = (b & 0x7F)      ; if (b & 0x80) {
         b = this.buffer.readUint8(offset++, this.noAssert); part2 |= (b & 0x7F) <<  7; if (b & 0x80) {
-        throw(new Error("Data must be corrupt: Buffer overrun")); }}}}}}}}}}
+        throw new Error("Data must be corrupt: Buffer overrun"); }}}}}}}}}}
         //? }
     //? } else { // Asserts on its own
         b = this.view.getUint8(offset++); part0  = (b & 0x7F)      ; if (b & 0x80) {
@@ -185,7 +185,7 @@ if (Long) {
         b = this.view.getUint8(offset++); part1 |= (b & 0x7F) << 21; if (b & 0x80) {
         b = this.view.getUint8(offset++); part2  = (b & 0x7F)      ; if (b & 0x80) {
         b = this.view.getUint8(offset++); part2 |= (b & 0x7F) <<  7; if (b & 0x80) {
-        throw(new Error("Data must be corrupt: Buffer overrun")); }}}}}}}}}}
+        throw new Error("Data must be corrupt: Buffer overrun"); }}}}}}}}}}
     //? }
         var value = Long.from28Bits(part0, part1, part2, false);
         if (relative) {

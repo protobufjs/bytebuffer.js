@@ -40,7 +40,7 @@ ByteBuffer.prototype.copyTo = function(target, targetOffset, sourceOffset, sourc
         targetRelative;
     if (!this.noAssert) {
         if (!ByteBuffer.isByteBuffer(target))
-            throw(new TypeError("Illegal target: Not a ByteBuffer"));
+            throw new TypeError("Illegal target: Not a ByteBuffer");
     }
     targetOffset = (targetRelative = typeof targetOffset === 'undefined') ? target.offset : targetOffset | 0;
     sourceOffset = (relative = typeof sourceOffset === 'undefined') ? this.offset : sourceOffset | 0;
@@ -48,9 +48,9 @@ ByteBuffer.prototype.copyTo = function(target, targetOffset, sourceOffset, sourc
 
     //? var TARGET_CAPACITY = NODE ? 'target.buffer.length' : 'target.buffer.byteLength';
     if (targetOffset < 0 || targetOffset > /*?= TARGET_CAPACITY */)
-        throw(new RangeError("Illegal target range: 0 <= "+targetOffset+" <= "+/*?= TARGET_CAPACITY */));
+        throw new RangeError("Illegal target range: 0 <= "+targetOffset+" <= "+/*?= TARGET_CAPACITY */);
     if (sourceOffset < 0 || sourceLimit > /*?= CAPACITY */)
-        throw(new RangeError("Illegal source range: 0 <= "+sourceOffset+" <= "+/*?= CAPACITY */));
+        throw new RangeError("Illegal source range: 0 <= "+sourceOffset+" <= "+/*?= CAPACITY */);
 
     var len = sourceLimit - sourceOffset;
     if (len === 0)

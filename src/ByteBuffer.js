@@ -18,11 +18,11 @@ var ByteBuffer = function(capacity, littleEndian, noAssert) {
     if (!noAssert) {
         capacity = capacity | 0;
         if (capacity < 0)
-            throw(new RangeError("Illegal capacity: 0 <= "+capacity));
+            throw new RangeError("Illegal capacity: 0 <= "+capacity);
         if (typeof littleEndian !== 'boolean')
-            throw(new TypeError("Illegal littleEndian: Not a boolean"));
+            throw new TypeError("Illegal littleEndian: Not a boolean");
         if (typeof noAssert !== 'boolean')
-            throw(new TypeError("Illegal noAssert: Not a boolean"));
+            throw new TypeError("Illegal noAssert: Not a boolean");
     }
     //? if (NODE) {
     

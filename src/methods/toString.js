@@ -32,6 +32,6 @@ ByteBuffer.prototype.toString = function(encoding) {
         //? }
         //? } // ENCODINGS
         default:
-            throw(new Error("Unsupported encoding: "+encoding));
+            throw new Error("Unsupported encoding: "+encoding);
     }
 };

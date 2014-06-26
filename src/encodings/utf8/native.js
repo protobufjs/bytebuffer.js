@@ -14,7 +14,7 @@ function utf8_decode_char(bb, offset) { //? // Also required for node to extract
         codePoint;
     //? if (NODE) {
     if (offset+1 > bb.buffer.length)
-        throw RangeError("Index out of range: "+offset+" + 1 <= "+bb.buffer.length);
+        throw new RangeError("Index out of range: "+offset+" + 1 <= "+bb.buffer.length);
     a = bb.buffer[offset++];
     //? } else {
     a = bb.view.getUint8(offset++);
@@ -24,7 +24,7 @@ function utf8_decode_char(bb, offset) { //? // Also required for node to extract
     } else if ((a&0xE0) === 0xC0) {
     //? if (NODE) {
         if (offset+1 > bb.buffer.length)
-            throw RangeError("Index out of range: "+offset+" + 1 <= "+bb.buffer.length);
+            throw new RangeError("Index out of range: "+offset+" + 1 <= "+bb.buffer.length);
         b = bb.buffer[offset++];
     //? } else { // getUint8 asserts on its own
         b = bb.view.getUint8(offset++);
@@ -33,7 +33,7 @@ function utf8_decode_char(bb, offset) { //? // Also required for node to extract
     } else if ((a&0xF0) === 0xE0) {
     //? if (NODE) {
         if (offset+2 > bb.buffer.length)
-            throw RangeError("Index out of range: "+offset+" + 2 <= "+bb.buffer.length);
+            throw new RangeError("Index out of range: "+offset+" + 2 <= "+bb.buffer.length);
         b = bb.buffer[offset++];
         c = bb.buffer[offset++];
     //? } else {
@@ -44,7 +44,7 @@ function utf8_decode_char(bb, offset) { //? // Also required for node to extract
     } else if ((a&0xF8) === 0xF0) {
         //? if (NODE) {
         if (offset+3 > bb.buffer.length)
-            throw RangeError("Index out of range: "+offset+" + 3 <= "+bb.buffer.length);
+            throw new RangeError("Index out of range: "+offset+" + 3 <= "+bb.buffer.length);
         b = bb.buffer[offset++];
         c = bb.buffer[offset++];
         d = bb.buffer[offset++];
@@ -55,7 +55,7 @@ function utf8_decode_char(bb, offset) { //? // Also required for node to extract
         //? }
         codePoint = ((a&0x07)<<18) | ((b&0x3F)<<12) | ((c&0x3F)<<6) | (d&0x3F);
     } else
-        throw RangeError("Illegal code point at offset "+offset+": "+a);
+        throw new RangeError("Illegal code point at offset "+offset+": "+a);
     return {
         'codePoint': codePoint,
         'length': offset - start
@@ -71,12 +71,12 @@ function utf8_decode_char(bb, offset) { //? // Also required for node to extract
  */
 function utf8_calc_char(codePoint) {
     if (codePoint < 0)
-        throw RangeError("Illegal code point: "+codePoint);
+        throw new RangeError("Illegal code point: "+codePoint);
     if      (codePoint <       0x80) return 1;
     else if (codePoint <      0x800) return 2;
     else if (codePoint <    0x10000) return 3;
     else if (codePoint <   0x110000) return 4;
-    else throw RangeError("Illegal code point: "+codePoint);
+    else throw new RangeError("Illegal code point: "+codePoint);
 }
 
 /**
@@ -112,7 +112,7 @@ function utf8_calc_string(str) {
 function utf8_encode_char(codePoint, bb, offset) {
     var start = offset;
     if (codePoint < 0)
-        throw RangeError("Illegal code point: "+codePoint);
+        throw new RangeError("Illegal code point: "+codePoint);
     //? // ByteBufferAB only, meta not necessary.
     if (codePoint < 0x80) {
         bb.view.setUint8(offset++,   codePoint     &0x7F)      ;
@@ -129,7 +129,7 @@ function utf8_encode_char(codePoint, bb, offset) {
         bb.view.setUint8(offset++, ((codePoint>>6 )&0x3F)|0x80);
         bb.view.setUint8(offset++, ( codePoint     &0x3F)|0x80);
     } else
-        throw RangeError("Illegal code point: "+codePoint);
+        throw new RangeError("Illegal code point: "+codePoint);
     return offset - start;
 }
 

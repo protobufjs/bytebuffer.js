@@ -9,7 +9,7 @@ ASSERT_INTEGER = function(varValue, unsigned) {
     if (VERBOSE_MS) writeln(__+'// <ASSERT_INTEGER>');
     if (INLINE) {
         writeln(__+'if (typeof '+varValue+' !== \'number\' || '+varValue+' % 1 !== 0)');
-        writeln(__+'    throw(new TypeError("Illegal '+varValue+': "+'+varValue+'+" (not an integer)"));');
+        writeln(__+'    throw new TypeError("Illegal '+varValue+': "+'+varValue+'+" (not an integer)");');
         writeln(__+varValue+' '+(unsigned ? '>>>' : '|')+'= 0;');
     } else {
         writeln(__+varValue+' = assertInteger('+varValue+(typeof unsigned !== 'undefined' ? ', '+unsigned : '')+');');
@@ -35,7 +35,7 @@ ASSERT_LONG = function(varValue, unsigned) {
         } else {
             writeln(__+'else if (!('+varValue+' && '+varValue+' instanceof Long))');
         }
-        writeln(__+'    throw(new TypeError("Illegal '+varValue+': "+'+varValue+'+" (not an integer or Long)"));');
+        writeln(__+'    throw new TypeError("Illegal '+varValue+': "+'+varValue+'+" (not an integer or Long)");');
     } else {
         writeln(__+varValue+' = assertLong('+varValue+(typeof unsigned !== 'undefined' ? ', '+unsigned : '')+');');
     }
@@ -61,10 +61,10 @@ ASSERT_OFFSET = function(size, varOffset) {
     if (VERBOSE_MS) writeln(__+'// <ASSERT_OFFSET>');
     if (INLINE) {
         writeln(__+'if (typeof '+varOffset+' !== \'number\' || '+varOffset+' % 1 !== 0)');
-        writeln(__+'    throw(new TypeError("Illegal '+varOffset+': "+'+varOffset+'+" (not an integer)"));');
+        writeln(__+'    throw new TypeError("Illegal '+varOffset+': "+'+varOffset+'+" (not an integer)");');
         writeln(__+varOffset+' >>>= 0;');
         writeln(__+'if ('+varOffset+' < 0 || '+varOffset+' + '+size+' > '+CAPACITY+')');
-        writeln(__+'    throw(new RangeError("Illegal '+varOffset+': 0 <= "+'+varOffset+'+" (+"+'+size+'+") <= "+'+CAPACITY+'));');
+        writeln(__+'    throw new RangeError("Illegal '+varOffset+': 0 <= "+'+varOffset+'+" (+"+'+size+'+") <= "+'+CAPACITY+');');
     } else {
         writeln(__+varOffset+' = assertOffset('+varOffset+', 0, '+CAPACITY+', '+size+');');
     }
@@ -78,13 +78,13 @@ ASSERT_RANGE = function(varBegin, varEnd) {
     if (VERBOSE_MS) writeln(__+'// <ASSERT_RANGE>');
     if (INLINE) {
         writeln(__+'if (typeof '+varBegin+' !== \'number\' || '+varBegin+' % 1 !== 0)');
-        writeln(__+'    throw(new TypeError("Illegal '+varBegin+': Not an integer"));');
+        writeln(__+'    throw new TypeError("Illegal '+varBegin+': Not an integer");');
         writeln(__+varBegin+' >>>= 0;');
         writeln(__+'if (typeof '+varEnd+' !== \'number\' || '+varEnd+' % 1 !== 0)');
-        writeln(__+'    throw(new TypeError("Illegal '+varEnd+': Not an integer"));');
+        writeln(__+'    throw new TypeError("Illegal '+varEnd+': Not an integer");');
         writeln(__+varEnd+' >>>= 0;');
         writeln(__+'if ('+varBegin+' < 0 || '+varBegin+' > '+varEnd+' || '+varEnd+' > '+CAPACITY+')');
-        writeln(__+'    throw(new RangeError("Illegal range: 0 <= "+'+varBegin+'+" <= "+'+varEnd+'+" <= "+'+CAPACITY+'));');
+        writeln(__+'    throw new RangeError("Illegal range: 0 <= "+'+varBegin+'+" <= "+'+varEnd+'+" <= "+'+CAPACITY+');');
     } else {
         writeln(__+'assertRange('+varBegin+', '+varEnd+', 0, '+CAPACITY+');');
         writeln(__+varBegin+' = rangeVal[0]; '+varEnd+' = rangeVal[1];');

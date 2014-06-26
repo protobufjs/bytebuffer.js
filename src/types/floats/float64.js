@@ -12,7 +12,7 @@ ByteBuffer.prototype.writeFloat64 = function(value, offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         if (typeof value !== 'number')
-            throw(new TypeError("Illegal value: "+value+" (not a number)"));
+            throw new TypeError("Illegal value: "+value+" (not a number)");
         //? ASSERT_OFFSET();
     }
     //? ENSURE_CAPACITY(8);

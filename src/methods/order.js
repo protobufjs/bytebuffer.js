@@ -7,7 +7,7 @@
 ByteBuffer.prototype.order = function(littleEndian) {
     if (!this.noAssert) {
         if (typeof littleEndian !== 'boolean')
-            throw(new TypeError("Illegal littleEndian: Not a boolean"));
+            throw new TypeError("Illegal littleEndian: Not a boolean");
     }
     this.littleEndian = !!littleEndian;
     return this;

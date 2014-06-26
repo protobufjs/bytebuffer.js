@@ -49,11 +49,11 @@
             if (!noAssert) {
                 capacity = capacity | 0;
                 if (capacity < 0)
-                    throw(new RangeError("Illegal capacity: 0 <= "+capacity));
+                    throw new RangeError("Illegal capacity: 0 <= "+capacity);
                 if (typeof littleEndian !== 'boolean')
-                    throw(new TypeError("Illegal littleEndian: Not a boolean"));
+                    throw new TypeError("Illegal littleEndian: Not a boolean");
                 if (typeof noAssert !== 'boolean')
-                    throw(new TypeError("Illegal noAssert: Not a boolean"));
+                    throw new TypeError("Illegal noAssert: Not a boolean");
             }
 
             /**
@@ -118,7 +118,7 @@
          * @const
          * @expose
          */
-        ByteBuffer.VERSION = "3.0.2";
+        ByteBuffer.VERSION = "3.0.3";
 
         /**
          * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -282,11 +282,11 @@
                     case "debug":
                         return ByteBuffer.fromDebug(buffer, littleEndian);
                     default:
-                        throw(new TypeError("Unsupported encoding: "+encoding));
+                        throw new TypeError("Unsupported encoding: "+encoding);
                 }
             }
             if (buffer === null || typeof buffer !== 'object')
-                throw(new TypeError("Illegal buffer: null or non-object"));
+                throw new TypeError("Illegal buffer: null or non-object");
             var bb;
             if (ByteBuffer.isByteBuffer(buffer)) {
                 bb = ByteBuffer.prototype.clone.call(buffer);
@@ -315,7 +315,7 @@
                 for (i=0; i<buffer.length; ++i)
                     bb.view.setUint8(i, buffer[i]);
             } else
-                throw(new TypeError("Illegal buffer")); // Otherwise fail
+                throw new TypeError("Illegal buffer"); // Otherwise fail
             return bb;
         };
 
@@ -333,13 +333,13 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof value !== 'number' || value % 1 !== 0)
-                    throw(new TypeError("Illegal value: "+value+" (not an integer)"));
+                    throw new TypeError("Illegal value: "+value+" (not an integer)");
                 value |= 0;
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             offset += 1;
             var capacity0 = this.buffer.byteLength;
@@ -372,10 +372,10 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 1 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength);
             }
             var value = this.view.getInt8(offset);
             if (relative) this.offset += 1;
@@ -403,13 +403,13 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof value !== 'number' || value % 1 !== 0)
-                    throw(new TypeError("Illegal value: "+value+" (not an integer)"));
+                    throw new TypeError("Illegal value: "+value+" (not an integer)");
                 value >>>= 0;
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             offset += 1;
             var capacity1 = this.buffer.byteLength;
@@ -432,10 +432,10 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 1 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength);
             }
             var value = this.view.getUint8(offset);
             if (relative) this.offset += 1;
@@ -457,13 +457,13 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof value !== 'number' || value % 1 !== 0)
-                    throw(new TypeError("Illegal value: "+value+" (not an integer)"));
+                    throw new TypeError("Illegal value: "+value+" (not an integer)");
                 value |= 0;
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             offset += 2;
             var capacity2 = this.buffer.byteLength;
@@ -499,10 +499,10 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 2 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+2+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+2+") <= "+this.buffer.byteLength);
             }
             var value = this.view.getInt16(offset, this.littleEndian);
             if (relative) this.offset += 2;
@@ -533,13 +533,13 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof value !== 'number' || value % 1 !== 0)
-                    throw(new TypeError("Illegal value: "+value+" (not an integer)"));
+                    throw new TypeError("Illegal value: "+value+" (not an integer)");
                 value >>>= 0;
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             offset += 2;
             var capacity3 = this.buffer.byteLength;
@@ -564,10 +564,10 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 2 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+2+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+2+") <= "+this.buffer.byteLength);
             }
             var value = this.view.getUint16(offset, this.littleEndian);
             if (relative) this.offset += 2;
@@ -587,13 +587,13 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof value !== 'number' || value % 1 !== 0)
-                    throw(new TypeError("Illegal value: "+value+" (not an integer)"));
+                    throw new TypeError("Illegal value: "+value+" (not an integer)");
                 value |= 0;
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             offset += 4;
             var capacity4 = this.buffer.byteLength;
@@ -624,10 +624,10 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 4 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength);
             }
             var value = this.view.getInt32(offset, this.littleEndian);
             if (relative) this.offset += 4;
@@ -653,13 +653,13 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof value !== 'number' || value % 1 !== 0)
-                    throw(new TypeError("Illegal value: "+value+" (not an integer)"));
+                    throw new TypeError("Illegal value: "+value+" (not an integer)");
                 value >>>= 0;
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             offset += 4;
             var capacity5 = this.buffer.byteLength;
@@ -682,10 +682,10 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 4 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength);
             }
             var value = this.view.getUint32(offset, this.littleEndian);
             if (relative) this.offset += 4;
@@ -710,12 +710,12 @@
                     if (typeof value === 'number')
                         value = Long.fromNumber(value);
                     else if (!(value && value instanceof Long))
-                        throw(new TypeError("Illegal value: "+value+" (not an integer or Long)"));
+                        throw new TypeError("Illegal value: "+value+" (not an integer or Long)");
                     if (typeof offset !== 'number' || offset % 1 !== 0)
-                        throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                        throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                     offset >>>= 0;
                     if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                        throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                        throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
                 }
                 if (typeof value === 'number')
                     value = Long.fromNumber(value);
@@ -755,10 +755,10 @@
                 if (relative) offset = this.offset;
                 if (!this.noAssert) {
                     if (typeof offset !== 'number' || offset % 1 !== 0)
-                        throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                        throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                     offset >>>= 0;
                     if (offset < 0 || offset + 8 > this.buffer.byteLength)
-                        throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.byteLength));
+                        throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.byteLength);
                 }
                 var value = this.littleEndian
                     ? new Long(this.view.getInt32(offset  , true ), this.view.getInt32(offset+4, true ), false)
@@ -789,12 +789,12 @@
                     if (typeof value === 'number')
                         value = Long.fromNumber(value);
                     else if (!(value && value instanceof Long))
-                        throw(new TypeError("Illegal value: "+value+" (not an integer or Long)"));
+                        throw new TypeError("Illegal value: "+value+" (not an integer or Long)");
                     if (typeof offset !== 'number' || offset % 1 !== 0)
-                        throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                        throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                     offset >>>= 0;
                     if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                        throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                        throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
                 }
                 if (typeof value === 'number')
                     value = Long.fromNumber(value);
@@ -825,10 +825,10 @@
                 if (relative) offset = this.offset;
                 if (!this.noAssert) {
                     if (typeof offset !== 'number' || offset % 1 !== 0)
-                        throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                        throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                     offset >>>= 0;
                     if (offset < 0 || offset + 8 > this.buffer.byteLength)
-                        throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.byteLength));
+                        throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.byteLength);
                 }
                 var value = this.littleEndian
                     ? new Long(this.view.getInt32(offset  , true ), this.view.getInt32(offset+4, true ), true)
@@ -854,12 +854,12 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof value !== 'number')
-                    throw(new TypeError("Illegal value: "+value+" (not a number)"));
+                    throw new TypeError("Illegal value: "+value+" (not a number)");
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             offset += 4;
             var capacity8 = this.buffer.byteLength;
@@ -892,10 +892,10 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 4 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength);
             }
             var value = this.view.getFloat32(offset, this.littleEndian);
             if (relative) this.offset += 4;
@@ -925,12 +925,12 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof value !== 'number')
-                    throw(new TypeError("Illegal value: "+value+" (not a number)"));
+                    throw new TypeError("Illegal value: "+value+" (not a number)");
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             offset += 8;
             var capacity9 = this.buffer.byteLength;
@@ -963,10 +963,10 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 8 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.byteLength);
             }
             var value = this.view.getFloat64(offset, this.littleEndian);
             if (relative) this.offset += 8;
@@ -1042,13 +1042,13 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof value !== 'number' || value % 1 !== 0)
-                    throw(new TypeError("Illegal value: "+value+" (not an integer)"));
+                    throw new TypeError("Illegal value: "+value+" (not an integer)");
                 value |= 0;
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             var size = ByteBuffer.calculateVarint32(value),
                 b;
@@ -1121,10 +1121,10 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 1 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength);
             }
             // ref: src/google/protobuf/io/coded_stream.cc
             var size = 0,
@@ -1249,12 +1249,12 @@
                     if (typeof value === 'number')
                         value = Long.fromNumber(value);
                     else if (!(value && value instanceof Long))
-                        throw(new TypeError("Illegal value: "+value+" (not an integer or Long)"));
+                        throw new TypeError("Illegal value: "+value+" (not an integer or Long)");
                     if (typeof offset !== 'number' || offset % 1 !== 0)
-                        throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                        throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                     offset >>>= 0;
                     if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                        throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                        throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
                 }
                 if (typeof value === 'number')
                     value = Long.fromNumber(value, false);
@@ -1314,10 +1314,10 @@
                 if (relative) offset = this.offset;
                 if (!this.noAssert) {
                     if (typeof offset !== 'number' || offset % 1 !== 0)
-                        throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                        throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                     offset >>>= 0;
                     if (offset < 0 || offset + 1 > this.buffer.byteLength)
-                        throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength));
+                        throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength);
                 }
                 // ref: src/google/protobuf/io/coded_stream.cc
                 var start = offset,
@@ -1335,7 +1335,7 @@
                 b = this.view.getUint8(offset++); part1 |= (b & 0x7F) << 21; if (b & 0x80) {
                 b = this.view.getUint8(offset++); part2  = (b & 0x7F)      ; if (b & 0x80) {
                 b = this.view.getUint8(offset++); part2 |= (b & 0x7F) <<  7; if (b & 0x80) {
-                throw(new Error("Data must be corrupt: Buffer overrun")); }}}}}}}}}}
+                throw new Error("Data must be corrupt: Buffer overrun"); }}}}}}}}}}
                 var value = Long.from28Bits(part0, part1, part2, false);
                 if (relative) {
                     this.offset = offset;
@@ -1387,16 +1387,16 @@
                 k = str.length;
             if (!this.noAssert) {
                 if (typeof str !== 'string')
-                    throw(new TypeError("Illegal str: Not a string"));
+                    throw new TypeError("Illegal str: Not a string");
                 for (i=0; i<k; ++i) {
                     if (str.codePointAt(i) === 0)
-                        throw(new RangeError("Illegal str: Contains NULL-characters"));
+                        throw new RangeError("Illegal str: Contains NULL-characters");
                 }
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             var start = offset;
             // UTF8 strings do not contain zero bytes in between except for the zero character, so:
@@ -1437,10 +1437,10 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 1 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength);
             }
             var start = offset,
                 temp;
@@ -1479,12 +1479,12 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof str !== 'string')
-                    throw(new TypeError("Illegal str: Not a string"));
+                    throw new TypeError("Illegal str: Not a string");
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             var start = offset,
                 k;
@@ -1526,10 +1526,10 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 4 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength);
             }
             var temp = 0,
                 start = offset,
@@ -1585,10 +1585,10 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             var k;
             var start = offset,
@@ -1657,7 +1657,7 @@
         /**
          * Reads an UTF8 encoded string.
          * @param {number} length Number of characters or bytes to read.
-         * @param {number=} metrics Metrics specifying what `n` is meant to count. Defaults to
+         * @param {string=} metrics Metrics specifying what `length` is meant to count. Defaults to
          *  {@link ByteBuffer.METRICS_CHARS}.
          * @param {number=} offset Offset to read from. Will use and increase {@link ByteBuffer#offset} by the number of bytes
          *  read if omitted.
@@ -1675,13 +1675,13 @@
             if (typeof metrics === 'undefined') metrics = ByteBuffer.METRICS_CHARS;
             if (!this.noAssert) {
                 if (typeof length !== 'number' || length % 1 !== 0)
-                    throw(new TypeError("Illegal length: "+length+" (not an integer)"));
+                    throw new TypeError("Illegal length: "+length+" (not an integer)");
                 length |= 0;
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             var out,
                 i = 0,
@@ -1707,10 +1707,10 @@
             } else if (metrics === ByteBuffer.METRICS_BYTES) {
                 if (!this.noAssert) {
                     if (typeof offset !== 'number' || offset % 1 !== 0)
-                        throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                        throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                     offset >>>= 0;
                     if (offset < 0 || offset + length > this.buffer.byteLength)
-                        throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+length+") <= "+this.buffer.byteLength));
+                        throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+length+") <= "+this.buffer.byteLength);
                 }
                 var k = offset + length;
                 out = [];
@@ -1720,7 +1720,7 @@
                     out.push(temp['codePoint']);
                 }
                 if (offset !== k)
-                    throw(new RangeError("Illegal range: Truncated character at "+k));
+                    throw new RangeError("Illegal range: Truncated character at "+k);
                 if (relative) {
                     this.offset = offset;
                     return String.fromCodePoint.apply(String, out);
@@ -1731,7 +1731,7 @@
                     };
                 }
             } else
-                throw(new TypeError("Unsupported metrics: "+metrics));
+                throw new TypeError("Unsupported metrics: "+metrics);
         };
 
         /**
@@ -1764,12 +1764,12 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof str !== 'string')
-                    throw(new TypeError("Illegal str: Not a string"));
+                    throw new TypeError("Illegal str: Not a string");
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             var start = offset,
                 k, l;
@@ -1811,10 +1811,10 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 1 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength);
             }
             var temp = this.readVarint32(offset),
                 start = offset,
@@ -1863,10 +1863,10 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             if (!(source instanceof ByteBuffer))
                 source = ByteBuffer.wrap(source, encoding);
@@ -1970,13 +1970,13 @@
             if (typeof end === 'undefined') end = this.limit;
             if (!this.noAssert) {
                 if (typeof begin !== 'number' || begin % 1 !== 0)
-                    throw(new TypeError("Illegal begin: Not an integer"));
+                    throw new TypeError("Illegal begin: Not an integer");
                 begin >>>= 0;
                 if (typeof end !== 'number' || end % 1 !== 0)
-                    throw(new TypeError("Illegal end: Not an integer"));
+                    throw new TypeError("Illegal end: Not an integer");
                 end >>>= 0;
                 if (begin < 0 || begin > end || end > this.buffer.byteLength)
-                    throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
             }
             if (begin === 0 && end === this.buffer.byteLength)
                 return this; // Already compacted
@@ -2012,13 +2012,13 @@
             if (typeof end === 'undefined') end = this.limit;
             if (!this.noAssert) {
                 if (typeof begin !== 'number' || begin % 1 !== 0)
-                    throw(new TypeError("Illegal begin: Not an integer"));
+                    throw new TypeError("Illegal begin: Not an integer");
                 begin >>>= 0;
                 if (typeof end !== 'number' || end % 1 !== 0)
-                    throw(new TypeError("Illegal end: Not an integer"));
+                    throw new TypeError("Illegal end: Not an integer");
                 end >>>= 0;
                 if (begin < 0 || begin > end || end > this.buffer.byteLength)
-                    throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
             }
             if (begin === end)
                 return new ByteBuffer(0, this.littleEndian, this.noAssert);
@@ -2048,16 +2048,16 @@
                 targetRelative;
             if (!this.noAssert) {
                 if (!ByteBuffer.isByteBuffer(target))
-                    throw(new TypeError("Illegal target: Not a ByteBuffer"));
+                    throw new TypeError("Illegal target: Not a ByteBuffer");
             }
             targetOffset = (targetRelative = typeof targetOffset === 'undefined') ? target.offset : targetOffset | 0;
             sourceOffset = (relative = typeof sourceOffset === 'undefined') ? this.offset : sourceOffset | 0;
             sourceLimit = typeof sourceLimit === 'undefined' ? this.limit : sourceLimit | 0;
 
             if (targetOffset < 0 || targetOffset > target.buffer.byteLength)
-                throw(new RangeError("Illegal target range: 0 <= "+targetOffset+" <= "+target.buffer.byteLength));
+                throw new RangeError("Illegal target range: 0 <= "+targetOffset+" <= "+target.buffer.byteLength);
             if (sourceOffset < 0 || sourceLimit > this.buffer.byteLength)
-                throw(new RangeError("Illegal source range: 0 <= "+sourceOffset+" <= "+this.buffer.byteLength));
+                throw new RangeError("Illegal source range: 0 <= "+sourceOffset+" <= "+this.buffer.byteLength);
 
             var len = sourceLimit - sourceOffset;
             if (len === 0)
@@ -2108,16 +2108,16 @@
             if (typeof end === 'undefined') end = this.limit;
             if (!this.noAssert) {
                 if (typeof value !== 'number' || value % 1 !== 0)
-                    throw(new TypeError("Illegal value: "+value+" (not an integer)"));
+                    throw new TypeError("Illegal value: "+value+" (not an integer)");
                 value |= 0;
                 if (typeof begin !== 'number' || begin % 1 !== 0)
-                    throw(new TypeError("Illegal begin: Not an integer"));
+                    throw new TypeError("Illegal begin: Not an integer");
                 begin >>>= 0;
                 if (typeof end !== 'number' || end % 1 !== 0)
-                    throw(new TypeError("Illegal end: Not an integer"));
+                    throw new TypeError("Illegal end: Not an integer");
                 end >>>= 0;
                 if (begin < 0 || begin > end || end > this.buffer.byteLength)
-                    throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
             }
             if (begin >= end) return this; // Nothing to fill
             while (begin < end) this.view.setUint8(begin++, value);
@@ -2151,10 +2151,10 @@
             offset = typeof offset === 'undefined' ? this.offset : offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             this.markedOffset = offset;
             return this;
@@ -2168,7 +2168,7 @@
         ByteBuffer.prototype.order = function(littleEndian) {
             if (!this.noAssert) {
                 if (typeof littleEndian !== 'boolean')
-                    throw(new TypeError("Illegal littleEndian: Not a boolean"));
+                    throw new TypeError("Illegal littleEndian: Not a boolean");
             }
             this.littleEndian = !!littleEndian;
             return this;
@@ -2218,10 +2218,10 @@
             if (relative) offset = this.offset;
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: "+offset+" (not an integer)"));
+                    throw new TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
-                    throw(new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             if (!(source instanceof ByteBuffer))
                 source = ByteBuffer.wrap(source, encoding);
@@ -2316,10 +2316,10 @@
         ByteBuffer.prototype.resize = function(capacity) {
             if (!this.noAssert) {
                 if (typeof capacity !== 'number' || capacity % 1 !== 0)
-                    throw(new TypeError("Illegal capacity: "+capacity+" (not an integer)"));
+                    throw new TypeError("Illegal capacity: "+capacity+" (not an integer)");
                 capacity |= 0;
                 if (capacity < 0)
-                    throw(new RangeError("Illegal capacity: 0 <= "+capacity));
+                    throw new RangeError("Illegal capacity: 0 <= "+capacity);
             }
             if (this.buffer.byteLength < capacity) {
                 var buffer = new ArrayBuffer(capacity);
@@ -2341,13 +2341,13 @@
             if (typeof end === 'undefined') end = this.limit;
             if (!this.noAssert) {
                 if (typeof begin !== 'number' || begin % 1 !== 0)
-                    throw(new TypeError("Illegal begin: Not an integer"));
+                    throw new TypeError("Illegal begin: Not an integer");
                 begin >>>= 0;
                 if (typeof end !== 'number' || end % 1 !== 0)
-                    throw(new TypeError("Illegal end: Not an integer"));
+                    throw new TypeError("Illegal end: Not an integer");
                 end >>>= 0;
                 if (begin < 0 || begin > end || end > this.buffer.byteLength)
-                    throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
             }
             if (begin === end)
                 return this; // Nothing to reverse
@@ -2364,13 +2364,13 @@
         ByteBuffer.prototype.skip = function(length) {
             if (!this.noAssert) {
                 if (typeof length !== 'number' || length % 1 !== 0)
-                    throw(new TypeError("Illegal length: "+length+" (not an integer)"));
+                    throw new TypeError("Illegal length: "+length+" (not an integer)");
                 length |= 0;
             }
             var offset = this.offset + length;
             if (!this.noAssert) {
                 if (offset < 0 || offset > this.buffer.byteLength)
-                    throw(new RangeError("Illegal length: 0 <= "+this.offset+" + "+length+" <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal length: 0 <= "+this.offset+" + "+length+" <= "+this.buffer.byteLength);
             }
             this.offset = offset;
             return this;
@@ -2388,13 +2388,13 @@
             if (typeof end === 'undefined') end = this.limit;
             if (!this.noAssert) {
                 if (typeof begin !== 'number' || begin % 1 !== 0)
-                    throw(new TypeError("Illegal begin: Not an integer"));
+                    throw new TypeError("Illegal begin: Not an integer");
                 begin >>>= 0;
                 if (typeof end !== 'number' || end % 1 !== 0)
-                    throw(new TypeError("Illegal end: Not an integer"));
+                    throw new TypeError("Illegal end: Not an integer");
                 end >>>= 0;
                 if (begin < 0 || begin > end || end > this.buffer.byteLength)
-                    throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
             }
             var bb = this.clone();
             bb.offset = begin;
@@ -2420,13 +2420,13 @@
             }
             if (!this.noAssert) {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
-                    throw(new TypeError("Illegal offset: Not an integer"));
+                    throw new TypeError("Illegal offset: Not an integer");
                 offset >>>= 0;
                 if (typeof limit !== 'number' || limit % 1 !== 0)
-                    throw(new TypeError("Illegal limit: Not an integer"));
+                    throw new TypeError("Illegal limit: Not an integer");
                 limit >>>= 0;
                 if (offset < 0 || offset > limit || limit > this.buffer.byteLength)
-                    throw(new RangeError("Illegal range: 0 <= "+offset+" <= "+limit+" <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal range: 0 <= "+offset+" <= "+limit+" <= "+this.buffer.byteLength);
             }
             // NOTE: It's not possible to have another ArrayBuffer reference the same memory as the backing buffer. This is
             // possible with Uint8Array#subarray only, but we have to return an ArrayBuffer by contract. So:
@@ -2481,7 +2481,7 @@
                 case "columns":
                     return this.toColumns();
                 default:
-                    throw(new Error("Unsupported encoding: "+encoding));
+                    throw new Error("Unsupported encoding: "+encoding);
             }
         };
 
@@ -2507,13 +2507,13 @@
             if (typeof end === 'undefined') end = this.limit;
             if (!this.noAssert) {
                 if (typeof begin !== 'number' || begin % 1 !== 0)
-                    throw(new TypeError("Illegal begin: Not an integer"));
+                    throw new TypeError("Illegal begin: Not an integer");
                 begin >>>= 0;
                 if (typeof end !== 'number' || end % 1 !== 0)
-                    throw(new TypeError("Illegal end: Not an integer"));
+                    throw new TypeError("Illegal end: Not an integer");
                 end >>>= 0;
                 if (begin < 0 || begin > end || end > this.buffer.byteLength)
-                    throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
             }
             if (begin === end) return "";
             var b1, b2, b3,     // input bytes
@@ -2550,9 +2550,9 @@
         ByteBuffer.fromBase64 = function(str, littleEndian, noAssert) {
             if (!noAssert) {
                 if (typeof str !== 'string')
-                    throw TypeError("Illegal str: Not a string");
+                    throw new TypeError("Illegal str: Not a string");
                 if (str.length % 4 !== 0)
-                    throw TypeError("Illegal str: Length not a multiple of 4");
+                    throw new TypeError("Illegal str: Length not a multiple of 4");
             }
             var len = str.length,
                 suffix = 0,
@@ -2562,7 +2562,7 @@
                 else break;
             }
             if (suffix > 2)
-                throw TypeError("Illegal str: Suffix is too large");
+                throw new TypeError("Illegal str: Suffix is too large");
             if (len === 0)
                 return new ByteBuffer(0, littleEndian, noAssert);
             var b1, b2, b3, b4, // input bytes
@@ -2575,7 +2575,7 @@
                 b4 = (h4 = i < len) ? B64.indexOf(str.charAt(i++)) : 0;
                 if (!noAssert) {
                     if (b1 < 0 || b2 < 0 || b3 < 0 || b4 < 0)
-                        throw TypeError("Illegal str: Contains non-base64 characters");
+                        throw new TypeError("Illegal str: Contains non-base64 characters");
                 }
                 bb.view.setUint8(j++, (b1 << 2) | (b2 >> 4));
                 if (b3 !== 64) {
@@ -2626,13 +2626,13 @@
             end = typeof end === 'undefined' ? this.limit : end;
             if (!this.noAssert) {
                 if (typeof begin !== 'number' || begin % 1 !== 0)
-                    throw(new TypeError("Illegal begin: Not an integer"));
+                    throw new TypeError("Illegal begin: Not an integer");
                 begin >>>= 0;
                 if (typeof end !== 'number' || end % 1 !== 0)
-                    throw(new TypeError("Illegal end: Not an integer"));
+                    throw new TypeError("Illegal end: Not an integer");
                 end >>>= 0;
                 if (begin < 0 || begin > end || end > this.buffer.byteLength)
-                    throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
             }
             if (begin === end) return "";
             var out = [];
@@ -2654,14 +2654,14 @@
         ByteBuffer.fromBinary = function(str, littleEndian, noAssert) {
             if (!noAssert) {
                 if (typeof str !== 'string')
-                    throw(new TypeError("Illegal str: Not a string"));
+                    throw new TypeError("Illegal str: Not a string");
             }
             var i = 0, k = str.length, charCode,
                 bb = new ByteBuffer(k, littleEndian, noAssert);
             while (i<k) {
                 charCode = str.charCodeAt(i);
                 if (!noAssert && charCode > 255)
-                    throw(new TypeError("Illegal charCode at "+i+": 0 <= "+charCode+" <= 255"));
+                    throw new TypeError("Illegal charCode at "+i+": 0 <= "+charCode+" <= 255");
                 bb.view.setUint8(i++, charCode);
             }
             bb.limit = k;
@@ -2829,19 +2829,19 @@
                         b = parseInt(ch+str.charAt(i++), 16);
                         if (!noAssert) {
                             if (isNaN(b) || b < 0 || b > 255)
-                                throw(new TypeError("Illegal str: Not a debug encoded string"));
+                                throw new TypeError("Illegal str: Not a debug encoded string");
                         }
                         bb.view.setUint8(j++, b);
                         rs = true;
                 }
                 if (fail)
-                    throw(new TypeError("Illegal str: Invalid symbol at "+i));
+                    throw new TypeError("Illegal str: Invalid symbol at "+i);
             }
             if (!noAssert) {
                 if (!ho || !hl)
-                    throw(new TypeError("Illegal str: Missing offset or limit"));
+                    throw new TypeError("Illegal str: Missing offset or limit");
                 if (j<bb.buffer.byteLength)
-                    throw(new TypeError("Illegal str: Not a debug encoded string (is it hex?) "+j+" < "+k));
+                    throw new TypeError("Illegal str: Not a debug encoded string (is it hex?) "+j+" < "+k);
             }
             return bb;
         };
@@ -2860,13 +2860,13 @@
             end = typeof end === 'undefined' ? this.limit : end;
             if (!this.noAssert) {
                 if (typeof begin !== 'number' || begin % 1 !== 0)
-                    throw(new TypeError("Illegal begin: Not an integer"));
+                    throw new TypeError("Illegal begin: Not an integer");
                 begin >>>= 0;
                 if (typeof end !== 'number' || end % 1 !== 0)
-                    throw(new TypeError("Illegal end: Not an integer"));
+                    throw new TypeError("Illegal end: Not an integer");
                 end >>>= 0;
                 if (begin < 0 || begin > end || end > this.buffer.byteLength)
-                    throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
             }
             var out = new Array(end - begin),
                 b;
@@ -2891,9 +2891,9 @@
         ByteBuffer.fromHex = function(str, littleEndian, noAssert) {
             if (!noAssert) {
                 if (typeof str !== 'string')
-                    throw(new TypeError("Illegal str: Not a string"));
+                    throw new TypeError("Illegal str: Not a string");
                 if (str.length % 2 !== 0)
-                    throw(new TypeError("Illegal str: Length not a multiple of 2"));
+                    throw new TypeError("Illegal str: Length not a multiple of 2");
             }
             var k = str.length,
                 bb = new ByteBuffer((k / 2) | 0, littleEndian),
@@ -2902,7 +2902,7 @@
                 b = parseInt(str.substring(i, i+2), 16);
                 if (!noAssert) {
                     if (!isFinite(b) || b < 0 || b > 255)
-                        throw(new TypeError("Illegal str: Contains non-hex characters"));
+                        throw new TypeError("Illegal str: Contains non-hex characters");
                 }
                 bb.view.setUint8(j++, b);
             }
@@ -2945,7 +2945,7 @@
                                 codePoint > 0x10FFFF || // not a valid Unicode code point
                                 floor(codePoint) != codePoint // not an integer
                             ) {
-                            throw RangeError('Invalid code point: ' + codePoint);
+                            throw new RangeError('Invalid code point: ' + codePoint);
                         }
                         if (codePoint <= 0xFFFF) { // BMP code point
                             codeUnits.push(codePoint);
@@ -2980,8 +2980,8 @@
             (function() {
                 'use strict'; // needed to support `apply`/`call` with `undefined`/`null`
                 var codePointAt = function(position) {
-                    if (this == null) {
-                        throw TypeError();
+                    if (this === null) {
+                        throw new TypeError();
                     }
                     var string = String(this);
                     var size = string.length;
@@ -3051,7 +3051,7 @@
                 d = bb.view.getUint8(offset++);
                 codePoint = ((a&0x07)<<18) | ((b&0x3F)<<12) | ((c&0x3F)<<6) | (d&0x3F);
             } else
-                throw RangeError("Illegal code point at offset "+offset+": "+a);
+                throw new RangeError("Illegal code point at offset "+offset+": "+a);
             return {
                 'codePoint': codePoint,
                 'length': offset - start
@@ -3067,12 +3067,12 @@
          */
         function utf8_calc_char(codePoint) {
             if (codePoint < 0)
-                throw RangeError("Illegal code point: "+codePoint);
+                throw new RangeError("Illegal code point: "+codePoint);
             if      (codePoint <       0x80) return 1;
             else if (codePoint <      0x800) return 2;
             else if (codePoint <    0x10000) return 3;
             else if (codePoint <   0x110000) return 4;
-            else throw RangeError("Illegal code point: "+codePoint);
+            else throw new RangeError("Illegal code point: "+codePoint);
         }
 
         /**
@@ -3107,7 +3107,7 @@
         function utf8_encode_char(codePoint, bb, offset) {
             var start = offset;
             if (codePoint < 0)
-                throw RangeError("Illegal code point: "+codePoint);
+                throw new RangeError("Illegal code point: "+codePoint);
             if (codePoint < 0x80) {
                 bb.view.setUint8(offset++,   codePoint     &0x7F)      ;
             } else if (codePoint < 0x800) {
@@ -3123,7 +3123,7 @@
                 bb.view.setUint8(offset++, ((codePoint>>6 )&0x3F)|0x80);
                 bb.view.setUint8(offset++, ( codePoint     &0x3F)|0x80);
             } else
-                throw RangeError("Illegal code point: "+codePoint);
+                throw new RangeError("Illegal code point: "+codePoint);
             return offset - start;
         }
 
@@ -3142,13 +3142,13 @@
             if (typeof end === 'undefined') end = this.limit;
             if (!this.noAssert) {
                 if (typeof begin !== 'number' || begin % 1 !== 0)
-                    throw(new TypeError("Illegal begin: Not an integer"));
+                    throw new TypeError("Illegal begin: Not an integer");
                 begin >>>= 0;
                 if (typeof end !== 'number' || end % 1 !== 0)
-                    throw(new TypeError("Illegal end: Not an integer"));
+                    throw new TypeError("Illegal end: Not an integer");
                 end >>>= 0;
                 if (begin < 0 || begin > end || end > this.buffer.byteLength)
-                    throw(new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength));
+                    throw new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
             }
             var out = [], temp;
             while (begin < end) {
@@ -3158,7 +3158,7 @@
             }
             if (!this.noAssert) {
                 if (begin !== end)
-                    throw(new RangeError("Illegal range: Truncated data"));
+                    throw new RangeError("Illegal range: Truncated data");
             }
             return String.fromCodePoint.apply(String, out);
         };
@@ -3176,7 +3176,7 @@
         ByteBuffer.fromUTF8 = function(str, littleEndian, noAssert) {
             if (!noAssert) {
                 if (typeof str !== 'string')
-                    throw(new TypeError("Illegal str: Not a string"));
+                    throw new TypeError("Illegal str: Not a string");
             }
             var bb = new ByteBuffer(utf8_calc_string(str), littleEndian, noAssert),
                 cp;

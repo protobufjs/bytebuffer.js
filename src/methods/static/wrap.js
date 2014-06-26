@@ -41,11 +41,11 @@ ByteBuffer.wrap = function(buffer, encoding, littleEndian, noAssert) {
                 return ByteBuffer.fromDebug(buffer, littleEndian);
             //? }
             default:
-                throw(new TypeError("Unsupported encoding: "+encoding));
+                throw new TypeError("Unsupported encoding: "+encoding);
         }
     }
     if (buffer === null || typeof buffer !== 'object')
-        throw(new TypeError("Illegal buffer: null or non-object"));
+        throw new TypeError("Illegal buffer: null or non-object");
     var bb;
     if (ByteBuffer.isByteBuffer(buffer)) {
         bb = ByteBuffer.prototype.clone.call(buffer);
@@ -78,7 +78,7 @@ ByteBuffer.wrap = function(buffer, encoding, littleEndian, noAssert) {
         buffer = b;
     } else if (!(buffer instanceof Buffer)) { // Create from octets if it is an error, otherwise fail
         if (Object.prototype.toString.call(buffer) !== "[object Array]")
-            throw(new TypeError("Illegal buffer"));
+            throw new TypeError("Illegal buffer");
         buffer = new Buffer(buffer);
     }
     bb = new ByteBuffer(0, littleEndian, noAssert);
@@ -111,7 +111,7 @@ ByteBuffer.wrap = function(buffer, encoding, littleEndian, noAssert) {
         for (i=0; i<buffer.length; ++i)
             bb.view.setUint8(i, buffer[i]);
     } else
-        throw(new TypeError("Illegal buffer")); // Otherwise fail
+        throw new TypeError("Illegal buffer"); // Otherwise fail
     //? }
     return bb;
 };

@@ -14,7 +14,7 @@ ByteBuffer.prototype.writeIString = function(str, offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         if (typeof str !== 'string')
-            throw(new TypeError("Illegal str: Not a string"));
+            throw new TypeError("Illegal str: Not a string");
         //? ASSERT_OFFSET();
     }
     var start = offset,
@@ -70,7 +70,7 @@ ByteBuffer.prototype.readIString = function(offset) {
     //? READ_UINT32_ARRAY('temp');
     offset += 4;
     if (offset + temp > this.buffer.length)
-        throw(new RangeError("Index out of bounds: "+offset+" + "+temp+" <= "+this.buffer.length));
+        throw new RangeError("Index out of bounds: "+offset+" + "+temp+" <= "+this.buffer.length);
     str = this.buffer.slice(offset, offset + temp).toString("utf8");
     offset += temp;
     //? } else {

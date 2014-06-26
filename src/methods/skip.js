@@ -11,7 +11,7 @@ ByteBuffer.prototype.skip = function(length) {
     var offset = this.offset + length;
     if (!this.noAssert) {
         if (offset < 0 || offset > /*?= CAPACITY */)
-            throw(new RangeError("Illegal length: 0 <= "+this.offset+" + "+length+" <= "+/*?= CAPACITY */));
+            throw new RangeError("Illegal length: 0 <= "+this.offset+" + "+length+" <= "+/*?= CAPACITY */);
     }
     this.offset = offset;
     return this;
