@@ -18,7 +18,7 @@ ByteBuffer.prototype.writeCString = function(str, offset) {
         if (typeof str !== 'string')
             throw new TypeError("Illegal str: Not a string");
         for (i=0; i<k; ++i) {
-            if (str.codePointAt(i) === 0)
+            if (str.charCodeAt(i) === 0)
                 throw new RangeError("Illegal str: Contains NULL-characters");
         }
         //? ASSERT_OFFSET();
@@ -34,24 +34,18 @@ ByteBuffer.prototype.writeCString = function(str, offset) {
     this.buffer[offset++] = 0;
     buffer = null;
     //? } else {
-    k = utf8_calc_string(str);
+    k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
     //? ENSURE_CAPACITY('k+1');
-    var cp; k = str.length;
-    for (i=0; i<k; i++) {
-        cp = str.charCodeAt(i);
-        if (cp >= 0xD800 && cp <= 0xDFFF) {
-            cp = str.codePointAt(i);
-            if (cp > 0xFFFF) i++;
-        }
-        offset += utf8_encode_char(cp, this, offset);
-    }
+    utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
+        this.view.setUint8(offset++, b);
+    }.bind(this));
     this.view.setUint8(offset++, 0);
     //? }
     if (relative) {
-        this.offset = offset;
+        this.offset = offset - start;
         return this;
     }
-    return offset - start;
+    return k;
 };
 
 /**
@@ -88,19 +82,19 @@ ByteBuffer.prototype.readCString = function(offset) {
         };
     }
     //? } else { // getUint8 asserts on its own
-    var out = [];
-    do {
-        temp = utf8_decode_char(this, offset);
-        offset += temp['length'];
-        if (temp['codePoint'] === 0) break;
-        out.push(temp['codePoint']);
-    } while (true);
+    var sd, b = -1;
+    utfx.decodeUTF8toUTF16(function() {
+        if (b === 0) return null;
+        if (offset >= this.limit)
+            throw RangeError("Illegal range: Truncated data, "+offset+" < "+this.limit);
+        return (b = this.view.getUint8(offset++)) === 0 ? null : b;
+    }.bind(this), sd = utfx.stringDestination(), true);
     if (relative) {
         this.offset = offset;
-        return String.fromCodePoint.apply(String, out);
+        return sd();
     } else {
         return {
-            "string": String.fromCodePoint.apply(String, out),
+            "string": sd(),
             "length": offset - start
         };
     }

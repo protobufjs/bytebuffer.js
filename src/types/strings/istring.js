@@ -28,19 +28,15 @@ ByteBuffer.prototype.writeIString = function(str, offset) {
     buffer.copy(this.buffer, offset);
     offset += k;
     //? } else {
-    k = utf8_calc_string(str);
+    k = utfx.calculateUTF16asUTF8(utfx.stringSource(str), this.noAssert)[1];
     //? ENSURE_CAPACITY('4+k');
     this.view.setUint32(offset, k, this.littleEndian);
     offset += 4;
-    k = str.length;
-    for (var i=0, cp; i<k; i++) {
-        cp = str.charCodeAt(i);
-        if (cp >= 0xD800 && cp <= 0xDFFF) {
-            cp = str.codePointAt(i);
-            if (cp > 0xFFFF) i++;
-        }
-        offset += utf8_encode_char(cp, this, offset);
-    }
+    utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
+        this.view.setUint8(offset++, b);
+    }.bind(this));
+    if (offset !== start + 4 + k)
+        throw new RangeError("Illegal range: Truncated data, "+offset+" == "+(offset+4+k));
     //? }
     if (relative) {
         this.offset = offset;
@@ -77,13 +73,11 @@ ByteBuffer.prototype.readIString = function(offset) {
     temp = this.view.getUint32(offset, this.littleEndian);
     offset += 4;
     var k = offset + temp,
-        out = [];
-    while (offset < k) {
-        temp = utf8_decode_char(this, offset);
-        offset += temp['length'];
-        out.push(temp['codePoint']);
-    }
-    str = String.fromCodePoint.apply(String, out);
+        sd;
+    utfx.decodeUTF8toUTF16(function() {
+        return offset < k ? this.view.getUint8(offset++) : null;
+    }.bind(this), sd = utfx.stringDestination(), this.noAssert);
+    str = sd();
     //? }
     if (relative) {
         this.offset = offset;

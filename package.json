@@ -1,10 +1,10 @@
 {
     "name": "bytebuffer",
-    "version": "3.0.3",
+    "version": "3.1.0",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "description": "The swiss army knife for binary data in JavaScript.",
     "main": "index.js",
-    "browser": "dist/ByteBufferAB.js",
+    "browser": "dist/ByteBufferAB.min.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/dcodeIO/ByteBuffer.js.git"
@@ -18,6 +18,7 @@
         "bufferview": "~1"
     },
     "devDependencies": {
+        "utfx": "~0.12",
         "testjs": "~1",
         "metascript": "~0",
         "closurecompiler": "~1"

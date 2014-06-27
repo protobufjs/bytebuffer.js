@@ -41,18 +41,12 @@ ByteBuffer.prototype.writeUTF8String = function(str, offset) {
     }
     return k;
     //? } else {
-    var start = offset,
-        cp;
-    k = utf8_calc_string(str);
+    var start = offset;
+    k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
     //? ENSURE_CAPACITY('k');
-    for (var i=0; i<str.length; i++) {
-        cp = str.charCodeAt(i);
-        if (cp >= 0xD800 && cp <= 0xDFFF) {
-            cp = str.codePointAt(i);
-            if (cp > 0xFFFF) i++;
-        }
-        offset += utf8_encode_char(cp, this, offset);
-    }
+    utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
+        this.view.setUint8(offset++, b);
+    }.bind(this));
     if (relative) {
         this.offset = offset;
         return this;
@@ -82,16 +76,7 @@ ByteBuffer.prototype.writeString = ByteBuffer.prototype.writeUTF8String;
  * @expose
  */
 ByteBuffer.calculateUTF8Chars = function(str) {
-    var n = 0, cp;
-    for (var i=0; i<str.length; i++) {
-        cp = str.charCodeAt(i);
-        if (cp >= 0xD800 && cp <= 0xDFFF) {
-            cp = str.codePointAt(i);
-            if (cp > 0xFFFF) i++;
-        }
-        n++;
-    }
-    return n;
+    return utfx.calculateUTF16asUTF8(utfx.stringSource(str))[0];
 };
 
 /**
@@ -101,7 +86,14 @@ ByteBuffer.calculateUTF8Chars = function(str) {
  * @returns {number} Number of UTF8 bytes
  * @expose
  */
-ByteBuffer.calculateUTF8Bytes = utf8_calc_string;
+ByteBuffer.calculateUTF8Bytes = function(str) {
+    //? if (NODE) {
+    if (typeof str !== 'string')
+        throw new TypeError("Illegal argument: "+(typeof str));
+    return Buffer.byteLength(str, "utf8");
+    //? } else
+    return utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
+};
 
 /**
  * Reads an UTF8 encoded string.
@@ -125,24 +117,29 @@ ByteBuffer.prototype.readUTF8String = function(length, metrics, offset) {
         //? ASSERT_INTEGER('length');
         //? ASSERT_OFFSET();
     }
-    var out,
-        i = 0,
+    var i = 0,
         start = offset,
-        temp;
+        //? if (NODE)
+        temp,
+        sd;
     if (metrics === ByteBuffer.METRICS_CHARS) { // The same for node and the browser
-        out = [];
-        while (i < length) {
-            temp = utf8_decode_char(this, offset);
-            offset += temp['length'];
-            out.push(temp['codePoint']);
-            ++i;
-        }
+        sd = utfx.stringDestination();
+        utfx.decodeUTF8(function() {
+            //? if (NODE)
+            return i < length && offset < this.limit ? this.buffer[offset++] : null;
+            //? else
+            return i < length && offset < this.limit ? this.view.getUint8(offset++) : null;
+        }.bind(this), function(cp) {
+            ++i; utfx.UTF8toUTF16(cp, sd);
+        }.bind(this));
+        if (i !== length)
+            throw new RangeError("Illegal range: Truncated data, "+i+" == "+length);
         if (relative) {
             this.offset = offset;
-            return String.fromCodePoint.apply(String, out);
+            return sd();
         } else {
             return {
-                "string": String.fromCodePoint.apply(String, out),
+                "string": sd(),
                 "length": offset - start
             };
         }
@@ -163,20 +160,17 @@ ByteBuffer.prototype.readUTF8String = function(length, metrics, offset) {
         }
         //? } else {
         var k = offset + length;
-        out = [];
-        while (offset < k) {
-            temp = utf8_decode_char(this, offset);
-            offset += temp['length'];
-            out.push(temp['codePoint']);
-        }
+        utfx.decodeUTF8toUTF16(function() {
+            return offset < k ? this.view.getUint8(offset++) : null;
+        }.bind(this), sd = utfx.stringDestination(), this.noAssert);
         if (offset !== k)
-            throw new RangeError("Illegal range: Truncated character at "+k);
+            throw new RangeError("Illegal range: Truncated data, "+offset+" == "+k);
         if (relative) {
             this.offset = offset;
-            return String.fromCodePoint.apply(String, out);
+            return sd();
         } else {
             return {
-                'string': String.fromCodePoint.apply(String, out),
+                'string': sd(),
                 'length': offset - start
             };
         }

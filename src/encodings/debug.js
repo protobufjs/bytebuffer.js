@@ -37,7 +37,7 @@ ByteBuffer.prototype.toDebug = function(columns) {
             if (b < 0x10) hex += "0"+b.toString(16).toUpperCase();
             else hex += b.toString(16).toUpperCase();
             if (columns) {
-                asc += b > 32 && b < 127 ? String.fromCodePoint(b) : '.';
+                asc += b > 32 && b < 127 ? String.fromCharCode(b) : '.';
             }
         }
         ++i;

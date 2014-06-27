@@ -110,7 +110,7 @@ module.exports = (function() {
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "3.0.3";
+    ByteBuffer.VERSION = "3.1.0";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -1542,7 +1542,7 @@ module.exports = (function() {
             if (typeof str !== 'string')
                 throw new TypeError("Illegal str: Not a string");
             for (i=0; i<k; ++i) {
-                if (str.codePointAt(i) === 0)
+                if (str.charCodeAt(i) === 0)
                     throw new RangeError("Illegal str: Contains NULL-characters");
             }
             if (typeof offset !== 'number' || offset % 1 !== 0)
@@ -1565,10 +1565,10 @@ module.exports = (function() {
         this.buffer[offset++] = 0;
         buffer = null;
         if (relative) {
-            this.offset = offset;
+            this.offset = offset - start;
             return this;
         }
-        return offset - start;
+        return k;
     };
 
     /**
@@ -1782,16 +1782,7 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.calculateUTF8Chars = function(str) {
-        var n = 0, cp;
-        for (var i=0; i<str.length; i++) {
-            cp = str.charCodeAt(i);
-            if (cp >= 0xD800 && cp <= 0xDFFF) {
-                cp = str.codePointAt(i);
-                if (cp > 0xFFFF) i++;
-            }
-            n++;
-        }
-        return n;
+        return utfx.calculateUTF16asUTF8(utfx.stringSource(str))[0];
     };
 
     /**
@@ -1801,7 +1792,11 @@ module.exports = (function() {
      * @returns {number} Number of UTF8 bytes
      * @expose
      */
-    ByteBuffer.calculateUTF8Bytes = utf8_calc_string;
+    ByteBuffer.calculateUTF8Bytes = function(str) {
+        if (typeof str !== 'string')
+            throw new TypeError("Illegal argument: "+(typeof str));
+        return Buffer.byteLength(str, "utf8");
+    };
 
     /**
      * Reads an UTF8 encoded string.
@@ -1832,24 +1827,25 @@ module.exports = (function() {
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
         }
-        var out,
-            i = 0,
+        var i = 0,
             start = offset,
-            temp;
+            temp,
+            sd;
         if (metrics === ByteBuffer.METRICS_CHARS) { // The same for node and the browser
-            out = [];
-            while (i < length) {
-                temp = utf8_decode_char(this, offset);
-                offset += temp['length'];
-                out.push(temp['codePoint']);
-                ++i;
-            }
+            sd = utfx.stringDestination();
+            utfx.decodeUTF8(function() {
+                return i < length && offset < this.limit ? this.buffer[offset++] : null;
+            }.bind(this), function(cp) {
+                ++i; utfx.UTF8toUTF16(cp, sd);
+            }.bind(this));
+            if (i !== length)
+                throw new RangeError("Illegal range: Truncated data, "+i+" == "+length);
             if (relative) {
                 this.offset = offset;
-                return String.fromCodePoint.apply(String, out);
+                return sd();
             } else {
                 return {
-                    "string": String.fromCodePoint.apply(String, out),
+                    "string": sd(),
                     "length": offset - start
                 };
             }
@@ -1915,8 +1911,8 @@ module.exports = (function() {
         var start = offset,
             k, l;
         var buffer = new Buffer(str, "utf8");
-        l = ByteBuffer.calculateVarint32(buffer.length);
         k = buffer.length;
+        l = ByteBuffer.calculateVarint32(k);
         offset += l+k;
         var capacity15 = this.buffer.length;
         if (offset > capacity15)
@@ -2789,7 +2785,7 @@ module.exports = (function() {
                 if (b < 0x10) hex += "0"+b.toString(16).toUpperCase();
                 else hex += b.toString(16).toUpperCase();
                 if (columns) {
-                    asc += b > 32 && b < 127 ? String.fromCodePoint(b) : '.';
+                    asc += b > 32 && b < 127 ? String.fromCharCode(b) : '.';
                 }
             }
             ++i;
@@ -2983,86 +2979,278 @@ module.exports = (function() {
         return bb;
     };
 
-    // encodings/utf8/native
+    // utfx-embeddable
 
     /**
-     * Decodes a single UTF8 character from the specified ByteBuffer. The ByteBuffer's offsets remain untouched.
-     * @param {!ByteBuffer} bb ByteBuffer to decode from
-     * @param {number} offset Offset to start at
-     * @returns {!{codePoint: number, length: number}} Decoded char code and the number of bytes read
-     * @inner
-     * @see http://en.wikipedia.org/wiki/UTF-8#Description
+     * utfx-embeddable (c) 2014 Daniel Wirtz <dcode@dcode.io>
+     * Released under the Apache License, Version 2.0
+     * see: https://github.com/dcodeIO/utfx for details
      */
-    function utf8_decode_char(bb, offset) {
-        var start = offset,
-            a, b, c, d,
-            codePoint;
-        if (offset+1 > bb.buffer.length)
-            throw new RangeError("Index out of range: "+offset+" + 1 <= "+bb.buffer.length);
-        a = bb.buffer[offset++];
-        if ((a&0x80) === 0) {
-            codePoint = a;
-        } else if ((a&0xE0) === 0xC0) {
-            if (offset+1 > bb.buffer.length)
-                throw new RangeError("Index out of range: "+offset+" + 1 <= "+bb.buffer.length);
-            b = bb.buffer[offset++];
-            codePoint = ((a&0x1F)<<6) | (b&0x3F);
-        } else if ((a&0xF0) === 0xE0) {
-            if (offset+2 > bb.buffer.length)
-                throw new RangeError("Index out of range: "+offset+" + 2 <= "+bb.buffer.length);
-            b = bb.buffer[offset++];
-            c = bb.buffer[offset++];
-            codePoint = ((a&0x0F)<<12) | ((b&0x3F)<<6) | (c&0x3F);
-        } else if ((a&0xF8) === 0xF0) {
-            if (offset+3 > bb.buffer.length)
-                throw new RangeError("Index out of range: "+offset+" + 3 <= "+bb.buffer.length);
-            b = bb.buffer[offset++];
-            c = bb.buffer[offset++];
-            d = bb.buffer[offset++];
-            codePoint = ((a&0x07)<<18) | ((b&0x3F)<<12) | ((c&0x3F)<<6) | (d&0x3F);
-        } else
-            throw new RangeError("Illegal code point at offset "+offset+": "+a);
-        return {
-            'codePoint': codePoint,
-            'length': offset - start
-        };
-    }
+    var utfx = function() {
+        "use strict";
 
-    /**
-     * Calculates the actual number of bytes required to encode the specified char code.
-     * @param {number} codePoint Code point to encode
-     * @returns {number} Number of bytes required to encode the specified code point
-     * @inner
-     * @see http://en.wikipedia.org/wiki/UTF-8#Description
-     */
-    function utf8_calc_char(codePoint) {
-        if (codePoint < 0)
-            throw new RangeError("Illegal code point: "+codePoint);
-        if      (codePoint <       0x80) return 1;
-        else if (codePoint <      0x800) return 2;
-        else if (codePoint <    0x10000) return 3;
-        else if (codePoint <   0x110000) return 4;
-        else throw new RangeError("Illegal code point: "+codePoint);
-    }
+        /**
+         * utfx namespace.
+         * @inner
+         * @type {!Object.<string,*>}
+         */
+        var utfx = {};
 
-    /**
-     * Calculates the number of bytes required to store an UTF8 encoded string.
-     * @param {string} str String to calculate
-     * @returns {number} Number of bytes required
-     * @inner
-     */
-    function utf8_calc_string(str) {
-        var cp, n = 0;
-        for (var i=0; i<str.length; i++) {
-            cp = str.charCodeAt(i);
-            if (cp >= 0xD800 && cp <= 0xDFFF) {
-                cp = str.codePointAt(i);
-                if (cp > 0xFFFF) i++;
+        /**
+         * Encodes UTF8 code points to UTF8 bytes.
+         * @param {(!function():number|null) | number} src Code points source, either as a function returning the next code point
+         *  respectively `null` if there are no more code points left or a single numeric code point.
+         * @param {!function(number)} dst Bytes destination as a function successively called with the next byte
+         */
+        utfx.encodeUTF8 = function(src, dst) {
+            var cp = null;
+            if (typeof src === 'number')
+                cp = src,
+                src = function() { return null; };
+            while (cp !== null || (cp = src()) !== null) {
+                if (cp < 0x80)
+                    dst(cp&0x7F);
+                else if (cp < 0x800)
+                    dst(((cp>>6)&0x1F)|0xC0),
+                    dst((cp&0x3F)|0x80);
+                else if (cp < 0x10000)
+                    dst(((cp>>12)&0x0F)|0xE0),
+                    dst(((cp>>6)&0x3F)|0x80),
+                    dst((cp&0x3F)|0x80);
+                else
+                    dst(((cp>>18)&0x07)|0xF0),
+                    dst(((cp>>12)&0x3F)|0x80),
+                    dst(((cp>>6)&0x3F)|0x80),
+                    dst((cp&0x3F)|0x80);
+                cp = null;
             }
-            n += utf8_calc_char(cp);
-        }
-        return n;
-    }
+        };
+
+        /**
+         * Decodes UTF8 bytes to UTF8 code points.
+         * @param {!function():number|null} src Bytes source as a function returning the next byte respectively `null` if there
+         *  are no more bytes left.
+         * @param {!function(number)} dst Code points destination as a function successively called with each decoded code point.
+         * @throws {RangeError} If a starting byte is invalid in UTF8
+         * @throws {Error} If the last sequence is truncated. Has an array property `bytes` holding the
+         *  remaining bytes.
+         */
+        utfx.decodeUTF8 = function(src, dst) {
+            var a, b, c, d, fail = function(b) {
+                b = b.slice(0, b.indexOf(null));
+                var err = Error(b.toString());
+                err.name = "TruncatedError";
+                err['bytes'] = b;
+                throw err;
+            };
+            while ((a = src()) !== null) {
+                if ((a&0x80) === 0)
+                    dst(a);
+                else if ((a&0xE0) === 0xC0)
+                    ((b = src()) === null) && fail([a, b]),
+                    dst(((a&0x1F)<<6) | (b&0x3F));
+                else if ((a&0xF0) === 0xE0)
+                    ((b=src()) === null || (c=src()) === null) && fail([a, b, c]),
+                    dst(((a&0x0F)<<12) | ((b&0x3F)<<6) | (c&0x3F));
+                else if ((a&0xF8) === 0xF0)
+                    ((b=src()) === null || (c=src()) === null || (d=src()) === null) && fail([a, b, c ,d]),
+                    dst(((a&0x07)<<18) | ((b&0x3F)<<12) | ((c&0x3F)<<6) | (d&0x3F));
+                else throw RangeError("Illegal starting byte: "+a);
+            }
+        };
+
+        /**
+         * Converts UTF16 characters to UTF8 code points.
+         * @param {!function():number|null} src Characters source as a function returning the next char code respectively
+         *  `null` if there are no more characters left.
+         * @param {!function(number)} dst Code points destination as a function successively called with each converted code
+         *  point.
+         */
+        utfx.UTF16toUTF8 = function(src, dst) {
+            var c1, c2 = null;
+            while (true) {
+                if ((c1 = c2 !== null ? c2 : src()) === null)
+                    break;
+                if (c1 >= 0xD800 && c1 <= 0xDFFF) {
+                    if ((c2 = src()) !== null) {
+                        if (c2 >= 0xDC00 && c2 <= 0xDFFF) {
+                            dst((c1-0xD800)*0x400+c2-0xDC00+0x10000);
+                            c2 = null; continue;
+                        }
+                    }
+                }
+                dst(c1);
+            }
+            if (c2 !== null) dst(c2);
+        };
+
+        /**
+         * Converts UTF8 code points to UTF16 characters.
+         * @param {(!function():number|null) | number} src Code points source, either as a function returning the next code point
+         *  respectively `null` if there are no more code points left or a single numeric code point.
+         * @param {!function(number)} dst Characters destination as a function successively called with each converted char code.
+         * @throws {RangeError} If a code point is out of range
+         */
+        utfx.UTF8toUTF16 = function(src, dst) {
+            var cp = null;
+            if (typeof src === 'number')
+                cp = src, src = function() { return null; };
+            while (cp !== null || (cp = src()) !== null) {
+                if (cp <= 0xFFFF)
+                    dst(cp);
+                else
+                    cp -= 0x10000,
+                    dst((cp>>10)+0xD800),
+                    dst((cp%0x400)+0xDC00);
+                cp = null;
+            }
+        };
+
+        /**
+         * Converts and encodes UTF16 characters to UTF8 bytes.
+         * @param {!function():number|null} src Characters source as a function returning the next char code respectively `null`
+         *  if there are no more characters left.
+         * @param {!function(number)} dst Bytes destination as a function successively called with the next byte.
+         */
+        utfx.encodeUTF16toUTF8 = function(src, dst) {
+            utfx.UTF16toUTF8(src, function(cp) {
+                utfx.encodeUTF8(cp, dst);
+            });
+        };
+
+        /**
+         * Decodes and converts UTF8 bytes to UTF16 characters.
+         * @param {!function():number|null} src Bytes source as a function returning the next byte respectively `null` if there
+         *  are no more bytes left.
+         * @param {!function(number)} dst Characters destination as a function successively called with each converted char code.
+         * @throws {RangeError} If a starting byte is invalid in UTF8
+         * @throws {Error} If the last sequence is truncated. Has an array property `bytes` holding the remaining bytes.
+         */
+        utfx.decodeUTF8toUTF16 = function(src, dst) {
+            utfx.decodeUTF8(src, function(cp) {
+                utfx.UTF8toUTF16(cp, dst);
+            });
+        };
+
+        /**
+         * Asserts a byte value.
+         * @param {number} b 8bit byte value
+         * @returns {number} Valid byte value
+         * @throws {TypeError} If the byte value is invalid
+         * @throws {RangeError} If the byte value is out of range
+         */
+        utfx.assertByte = function(b) {
+            if (typeof b !== 'number' || b !== b)
+                throw TypeError("Illegal byte: "+(typeof b));
+            if (b < -128 || b > 255)
+                throw RangeError("Illegal byte: "+b);
+            return b;
+        };
+
+        /**
+         * Asserts an UTF16 char code.
+         * @param {number} c UTF16 char code
+         * @returns {number} Valid char code
+         * @throws {TypeError} If the char code is invalid
+         * @throws {RangeError} If the char code is out of range
+         */
+        utfx.assertCharCode = function(c) {
+            if (typeof c !== 'number' || c !== c)
+                throw TypeError("Illegal char code: "+(typeof c));
+            if (c < 0 || c > 0xFFFF)
+                throw RangeError("Illegal char code: "+c);
+            return c;
+        };
+
+        /**
+         * Asserts an UTF8 code point.
+         * @param {number} cp UTF8 code point
+         * @returns {number} Valid code point
+         * @throws {TypeError} If the code point is invalid
+         * @throws {RangeError} If the code point is out of range
+         */
+        utfx.assertCodePoint = function(cp) {
+            if (typeof cp !== 'number' || cp !== cp)
+                throw TypeError("Illegal code point: "+(typeof cp));
+            if (cp < 0 || cp > 0x10FFFF)
+                throw RangeError("Illegal code point: "+cp);
+            return cp;
+        };
+
+        /**
+         * Calculates the byte length of an UTF8 code point.
+         * @param {number} cp UTF8 code point
+         * @returns {number} Byte length
+         */
+        utfx.calculateCodePoint = function(cp) {
+            return (cp < 0x80) ? 1 : (cp < 0x800) ? 2 : (cp < 0x10000) ? 3 : 4;
+        };
+
+        /**
+         * Calculates the number of UTF8 bytes required to store UTF8 code points.
+         * @param {(!function():number|null)} src Code points source as a function returning the next code point respectively
+         *  `null` if there are no more code points left.
+         * @returns {number} The number of UTF8 bytes required
+         */
+        utfx.calculateUTF8 = function(src) {
+            var cp, l=0;
+            while ((cp = src()) !== null)
+                l += utfx.calculateCodePoint(cp);
+            return l;
+        };
+
+        /**
+         * Calculates the number of UTF8 code points respectively UTF8 bytes required to store UTF16 char codes.
+         * @param {(!function():number|null)} src Characters source as a function returning the next char code respectively
+         *  `null` if there are no more characters left.
+         * @returns {!Array.<number>} The number of UTF8 code points at index 0 and the number of UTF8 bytes required at index 1.
+         */
+        utfx.calculateUTF16asUTF8 = function(src) {
+            var n=0, l=0;
+            utfx.UTF16toUTF8(src, function(cp) {
+                ++n; l += utfx.calculateCodePoint(cp);
+            });
+            return [n,l];
+        };
+
+        return utfx;
+    }();
+
+    /**
+     * String.fromCharCode reference for compile-time renaming.
+     * @type {function(...number):string}
+     * @inner
+     */
+    var stringFromCharCode = String.fromCharCode;
+
+    /**
+     * Creates a source function for a string.
+     * @param {string} s String to read from
+     * @returns {function():number|null} Source function returning the next char code respectively `null` if there are
+     *  no more characters left.
+     * @throws {TypeError} If the argument is invalid
+     */
+    utfx.stringSource = function(s) {
+        var i=0; return function() {
+            return i < s.length ? s.charCodeAt(i++) : null;
+        };
+    };
+
+    /**
+     * Creates a destination function for a string.
+     * @returns {function(number=):undefined|string} Destination function successively called with the next char code.
+     *  Returns the final string when called without arguments.
+     */
+    utfx.stringDestination = function() {
+        var cs = [], ps = []; return function() {
+            if (arguments.length === 0)
+                return ps.join('')+stringFromCharCode.apply(String, cs);
+            if (cs.length + arguments.length > 1024)
+                ps.push(stringFromCharCode.apply(String, cs)),
+                cs.length = 0;
+            Array.prototype.push.apply(cs, arguments);
+        };
+    };
 
     // encodings/utf8
 
