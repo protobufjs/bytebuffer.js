@@ -110,7 +110,7 @@ module.exports = (function() {
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "3.1.0";
+    ByteBuffer.VERSION = "3.1.1";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -1489,7 +1489,7 @@ module.exports = (function() {
             b = this.buffer[offset++]; part2  = (b & 0x7F)      ; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
             b = this.buffer[offset++]; part2 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
             throw new Error("Data must be corrupt: Buffer overrun"); }}}}}}}}}}
-            var value = Long.from28Bits(part0, part1, part2, false);
+            var value = Long.fromBits(part0 | (part1 << 28), (part1 >>> 4) | (part2) << 24, false);
             if (relative) {
                 this.offset = offset;
                 return value;
@@ -2997,6 +2997,13 @@ module.exports = (function() {
         var utfx = {};
 
         /**
+         * Maximum valid code point.
+         * @type {number}
+         * @const
+         */
+        utfx.MAX_CODEPOINT = 0x10FFFF;
+
+        /**
          * Encodes UTF8 code points to UTF8 bytes.
          * @param {(!function():number|null) | number} src Code points source, either as a function returning the next code point
          *  respectively `null` if there are no more code points left or a single numeric code point.
@@ -3130,51 +3137,6 @@ module.exports = (function() {
             utfx.decodeUTF8(src, function(cp) {
                 utfx.UTF8toUTF16(cp, dst);
             });
-        };
-
-        /**
-         * Asserts a byte value.
-         * @param {number} b 8bit byte value
-         * @returns {number} Valid byte value
-         * @throws {TypeError} If the byte value is invalid
-         * @throws {RangeError} If the byte value is out of range
-         */
-        utfx.assertByte = function(b) {
-            if (typeof b !== 'number' || b !== b)
-                throw TypeError("Illegal byte: "+(typeof b));
-            if (b < -128 || b > 255)
-                throw RangeError("Illegal byte: "+b);
-            return b;
-        };
-
-        /**
-         * Asserts an UTF16 char code.
-         * @param {number} c UTF16 char code
-         * @returns {number} Valid char code
-         * @throws {TypeError} If the char code is invalid
-         * @throws {RangeError} If the char code is out of range
-         */
-        utfx.assertCharCode = function(c) {
-            if (typeof c !== 'number' || c !== c)
-                throw TypeError("Illegal char code: "+(typeof c));
-            if (c < 0 || c > 0xFFFF)
-                throw RangeError("Illegal char code: "+c);
-            return c;
-        };
-
-        /**
-         * Asserts an UTF8 code point.
-         * @param {number} cp UTF8 code point
-         * @returns {number} Valid code point
-         * @throws {TypeError} If the code point is invalid
-         * @throws {RangeError} If the code point is out of range
-         */
-        utfx.assertCodePoint = function(cp) {
-            if (typeof cp !== 'number' || cp !== cp)
-                throw TypeError("Illegal code point: "+(typeof cp));
-            if (cp < 0 || cp > 0x10FFFF)
-                throw RangeError("Illegal code point: "+cp);
-            return cp;
         };
 
         /**

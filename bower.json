@@ -1,12 +1,12 @@
 {
     "name": "bytebuffer",
-    "version": "3.1.0",
+    "version": "3.1.1",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "description": "A full-featured ByteBuffer implementation using typed arrays.",
-    "main": "ByteBuffer.js",
+    "main": "dist/ByteBufferAB.js",
     "keywords": ["net", "array", "buffer", "arraybuffer", "typed array", "bytebuffer", "json", "websocket", "webrtc"],
     "dependencies": {
-    "long": "latest"
+        "long": "latest"
     },
     "license": "Apache-2.0"
 }

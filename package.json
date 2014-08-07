@@ -1,6 +1,6 @@
 {
     "name": "bytebuffer",
-    "version": "3.1.0",
+    "version": "3.1.1",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "description": "The swiss army knife for binary data in JavaScript.",
     "main": "index.js",
@@ -18,7 +18,7 @@
         "bufferview": "~1"
     },
     "devDependencies": {
-        "utfx": "~0.12",
+        "utfx": "~1.0",
         "testjs": "~1",
         "metascript": "~0",
         "closurecompiler": "~1"

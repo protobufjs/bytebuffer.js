@@ -187,7 +187,7 @@ if (Long) {
         b = this.view.getUint8(offset++); part2 |= (b & 0x7F) <<  7; if (b & 0x80) {
         throw new Error("Data must be corrupt: Buffer overrun"); }}}}}}}}}}
     //? }
-        var value = Long.from28Bits(part0, part1, part2, false);
+        var value = Long.fromBits(part0 | (part1 << 28), (part1 >>> 4) | (part2) << 24, false);
         if (relative) {
             this.offset = offset;
             return value;
