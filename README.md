@@ -26,10 +26,15 @@ available.
 
 ```javascript
 var ByteBuffer = require("bytebuffer");
-var bb = new ByteBuffer();
-bb.writeIString("Hello world!").flip();
+
+var bb = new ByteBuffer()
+            .writeIString("Hello world!")
+            .flip();
 console.log(bb.readIString()+" from ByteBuffer.js");
 ```
+
+In the browser, 64 bit integer support is optional and present only if [Long.js](https://github.com/dcodeIO/Long.js) has
+been loaded prior to ByteBuffer.js.
 
 API
 ---
