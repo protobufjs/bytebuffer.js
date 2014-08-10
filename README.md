@@ -38,7 +38,8 @@ been loaded prior to ByteBuffer.js.
 
 API
 ---
-* [View the API documentation](http://htmlpreview.github.io/?https://raw.githubusercontent.com/dcodeIO/ByteBuffer.js/master/docs/index.html)
+* [View the API documentation](https://github.com/dcodeIO/ByteBuffer.js/wiki/API)
+* [Check the wiki](https://github.com/dcodeIO/ByteBuffer.js/wiki)
 
 Downloads
 ---------

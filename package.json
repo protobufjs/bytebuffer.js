@@ -30,10 +30,9 @@
     "scripts": {
         "prepublish": "npm test",
         "test": "node node_modules/testjs/bin/testjs tests/suite.js",
-        "make": "npm run-script build && npm run-script compile && npm run-script compress && npm test && npm run-script jsdoc",
+        "make": "npm run-script build && npm run-script compile && npm run-script compress && npm test",
         "build": "node scripts/build.js",
         "compile": "ccjs dist/ByteBufferAB.js --create_source_map=dist/ByteBufferAB.min.map --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --externs=externs/Long.js > dist/ByteBufferAB.min.js",
-        "compress": "gzip -c -9 dist/ByteBufferAB.min.js > dist/ByteBufferAB.min.js.gz",
-        "jsdoc": "jsdoc -c jsdoc.json"
+        "compress": "gzip -c -9 dist/ByteBufferAB.min.js > dist/ByteBufferAB.min.js.gz"
     }
 }
