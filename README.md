@@ -83,7 +83,7 @@ Downloads
 
 Documentation
 -------------
-* [View the API documentation](http://htmlpreview.github.com/?http://github.com/dcodeIO/ByteBuffer.js/master/docs/ByteBuffer.html)
+* [View the API documentation](http://htmlpreview.github.io/?https://raw.githubusercontent.com/dcodeIO/ByteBuffer.js/master/docs/index.html)
 
 Tests (& Examples) [![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.png?branch=master)](https://travis-ci.org/dcodeIO/ByteBuffer.js)
 ------------------
