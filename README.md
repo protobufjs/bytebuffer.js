@@ -3,7 +3,8 @@
 A fast and complete ByteBuffer implementation using either ArrayBuffers in the browser or node Buffers under node.js,
 generated from a single source tree through [MetaScript](https://github.com/dcodeIO/MetaScript).
 
-If you are looking for ByteBuffer.js 2 (ArrayBuffers only), [that's the branch](https://github.com/dcodeIO/ByteBuffer.js/tree/ByteBuffer2).
+[![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.png?branch=master)](https://travis-ci.org/dcodeIO/ByteBuffer.js)
+[![Donate](https://raw.githubusercontent.com/dcodeIO/Long.js/master/donate.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=info%40code-emitter.com&item_name=Open%20Source%3A%20Long.js)
 
 What can it do?
 ---------------
@@ -18,20 +19,10 @@ What can it do?
 * Chaining of all operations that do not return a specific value
 * Slicing, appending, prepending, reversing, flip, mark, reset, etc.
 
-More
-----
-* CommonJS, AMD and shim compatible
-* Also available via [npm](https://npmjs.org/package/bytebuffer)
-* Compiled through [Closure Compiler](https://developers.google.com/closure/compiler/) using ADVANCED_OPTIMIZATIONS 
- (fully annotated, includes externs and source map)
-* Fully documented using [jsdoc3](https://github.com/jsdoc3/jsdoc)
-* Well tested through [test.js](https://github.com/dcodeIO/test.js)
-* Zero production dependencies (Long.js is optional)
-
 Usage
 -----
-### Node.js ###
-* Install: `npm install bytebuffer`
+The library is compatible with CommonJS and AMD loaders and is exposed globally as `dcodeIO.ByteBuffer` if neither is
+available.
 
 ```javascript
 var ByteBuffer = require("bytebuffer");
@@ -40,55 +31,15 @@ bb.writeIString("Hello world!").flip();
 console.log(bb.readIString()+" from ByteBuffer.js");
 ```
 
-### Browser ###
-
-Optionally depends on [Long.js](https://github.com/dcodeIO/Long.js) for long (int64) support. If you do not require long
-support, you can skip the Long.js include.
-
-```html
-<script src="Long.min.js"></script>
-<script src="ByteBufferAB.min.js"></script>
-```
-
-```javascript
-var ByteBuffer = dcodeIO.ByteBuffer;
-var bb = new ByteBuffer();
-bb.writeIString("Hello world!").flip();
-alert(bb.readIString()+" from ByteBuffer.js");
-```
-
-### AMD ###
-
-Optionally depends on [Long.js](https://github.com/dcodeIO/Long.js) for long (int64) support. If you do not require long
-support, you can skip the Long.js config. [Require.js](http://requirejs.org/) example:
-
-```javascript
-require.config({
-    "paths": {
-        "Long": "/path/to/Long.js"
-        "ByteBuffer": "/path/to/ByteBufferAB.js"
-    }
-});
-require(["ByteBuffer"], function(ByteBuffer) {
-    var bb = new ByteBuffer();
-    bb.writeIString("Hello world!").flip();
-    alert(bb.readIString()+" from ByteBuffer.js");
-});
-```
+API
+---
+* [View the API documentation](http://htmlpreview.github.io/?https://raw.githubusercontent.com/dcodeIO/ByteBuffer.js/master/docs/index.html)
 
 Downloads
 ---------
+* [Distributions](https://github.com/dcodeIO/ByteBuffer.js/tree/master/dist)
 * [ZIP-Archive](https://github.com/dcodeIO/ByteBuffer.js/archive/master.zip)
 * [Tarball](https://github.com/dcodeIO/ByteBuffer.js/tarball/master)
-
-Documentation
--------------
-* [View the API documentation](http://htmlpreview.github.io/?https://raw.githubusercontent.com/dcodeIO/ByteBuffer.js/master/docs/index.html)
-
-Tests (& Examples) [![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.png?branch=master)](https://travis-ci.org/dcodeIO/ByteBuffer.js)
-------------------
-* [View source](https://github.com/dcodeIO/ByteBuffer.js/blob/master/tests/suite.js)
-* [View report](https://travis-ci.org/dcodeIO/ByteBuffer.js)
 
 Support for IE<10, FF<15, Chrome<9 etc.
 ---------------------------------------

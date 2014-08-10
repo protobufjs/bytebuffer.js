@@ -21,6 +21,9 @@ ByteBuffer uses either ArrayBuffers in the browser or Buffers under node.js.
 
 * **[ByteBufferNB.js](https://raw.githubusercontent.com/dcodeIO/ByteBuffer.js/master/dist/ByteBufferNB.js)**
   uses a node Buffer as its backing buffer.
+  
+Also available as `bytebuffer` on [npm](https://www.npmjs.org/package/bytebuffer) and
+[bower](http://bower.io/search/?q=bytebuffer).
 
 When installed as an [npm package](https://www.npmjs.org/package/bytebuffer), both versions are available.
 `exports` and `exports.ByteBufferNB` point at ByteBufferNB, `exports.ByteBufferAB` points at ByteBufferAB.
