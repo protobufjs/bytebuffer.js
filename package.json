@@ -1,6 +1,6 @@
 {
     "name": "bytebuffer",
-    "version": "3.1.1-1",
+    "version": "3.2.0",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "description": "The swiss army knife for binary data in JavaScript.",
     "main": "index.js",
@@ -14,14 +14,17 @@
     },
     "keywords": ["net", "array", "buffer", "arraybuffer", "typed array", "bytebuffer", "json", "websocket", "webrtc"],
     "dependencies": {
-        "long": "~1",
+        "long": "~2",
         "bufferview": "~1"
     },
     "devDependencies": {
-        "utfx": "~1.0",
+        "utfx": "~1",
         "testjs": "~1",
         "metascript": "~0",
         "closurecompiler": "~1"
+    },
+    "optionalDependencies": {
+        "memcpy": "~0.5" 
     },
     "license": "Apache-2.0",
     "engines": {
@@ -32,7 +35,7 @@
         "test": "node node_modules/testjs/bin/testjs tests/suite.js",
         "make": "npm run-script build && npm run-script compile && npm run-script compress && npm test",
         "build": "node scripts/build.js",
-        "compile": "ccjs dist/ByteBufferAB.js --create_source_map=dist/ByteBufferAB.min.map --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --externs=externs/Long.js > dist/ByteBufferAB.min.js",
+        "compile": "ccjs dist/ByteBufferAB.js --create_source_map=dist/ByteBufferAB.min.map --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --externs=node_modules/long/externs/Long.js > dist/ByteBufferAB.min.js",
         "compress": "gzip -c -9 dist/ByteBufferAB.min.js > dist/ByteBufferAB.min.js.gz"
     }
 }

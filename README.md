@@ -6,14 +6,14 @@ generated from a single source tree through [MetaScript](https://github.com/dcod
 [![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.svg?branch=master)](https://travis-ci.org/dcodeIO/ByteBuffer.js)
 [![Donate](https://raw.githubusercontent.com/dcodeIO/Long.js/master/donate.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=info%40code-emitter.com&item_name=Open%20Source%3A%20Long.js)
 
-What can it do?
----------------
+Features
+--------
 * 8, 16, 32 and 64 bit signed and unsigned integers
 * 32 and 64 bit floats
-* Big and little endianness
 * Varints as used in protobuf (32 and 64 bit, zig-zag)
 * Base64, binary, debug, hex and utf8 encodings
 * Handy string and debugging utilities
+* Big and little endianness
 * Relative and absolute zero-copy operations wherever possible
 * Transparent resizing when using unknown-length data
 * Chaining of all operations that do not return a specific value

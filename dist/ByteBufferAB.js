@@ -118,7 +118,7 @@
          * @const
          * @expose
          */
-        ByteBuffer.VERSION = "3.1.1-1";
+        ByteBuffer.VERSION = "3.2.0";
 
         /**
          * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -3172,14 +3172,11 @@
         return ByteBuffer;
     }
 
-    // Enable module loading if available
-    if (typeof module != 'undefined' && module["exports"]) { // CommonJS
+    /* CommonJS */ if (typeof module !== 'undefined' && module["exports"])
         module["exports"] = loadByteBuffer(require("long"));
-    } else if (typeof define !== 'undefined' && define["amd"]) { // AMD
-        define("ByteBuffer", ["Math/Long"], function(Long) { return loadByteBuffer(Long); });
-    } else { // Shim
-        if (!global["dcodeIO"]) global["dcodeIO"] = {};
-        global["dcodeIO"]["ByteBuffer"] = loadByteBuffer(global["dcodeIO"]["Long"]);
-    }
+    /* AMD */ else if (typeof define === 'function' && define["amd"])
+        define("ByteBuffer", ["Long"], function(Long) { return loadByteBuffer(Long); });
+    /* Global */ else
+        (global["dcodeIO"] = global["dcodeIO"] || {})["ByteBuffer"] = loadByteBuffer(global["dcodeIO"]["Long"]);
 
 })(this);

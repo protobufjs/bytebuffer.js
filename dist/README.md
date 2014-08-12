@@ -9,7 +9,7 @@ ByteBuffer uses either ArrayBuffers in the browser or Buffers under node.js.
   uses an ArrayBuffer as its backing buffer, accessed through a DataView.
   
 * **[ByteBufferAB.min.js](https://raw.githubusercontent.com/dcodeIO/ByteBuffer.js/master/dist/ByteBufferAB.min.js)**
-  has been compiled with Closure Compiler using `--compilation_level=ADVANCED_OPTIMIZATIONS`.
+  has been compiled with Closure Compiler using advanced optimizations.
   
 * **[ByteBufferAB.min.js.gz](https://raw.githubusercontent.com/dcodeIO/ByteBuffer.js/master/dist/ByteBufferAB.min.js.gz)**
   has also been gzipped using `-9`.

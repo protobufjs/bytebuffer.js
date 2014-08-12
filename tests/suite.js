@@ -671,8 +671,8 @@ function makeSuite(ByteBuffer) {
             test.equal(ByteBuffer.zigZagDecode64(values[i][1]).toNumber(), values[i][0]);
         }
         values = [
-            [Long.MAX_SIGNED_VALUE, Long.MAX_UNSIGNED_VALUE.subtract(Long.ONE)],
-            [Long.MIN_SIGNED_VALUE, Long.MAX_UNSIGNED_VALUE]
+            [Long.MAX_VALUE, Long.MAX_UNSIGNED_VALUE.subtract(Long.ONE)],
+            [Long.MIN_VALUE, Long.MAX_UNSIGNED_VALUE]
         ];
         // NOTE: Even 64bit doubles from toNumber() fail for these values so we are using toString() here
         for (i=0; i<values.length; i++) {
@@ -974,7 +974,7 @@ function makeSuite(ByteBuffer) {
             vm.runInNewContext(code, sandbox, "amd-sandbox");
             test.ok(sandbox.define.called);
             test.equal(sandbox.define.called[0], "ByteBuffer");
-            test.equal(sandbox.define.called[1][0], "Math/Long");
+            test.equal(sandbox.define.called[1][0], "Long");
             test.done();
         };
         
