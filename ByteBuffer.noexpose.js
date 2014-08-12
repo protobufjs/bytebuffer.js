@@ -103,7 +103,7 @@
          * @type {string}
          * @const
          */
-        ByteBuffer.VERSION = "2.3.1";
+        ByteBuffer.VERSION = "2.3.2";
 
         /**
          * Default buffer capacity of `16`. The ByteBuffer will be automatically resized by a factor of 2 if required.

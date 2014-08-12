@@ -424,19 +424,14 @@ var suite = {
     "write/readUint64": function(test) {
         var bb = new ByteBuffer(8);
 
-        var max = ByteBuffer.Long.MAX_UNSIGNED_VALUE.toNumber();
+        var max = ByteBuffer.Long.MAX_UNSIGNED_VALUE;
         bb.writeUint64(max).flip();
         test.equal(bb.toString("debug"), "<FF FF FF FF FF FF FF FF>");
-        test.equal(bb.readUint64(0), max);
-
-        var min = ByteBuffer.Long.MIN_UNSIGNED_VALUE.toNumber();
-        bb.writeLong(min).flip();
-        test.equal(bb.toString("debug"), "<00 00 00 00 00 00 00 00>");
-        test.equal(bb.readUint64(0), min);
+        test.deepEqual(bb.readUint64(0), max);
 
         bb.writeUint64(-1).flip();
-        test.equal(bb.toString("debug"), "<00 00 00 00 00 00 00 00>");
-        test.equal(bb.readUint64(0), 0);
+        test.equal(bb.toString("debug"), "<FF FF FF FF FF FF FF FF>");
+        test.deepEqual(bb.readUint64(0), ByteBuffer.Long.fromNumber(-1, true));
 
         bb.reset();
         bb.LE().writeUint64(new ByteBuffer.Long(0x89ABCDEF, 0x01234567, true)).flip();
