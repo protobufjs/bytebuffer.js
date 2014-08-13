@@ -4,7 +4,7 @@ A fast and complete ByteBuffer implementation using either ArrayBuffers in the b
 generated from a single source tree through [MetaScript](https://github.com/dcodeIO/MetaScript).
 
 [![Build Status](https://travis-ci.org/dcodeIO/ByteBuffer.js.svg?branch=master)](https://travis-ci.org/dcodeIO/ByteBuffer.js)
-[![Donate](https://raw.githubusercontent.com/dcodeIO/Long.js/master/donate.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=info%40code-emitter.com&item_name=Open%20Source%3A%20Long.js)
+[![Donate](https://raw.githubusercontent.com/dcodeIO/Long.js/master/donate.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=info%40code-emitter.com&item_name=Open%20Source%3A%20ByteBuffer.js)
 
 Features
 --------
