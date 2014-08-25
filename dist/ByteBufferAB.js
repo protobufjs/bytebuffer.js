@@ -118,7 +118,7 @@
          * @const
          * @expose
          */
-        ByteBuffer.VERSION = "3.2.0";
+        ByteBuffer.VERSION = "3.2.1";
 
         /**
          * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -1399,7 +1399,6 @@
                     throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             var start = offset;
-            // UTF8 strings do not contain zero bytes in between except for the zero character, so:
             k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
             offset += k+1;
             var capacity12 = this.buffer.byteLength;
@@ -1481,8 +1480,7 @@
                     throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             var start = offset,
-                k;
-            k = utfx.calculateUTF16asUTF8(utfx.stringSource(str), this.noAssert)[1];
+                k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
             offset += 4+k;
             var capacity13 = this.buffer.byteLength;
             if (offset > capacity13)
@@ -1530,7 +1528,7 @@
                 sd;
             utfx.decodeUTF8toUTF16(function() {
                 return offset < k ? this.view.getUint8(offset++) : null;
-            }.bind(this), sd = utfx.stringDestination(), this.noAssert);
+            }.bind(this), sd = utfx.stringDestination());
             str = sd();
             if (relative) {
                 this.offset = offset;
@@ -1578,9 +1576,8 @@
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
                     throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
-            var k;
-            var start = offset;
-            k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
+            var start = offset,
+                k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
             offset += k;
             var capacity14 = this.buffer.byteLength;
             if (offset > capacity14)
@@ -1690,7 +1687,7 @@
                 var k = offset + length;
                 utfx.decodeUTF8toUTF16(function() {
                     return offset < k ? this.view.getUint8(offset++) : null;
-                }.bind(this), sd = utfx.stringDestination(), this.noAssert);
+                }.bind(this), sd = utfx.stringDestination());
                 if (offset !== k)
                     throw new RangeError("Illegal range: Truncated data, "+offset+" == "+k);
                 if (relative) {
@@ -1744,9 +1741,8 @@
                     throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             var start = offset,
-                k, l;
-            k = utfx.calculateUTF16asUTF8(utfx.stringSource(str), this.noAssert)[1];
-            l = ByteBuffer.calculateVarint32(k);
+                k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1],
+                l = ByteBuffer.calculateVarint32(k);
             offset += l+k;
             var capacity15 = this.buffer.byteLength;
             if (offset > capacity15)
@@ -1793,7 +1789,7 @@
                 sd = utfx.stringDestination();
             utfx.decodeUTF8toUTF16(function() {
                 return offset < k ? this.view.getUint8(offset++) : null;
-            }.bind(this), sd, this.noAssert);
+            }.bind(this), sd);
             str = sd();
             if (relative) {
                 this.offset = offset;

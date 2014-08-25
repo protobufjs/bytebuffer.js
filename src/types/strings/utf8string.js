@@ -29,22 +29,13 @@ ByteBuffer.prototype.writeUTF8String = function(str, offset) {
     if (!this.noAssert) {
         //? ASSERT_OFFSET();
     }
-    var k;
-    //? if (NODE) {
-    var buffer = new Buffer(str, 'utf8');
-    k = buffer.length;
-    //? ENSURE_CAPACITY('k');
-    buffer.copy(this.buffer, offset);
-    if (relative) {
-        this.offset += k;
-        return this;
-    }
-    return k;
-    //? } else {
-    var start = offset;
-    k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
+    var start = offset,
+        k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
     //? ENSURE_CAPACITY('k');
     utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
+        //? if (NODE)
+        this.buffer[offset++] = b;
+        //? else
         this.view.setUint8(offset++, b);
     }.bind(this));
     if (relative) {
@@ -52,7 +43,6 @@ ByteBuffer.prototype.writeUTF8String = function(str, offset) {
         return this;
     }
     return offset - start;
-    //? }
 };
 //? if (ALIASES) {
 
@@ -162,7 +152,7 @@ ByteBuffer.prototype.readUTF8String = function(length, metrics, offset) {
         var k = offset + length;
         utfx.decodeUTF8toUTF16(function() {
             return offset < k ? this.view.getUint8(offset++) : null;
-        }.bind(this), sd = utfx.stringDestination(), this.noAssert);
+        }.bind(this), sd = utfx.stringDestination());
         if (offset !== k)
             throw new RangeError("Illegal range: Truncated data, "+offset+" == "+k);
         if (relative) {

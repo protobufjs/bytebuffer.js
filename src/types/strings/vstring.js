@@ -18,26 +18,18 @@ ByteBuffer.prototype.writeVString = function(str, offset) {
         //? ASSERT_OFFSET();
     }
     var start = offset,
-        k, l;
-    //? if (NODE) {
-    var buffer = new Buffer(str, "utf8");
-    k = buffer.length;
-    l = ByteBuffer.calculateVarint32(k);
-    //? ENSURE_CAPACITY('l+k');
-    offset += this.writeVarint32(buffer.length, offset);
-    buffer.copy(this.buffer, offset);
-    offset += buffer.length;
-    //? } else {
-    k = utfx.calculateUTF16asUTF8(utfx.stringSource(str), this.noAssert)[1];
-    l = ByteBuffer.calculateVarint32(k);
+        k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1],
+        l = ByteBuffer.calculateVarint32(k);
     //? ENSURE_CAPACITY('l+k');
     offset += this.writeVarint32(k, offset);
     utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
+        //? if (NODE)
+        this.buffer[offset++] = b;
+        //? else
         this.view.setUint8(offset++, b);
     }.bind(this));
     if (offset !== start+k+l)
         throw new RangeError("Illegal range: Truncated data, "+offset+" == "+(offset+k+l));
-    //? }
     if (relative) {
         this.offset = offset;
         return this;
@@ -74,7 +66,7 @@ ByteBuffer.prototype.readVString = function(offset) {
         sd = utfx.stringDestination();
     utfx.decodeUTF8toUTF16(function() {
         return offset < k ? this.view.getUint8(offset++) : null;
-    }.bind(this), sd, this.noAssert);
+    }.bind(this), sd);
     str = sd();
     //? }
     if (relative) {
