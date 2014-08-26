@@ -20,13 +20,11 @@ ByteBuffer.prototype.writeIString = function(str, offset) {
     var start = offset,
         k;
     //? if (NODE) {
-    var buffer = new Buffer(str, "utf8");
-    k = buffer.length;
+    k = Buffer.byteLength(str, "utf8");
     //? ENSURE_CAPACITY('4+k');
     //? WRITE_UINT32_ARRAY('k');
     offset += 4;
-    buffer.copy(this.buffer, offset);
-    offset += k;
+    offset += this.buffer.write(str, offset, k, "utf8");
     //? } else {
     k = utfx.calculateUTF16asUTF8(utfx.stringSource(str), this.noAssert)[1];
     //? ENSURE_CAPACITY('4+k');

@@ -26,13 +26,10 @@ ByteBuffer.prototype.writeCString = function(str, offset) {
     var start = offset;
     // UTF8 strings do not contain zero bytes in between except for the zero character, so:
     //? if (NODE) {
-    var buffer = new Buffer(str, 'utf8');
-    k = buffer.length;
+    k = Buffer.byteLength(str, "utf8");
     //? ENSURE_CAPACITY('k+1');
-    buffer.copy(this.buffer, offset);
-    offset += k;
+    offset += this.buffer.write(str, offset, k, "utf8");
     this.buffer[offset++] = 0;
-    buffer = null;
     //? } else {
     k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
     //? ENSURE_CAPACITY('k+1');

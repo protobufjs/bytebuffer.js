@@ -31,12 +31,11 @@ ByteBuffer.prototype.writeUTF8String = function(str, offset) {
     }
     var k;
     //? if (NODE) {
-    var buffer = new Buffer(str, 'utf8');
-    k = buffer.length;
+    k = Buffer.byteLength(str, "utf8");
     //? ENSURE_CAPACITY('k');
-    buffer.copy(this.buffer, offset);
+    offset += this.buffer.write(str, offset, k, "utf8");
     if (relative) {
-        this.offset += k;
+        this.offset += offset;
         return this;
     }
     return k;
