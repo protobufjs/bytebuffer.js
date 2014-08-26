@@ -24,18 +24,23 @@ ByteBuffer.prototype.writeCString = function(str, offset) {
         //? ASSERT_OFFSET();
     }
     var start = offset;
+    // UTF8 strings do not contain zero bytes in between except for the zero character, so:
+    //? if (NODE) {
+    var buffer = new Buffer(str, 'utf8');
+    k = buffer.length;
+    //? ENSURE_CAPACITY('k+1');
+    buffer.copy(this.buffer, offset);
+    offset += k;
+    this.buffer[offset++] = 0;
+    buffer = null;
+    //? } else {
     k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
     //? ENSURE_CAPACITY('k+1');
     utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
-        //? if (NODE)
-        this.buffer[offset++] = b;
-        //? else
         this.view.setUint8(offset++, b);
     }.bind(this));
-    //? if (NODE)
-    this.buffer[offset++] = 0;
-    //? else
     this.view.setUint8(offset++, 0);
+    //? }
     if (relative) {
         this.offset = offset - start;
         return this;
@@ -66,7 +71,7 @@ ByteBuffer.prototype.readCString = function(offset) {
             throw new RangeError("Index out of range: "+offset+" <= "+this.buffer.length);
         temp = this.buffer[offset++];
     } while (temp !== 0);
-    var str = this.buffer.slice(start, offset-1).toString("utf8");
+    var str = this.buffer.toString("utf8", start, offset-1);
     if (relative) {
         this.offset = offset;
         return str;

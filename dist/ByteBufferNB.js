@@ -110,7 +110,7 @@ module.exports = (function() {
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "3.2.1";
+    ByteBuffer.VERSION = "3.2.2";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -1552,16 +1552,18 @@ module.exports = (function() {
                 throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
         }
         var start = offset;
-        k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
+        // UTF8 strings do not contain zero bytes in between except for the zero character, so:
+        var buffer = new Buffer(str, 'utf8');
+        k = buffer.length;
         offset += k+1;
         var capacity12 = this.buffer.length;
         if (offset > capacity12)
             this.resize((capacity12 *= 2) > offset ? capacity12 : offset);
         offset -= k+1;
-        utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
-            this.buffer[offset++] = b;
-        }.bind(this));
+        buffer.copy(this.buffer, offset);
+        offset += k;
         this.buffer[offset++] = 0;
+        buffer = null;
         if (relative) {
             this.offset = offset - start;
             return this;
@@ -1596,7 +1598,7 @@ module.exports = (function() {
                 throw new RangeError("Index out of range: "+offset+" <= "+this.buffer.length);
             temp = this.buffer[offset++];
         } while (temp !== 0);
-        var str = this.buffer.slice(start, offset-1).toString("utf8");
+        var str = this.buffer.toString("utf8", start, offset-1);
         if (relative) {
             this.offset = offset;
             return str;
@@ -1632,7 +1634,9 @@ module.exports = (function() {
                 throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
         }
         var start = offset,
-            k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
+            k;
+        var buffer = new Buffer(str, "utf8");
+        k = buffer.length;
         offset += 4+k;
         var capacity13 = this.buffer.length;
         if (offset > capacity13)
@@ -1650,11 +1654,8 @@ module.exports = (function() {
             this.buffer[offset+3] =  k         & 0xFF;
         }
         offset += 4;
-        utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
-            this.buffer[offset++] = b;
-        }.bind(this));
-        if (offset !== start + 4 + k)
-            throw new RangeError("Illegal range: Truncated data, "+offset+" == "+(offset+4+k));
+        buffer.copy(this.buffer, offset);
+        offset += k;
         if (relative) {
             this.offset = offset;
             return this;
@@ -1698,7 +1699,7 @@ module.exports = (function() {
         offset += 4;
         if (offset + temp > this.buffer.length)
             throw new RangeError("Index out of bounds: "+offset+" + "+temp+" <= "+this.buffer.length);
-        str = this.buffer.slice(offset, offset + temp).toString("utf8");
+        str = this.buffer.toString("utf8", offset, offset + temp);
         offset += temp;
         if (relative) {
             this.offset = offset;
@@ -1746,21 +1747,20 @@ module.exports = (function() {
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
         }
-        var start = offset,
-            k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
+        var k;
+        var buffer = new Buffer(str, 'utf8');
+        k = buffer.length;
         offset += k;
         var capacity14 = this.buffer.length;
         if (offset > capacity14)
             this.resize((capacity14 *= 2) > offset ? capacity14 : offset);
         offset -= k;
-        utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
-            this.buffer[offset++] = b;
-        }.bind(this));
+        buffer.copy(this.buffer, offset);
         if (relative) {
-            this.offset = offset;
+            this.offset += k;
             return this;
         }
-        return offset - start;
+        return k;
     };
 
     /**
@@ -1857,7 +1857,7 @@ module.exports = (function() {
                 if (offset < 0 || offset + length > this.buffer.length)
                     throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+length+") <= "+this.buffer.length);
             }
-            temp = this.buffer.slice(offset, offset+length).toString("utf8");
+            temp = this.buffer.toString("utf8", offset, offset+length);
             if (relative) {
                 this.offset += length;
                 return temp;
@@ -1909,19 +1909,18 @@ module.exports = (function() {
                 throw new RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
         }
         var start = offset,
-            k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1],
-            l = ByteBuffer.calculateVarint32(k);
+            k, l;
+        var buffer = new Buffer(str, "utf8");
+        k = buffer.length;
+        l = ByteBuffer.calculateVarint32(k);
         offset += l+k;
         var capacity15 = this.buffer.length;
         if (offset > capacity15)
             this.resize((capacity15 *= 2) > offset ? capacity15 : offset);
         offset -= l+k;
-        offset += this.writeVarint32(k, offset);
-        utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
-            this.buffer[offset++] = b;
-        }.bind(this));
-        if (offset !== start+k+l)
-            throw new RangeError("Illegal range: Truncated data, "+offset+" == "+(offset+k+l));
+        offset += this.writeVarint32(buffer.length, offset);
+        buffer.copy(this.buffer, offset);
+        offset += buffer.length;
         if (relative) {
             this.offset = offset;
             return this;
@@ -1955,7 +1954,7 @@ module.exports = (function() {
         temp = temp['value'];
         if (offset + temp > this.buffer.length)
             throw new RangeError("Index out of bounds: "+offset+" + "+val.value+" <= "+this.buffer.length);
-        str = this.buffer.slice(offset, offset + temp).toString("utf8");
+        str = this.buffer.toString("utf8", offset, offset + temp);
         offset += temp;
         if (relative) {
             this.offset = offset;

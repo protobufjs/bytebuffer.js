@@ -18,18 +18,26 @@ ByteBuffer.prototype.writeVString = function(str, offset) {
         //? ASSERT_OFFSET();
     }
     var start = offset,
-        k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1],
-        l = ByteBuffer.calculateVarint32(k);
+        k, l;
+    //? if (NODE) {
+    var buffer = new Buffer(str, "utf8");
+    k = buffer.length;
+    l = ByteBuffer.calculateVarint32(k);
+    //? ENSURE_CAPACITY('l+k');
+    offset += this.writeVarint32(buffer.length, offset);
+    buffer.copy(this.buffer, offset);
+    offset += buffer.length;
+    //? } else {
+    k = utfx.calculateUTF16asUTF8(utfx.stringSource(str), this.noAssert)[1];
+    l = ByteBuffer.calculateVarint32(k);
     //? ENSURE_CAPACITY('l+k');
     offset += this.writeVarint32(k, offset);
     utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
-        //? if (NODE)
-        this.buffer[offset++] = b;
-        //? else
         this.view.setUint8(offset++, b);
     }.bind(this));
     if (offset !== start+k+l)
         throw new RangeError("Illegal range: Truncated data, "+offset+" == "+(offset+k+l));
+    //? }
     if (relative) {
         this.offset = offset;
         return this;
@@ -59,14 +67,14 @@ ByteBuffer.prototype.readVString = function(offset) {
     //? if (NODE) {
     if (offset + temp > this.buffer.length)
         throw new RangeError("Index out of bounds: "+offset+" + "+val.value+" <= "+this.buffer.length);
-    str = this.buffer.slice(offset, offset + temp).toString("utf8");
+    str = this.buffer.toString("utf8", offset, offset + temp);
     offset += temp;
     //? } else {
     var k = offset + temp,
         sd = utfx.stringDestination();
     utfx.decodeUTF8toUTF16(function() {
         return offset < k ? this.view.getUint8(offset++) : null;
-    }.bind(this), sd);
+    }.bind(this), sd, this.noAssert);
     str = sd();
     //? }
     if (relative) {

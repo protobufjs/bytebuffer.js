@@ -1,5 +1,6 @@
 // This file compares encoding speed of an intermediate node Buffer with using utfx directly.
 // Turns out that utfx is about 2.4 times faster when writing while buffers are about 2.4 times faster when reading.
+// EDIT: This seems to be true for small strings (<=11 bytes) only.
 
 var utfx = require("utfx");
 
