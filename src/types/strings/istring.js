@@ -26,11 +26,11 @@ ByteBuffer.prototype.writeIString = function(str, offset) {
     offset += 4;
     offset += this.buffer.write(str, offset, k, "utf8");
     //? } else {
-    k = utfx.calculateUTF16asUTF8(utfx.stringSource(str), this.noAssert)[1];
+    k = utfx.calculateUTF16asUTF8(stringSource(str), this.noAssert)[1];
     //? ENSURE_CAPACITY('4+k');
     this.view.setUint32(offset, k, this.littleEndian);
     offset += 4;
-    utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
+    utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
         this.view.setUint8(offset++, b);
     }.bind(this));
     if (offset !== start + 4 + k)
@@ -74,7 +74,7 @@ ByteBuffer.prototype.readIString = function(offset) {
         sd;
     utfx.decodeUTF8toUTF16(function() {
         return offset < k ? this.view.getUint8(offset++) : null;
-    }.bind(this), sd = utfx.stringDestination(), this.noAssert);
+    }.bind(this), sd = stringDestination(), this.noAssert);
     str = sd();
     //? }
     if (relative) {

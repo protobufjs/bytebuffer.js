@@ -29,7 +29,7 @@ ByteBuffer.prototype.toBinary = function(begin, end) {
         //? ASSERT_RANGE();
     }
     //? if (NODE)
-    return this.buffer.slice(begin, end).toString("binary");
+    return this.buffer.toString("binary", begin, end);
     //? else {
     if (begin === end) return "";
     var out = [];

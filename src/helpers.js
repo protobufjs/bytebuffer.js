@@ -99,3 +99,43 @@ function assertRange(begin, end, min, cap) {
     rangeVal[0] = begin; rangeVal[1] = end;
 }
 //? }
+//? if (BASE64 || UTF8) {
+
+/**
+ * String.fromCharCode reference for compile-time renaming.
+ * @type {function(...number):string}
+ * @inner
+ */
+var stringFromCharCode = String.fromCharCode;
+
+/**
+ * Creates a source function for a string.
+ * @param {string} s String to read from
+ * @returns {function():number|null} Source function returning the next char code respectively `null` if there are
+ *  no more characters left.
+ * @throws {TypeError} If the argument is invalid
+ * @inner
+ */
+function stringSource(s) {
+    var i=0; return function() {
+        return i < s.length ? s.charCodeAt(i++) : null;
+    };
+}
+
+/**
+ * Creates a destination function for a string.
+ * @returns {function(number=):undefined|string} Destination function successively called with the next char code.
+ *  Returns the final string when called without arguments.
+ * @inner
+ */
+function stringDestination() {
+    var cs = [], ps = []; return function() {
+        if (arguments.length === 0)
+            return ps.join('')+stringFromCharCode.apply(String, cs);
+        if (cs.length + arguments.length > 1024)
+            ps.push(stringFromCharCode.apply(String, cs)),
+                cs.length = 0;
+        Array.prototype.push.apply(cs, arguments);
+    };
+}
+//? }

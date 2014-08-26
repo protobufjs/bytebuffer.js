@@ -26,11 +26,11 @@ ByteBuffer.prototype.writeVString = function(str, offset) {
     offset += this.writeVarint32(k, offset);
     offset += this.buffer.write(str, offset, k, "utf8");
     //? } else {
-    k = utfx.calculateUTF16asUTF8(utfx.stringSource(str), this.noAssert)[1];
+    k = utfx.calculateUTF16asUTF8(stringSource(str), this.noAssert)[1];
     l = ByteBuffer.calculateVarint32(k);
     //? ENSURE_CAPACITY('l+k');
     offset += this.writeVarint32(k, offset);
-    utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
+    utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
         this.view.setUint8(offset++, b);
     }.bind(this));
     if (offset !== start+k+l)
@@ -69,7 +69,7 @@ ByteBuffer.prototype.readVString = function(offset) {
     offset += temp;
     //? } else {
     var k = offset + temp,
-        sd = utfx.stringDestination();
+        sd = stringDestination();
     utfx.decodeUTF8toUTF16(function() {
         return offset < k ? this.view.getUint8(offset++) : null;
     }.bind(this), sd, this.noAssert);

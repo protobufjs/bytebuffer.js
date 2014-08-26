@@ -15,7 +15,7 @@ ByteBuffer.prototype.toHex = function(begin, end) {
         //? ASSERT_RANGE();
     }
     //? if (NODE)
-    return this.buffer.slice(begin, end).toString("hex");
+    return this.buffer.toString("hex", begin, end);
     //? else {
     var out = new Array(end - begin),
         b;

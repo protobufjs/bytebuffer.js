@@ -118,7 +118,7 @@
          * @const
          * @expose
          */
-        ByteBuffer.VERSION = "3.2.3";
+        ByteBuffer.VERSION = "3.3.0";
 
         /**
          * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -174,6 +174,44 @@
          * @inner
          */
         var EMPTY_BUFFER = new ArrayBuffer(0);
+
+        /**
+         * String.fromCharCode reference for compile-time renaming.
+         * @type {function(...number):string}
+         * @inner
+         */
+        var stringFromCharCode = String.fromCharCode;
+
+        /**
+         * Creates a source function for a string.
+         * @param {string} s String to read from
+         * @returns {function():number|null} Source function returning the next char code respectively `null` if there are
+         *  no more characters left.
+         * @throws {TypeError} If the argument is invalid
+         * @inner
+         */
+        function stringSource(s) {
+            var i=0; return function() {
+                return i < s.length ? s.charCodeAt(i++) : null;
+            };
+        }
+
+        /**
+         * Creates a destination function for a string.
+         * @returns {function(number=):undefined|string} Destination function successively called with the next char code.
+         *  Returns the final string when called without arguments.
+         * @inner
+         */
+        function stringDestination() {
+            var cs = [], ps = []; return function() {
+                if (arguments.length === 0)
+                    return ps.join('')+stringFromCharCode.apply(String, cs);
+                if (cs.length + arguments.length > 1024)
+                    ps.push(stringFromCharCode.apply(String, cs)),
+                        cs.length = 0;
+                Array.prototype.push.apply(cs, arguments);
+            };
+        }
 
         /**
          * Allocates a new ByteBuffer backed by a buffer of the specified capacity.
@@ -1400,13 +1438,13 @@
             }
             var start = offset;
             // UTF8 strings do not contain zero bytes in between except for the zero character, so:
-            k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
+            k = utfx.calculateUTF16asUTF8(stringSource(str))[1];
             offset += k+1;
             var capacity12 = this.buffer.byteLength;
             if (offset > capacity12)
                 this.resize((capacity12 *= 2) > offset ? capacity12 : offset);
             offset -= k+1;
-            utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
+            utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
                 this.view.setUint8(offset++, b);
             }.bind(this));
             this.view.setUint8(offset++, 0);
@@ -1445,7 +1483,7 @@
                 if (offset >= this.limit)
                     throw RangeError("Illegal range: Truncated data, "+offset+" < "+this.limit);
                 return (b = this.view.getUint8(offset++)) === 0 ? null : b;
-            }.bind(this), sd = utfx.stringDestination(), true);
+            }.bind(this), sd = stringDestination(), true);
             if (relative) {
                 this.offset = offset;
                 return sd();
@@ -1482,7 +1520,7 @@
             }
             var start = offset,
                 k;
-            k = utfx.calculateUTF16asUTF8(utfx.stringSource(str), this.noAssert)[1];
+            k = utfx.calculateUTF16asUTF8(stringSource(str), this.noAssert)[1];
             offset += 4+k;
             var capacity13 = this.buffer.byteLength;
             if (offset > capacity13)
@@ -1490,7 +1528,7 @@
             offset -= 4+k;
             this.view.setUint32(offset, k, this.littleEndian);
             offset += 4;
-            utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
+            utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
                 this.view.setUint8(offset++, b);
             }.bind(this));
             if (offset !== start + 4 + k)
@@ -1530,7 +1568,7 @@
                 sd;
             utfx.decodeUTF8toUTF16(function() {
                 return offset < k ? this.view.getUint8(offset++) : null;
-            }.bind(this), sd = utfx.stringDestination(), this.noAssert);
+            }.bind(this), sd = stringDestination(), this.noAssert);
             str = sd();
             if (relative) {
                 this.offset = offset;
@@ -1580,13 +1618,13 @@
             }
             var k;
             var start = offset;
-            k = utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
+            k = utfx.calculateUTF16asUTF8(stringSource(str))[1];
             offset += k;
             var capacity14 = this.buffer.byteLength;
             if (offset > capacity14)
                 this.resize((capacity14 *= 2) > offset ? capacity14 : offset);
             offset -= k;
-            utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
+            utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
                 this.view.setUint8(offset++, b);
             }.bind(this));
             if (relative) {
@@ -1615,7 +1653,7 @@
          * @expose
          */
         ByteBuffer.calculateUTF8Chars = function(str) {
-            return utfx.calculateUTF16asUTF8(utfx.stringSource(str))[0];
+            return utfx.calculateUTF16asUTF8(stringSource(str))[0];
         };
 
         /**
@@ -1626,7 +1664,7 @@
          * @expose
          */
         ByteBuffer.calculateUTF8Bytes = function(str) {
-            return utfx.calculateUTF16asUTF8(utfx.stringSource(str))[1];
+            return utfx.calculateUTF16asUTF8(stringSource(str))[1];
         };
 
         /**
@@ -1662,7 +1700,7 @@
                 start = offset,
                 sd;
             if (metrics === ByteBuffer.METRICS_CHARS) { // The same for node and the browser
-                sd = utfx.stringDestination();
+                sd = stringDestination();
                 utfx.decodeUTF8(function() {
                     return i < length && offset < this.limit ? this.view.getUint8(offset++) : null;
                 }.bind(this), function(cp) {
@@ -1690,7 +1728,7 @@
                 var k = offset + length;
                 utfx.decodeUTF8toUTF16(function() {
                     return offset < k ? this.view.getUint8(offset++) : null;
-                }.bind(this), sd = utfx.stringDestination(), this.noAssert);
+                }.bind(this), sd = stringDestination(), this.noAssert);
                 if (offset !== k)
                     throw new RangeError("Illegal range: Truncated data, "+offset+" == "+k);
                 if (relative) {
@@ -1745,7 +1783,7 @@
             }
             var start = offset,
                 k, l;
-            k = utfx.calculateUTF16asUTF8(utfx.stringSource(str), this.noAssert)[1];
+            k = utfx.calculateUTF16asUTF8(stringSource(str), this.noAssert)[1];
             l = ByteBuffer.calculateVarint32(k);
             offset += l+k;
             var capacity15 = this.buffer.byteLength;
@@ -1753,7 +1791,7 @@
                 this.resize((capacity15 *= 2) > offset ? capacity15 : offset);
             offset -= l+k;
             offset += this.writeVarint32(k, offset);
-            utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
+            utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
                 this.view.setUint8(offset++, b);
             }.bind(this));
             if (offset !== start+k+l)
@@ -1790,7 +1828,7 @@
             offset += temp['length'];
             temp = temp['value'];
             var k = offset + temp,
-                sd = utfx.stringDestination();
+                sd = stringDestination();
             utfx.decodeUTF8toUTF16(function() {
                 return offset < k ? this.view.getUint8(offset++) : null;
             }.bind(this), sd, this.noAssert);
@@ -2451,15 +2489,121 @@
             }
         };
 
-        // encodings/base64
+        // lxiv-embeddable
 
         /**
-         * Base64 alphabet.
-         * @type {string}
-         * @inner
+         * lxiv-embeddable (c) 2014 Daniel Wirtz <dcode@dcode.io>
+         * Released under the Apache License, Version 2.0
+         * see: https://github.com/dcodeIO/lxiv for details
          */
-        var B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-        B64 = B64+""; // Prevent CC from inlining this
+        var lxiv = function() {
+            "use strict";
+
+            /**
+             * lxiv namespace.
+             * @type {!Object.<string,*>}
+             * @exports lxiv
+             */
+            var lxiv = {};
+
+            /**
+             * Character codes for output.
+             * @type {!Array.<number>}
+             * @inner
+             */
+            var aout = [
+                65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
+                81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102,
+                103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118,
+                119, 120, 121, 122, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 43, 47
+            ];
+
+            /**
+             * Character codes for input.
+             * @type {!Array.<number>}
+             * @inner
+             */
+            var ain = [];
+            for (var i=0, k=aout.length; i<k; ++i)
+                ain[aout[i]] = i;
+
+            /**
+             * Encodes bytes to base64 char codes.
+             * @param {!function():number|null} src Bytes source as a function returning the next byte respectively `null` if
+             *  there are no more bytes left.
+             * @param {!function(number)} dst Characters destination as a function successively called with each encoded char
+             *  code.
+             */
+            lxiv.encode = function(src, dst) {
+                var b, t;
+                while ((b = src()) !== null) {
+                    dst(aout[(b>>2)&0x3f]);
+                    t = (b&0x3)<<4;
+                    if ((b = src()) !== null) {
+                        t |= (b>>4)&0xf;
+                        dst(aout[(t|((b>>4)&0xf))&0x3f]);
+                        t = (b&0xf)<<2;
+                        if ((b = src()) !== null)
+                            dst(aout[(t|((b>>6)&0x3))&0x3f]),
+                            dst(aout[b&0x3f]);
+                        else
+                            dst(aout[t&0x3f]),
+                            dst(61);
+                    } else
+                        dst(aout[t&0x3f]),
+                        dst(61),
+                        dst(61);
+                }
+            };
+
+            /**
+             * Decodes base64 char codes to bytes.
+             * @param {!function():number|null} src Characters source as a function returning the next char code respectively
+             *  `null` if there are no more characters left.
+             * @param {!function(number)} dst Bytes destination as a function successively called with the next byte.
+             * @throws {Error} If a character code is invalid
+             */
+            lxiv.decode = function(src, dst) {
+                var c, t1, t2;
+                function fail(c) {
+                    throw Error("Illegal character code: "+c);
+                }
+                while ((c = src()) !== null) {
+                    t1 = ain[c];
+                    if (typeof t1 === 'undefined') fail(c);
+                    if ((c = src()) !== null) {
+                        t2 = ain[c];
+                        if (typeof t2 === 'undefined') fail(c);
+                        dst((t1<<2)>>>0|(t2&0x30)>>4);
+                        if ((c = src()) !== null) {
+                            t1 = ain[c];
+                            if (typeof t1 === 'undefined')
+                                if (c === 61) break; else fail(c);
+                            dst(((t2&0xf)<<4)>>>0|(t1&0x3c)>>2);
+                            if ((c = src()) !== null) {
+                                t2 = ain[c];
+                                if (typeof t2 === 'undefined')
+                                    if (c === 61) break; else fail(c);
+                                dst(((t1&0x3)<<6)>>>0|t2);
+                            }
+                        }
+                    }
+                }
+            };
+
+            /**
+             * Tests if a string is valid base64.
+             * @param {string} str String to test
+             * @returns {boolean} `true` if valid, otherwise `false`
+             */
+            lxiv.test = function(str) {
+                return /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(str);
+            };
+
+            return lxiv;
+        }();
+
+        // encodings/base64
 
         /**
          * Encodes this ByteBuffer's contents to a base64 encoded string.
@@ -2481,26 +2625,10 @@
                 if (begin < 0 || begin > end || end > this.buffer.byteLength)
                     throw new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
             }
-            if (begin === end) return "";
-            var b1, b2, b3,     // input bytes
-                h2, h3,         // has input?
-                o1, o2, o3, o4, // output bytes
-                out = "";       // output
-            while (begin < end) {
-                b1 = this.view.getUint8(begin++);
-                b2 = (h2 = begin < end) ? this.view.getUint8(begin++) : 0;
-                b3 = (h3 = begin < end) ? this.view.getUint8(begin++) : 0;
-                o1 =                       b1 >> 2;
-                o2 = ((b1 & 0x03) << 4) | (b2 >> 4);
-                o3 = ((b2 & 0x0F) << 2) | (b3 >> 6);
-                o4 =   b3 & 0x3F;
-                if (!h3) {
-                    o4 = 64;
-                    if (!h2) o3 = 64;
-                }
-                out += B64.charAt(o1) + B64.charAt(o2) + B64.charAt(o3) + B64.charAt(o4);
-            }
-            return out;
+            var sd; lxiv.encode(function() {
+                return begin < end ? this.view.getUint8(begin++) : null;
+            }.bind(this), sd = stringDestination());
+            return sd();
         };
 
         /**
@@ -2520,38 +2648,12 @@
                 if (str.length % 4 !== 0)
                     throw new TypeError("Illegal str: Length not a multiple of 4");
             }
-            var len = str.length,
-                suffix = 0,
-                i, j;
-            for (i=str.length-1; i>=0; --i) {
-                if (str.charAt(i) === '=') suffix++;
-                else break;
-            }
-            if (suffix > 2)
-                throw new TypeError("Illegal str: Suffix is too large");
-            if (len === 0)
-                return new ByteBuffer(0, littleEndian, noAssert);
-            var b1, b2, b3, b4, // input bytes
-                h2, h3, h4,     // has input?
-                bb = new ByteBuffer(len/4*3-suffix, littleEndian, noAssert);
-            for (i=0, j=0; i<len; ) {
-                b1 =                  B64.indexOf(str.charAt(i++));
-                b2 = (h2 = i < len) ? B64.indexOf(str.charAt(i++)) : 0;
-                b3 = (h3 = i < len) ? B64.indexOf(str.charAt(i++)) : 0;
-                b4 = (h4 = i < len) ? B64.indexOf(str.charAt(i++)) : 0;
-                if (!noAssert) {
-                    if (b1 < 0 || b2 < 0 || b3 < 0 || b4 < 0)
-                        throw new TypeError("Illegal str: Contains non-base64 characters");
-                }
-                bb.view.setUint8(j++, (b1 << 2) | (b2 >> 4));
-                if (b3 !== 64) {
-                    bb.view.setUint8(j++, ((b2 << 4) & 0xF0) | (b3 >> 2), j);
-                    if (b4 !== 64) {
-                        bb.view.setUint8(j++, ((b3 << 6) & 0xC0) | b4);
-                    }
-                }
-            }
-            bb.limit = j;
+            var bb = new ByteBuffer(str.length/4*3, littleEndian, noAssert),
+                i = 0;
+            lxiv.decode(stringSource(str), function(b) {
+                bb.view.setUint8(i++, b);
+            });
+            bb.limit = i;
             return bb;
         };
 
@@ -3075,42 +3177,6 @@
             return utfx;
         }();
 
-        /**
-         * String.fromCharCode reference for compile-time renaming.
-         * @type {function(...number):string}
-         * @inner
-         */
-        var stringFromCharCode = String.fromCharCode;
-
-        /**
-         * Creates a source function for a string.
-         * @param {string} s String to read from
-         * @returns {function():number|null} Source function returning the next char code respectively `null` if there are
-         *  no more characters left.
-         * @throws {TypeError} If the argument is invalid
-         */
-        utfx.stringSource = function(s) {
-            var i=0; return function() {
-                return i < s.length ? s.charCodeAt(i++) : null;
-            };
-        };
-
-        /**
-         * Creates a destination function for a string.
-         * @returns {function(number=):undefined|string} Destination function successively called with the next char code.
-         *  Returns the final string when called without arguments.
-         */
-        utfx.stringDestination = function() {
-            var cs = [], ps = []; return function() {
-                if (arguments.length === 0)
-                    return ps.join('')+stringFromCharCode.apply(String, cs);
-                if (cs.length + arguments.length > 1024)
-                    ps.push(stringFromCharCode.apply(String, cs)),
-                    cs.length = 0;
-                Array.prototype.push.apply(cs, arguments);
-            };
-        };
-
         // encodings/utf8
 
         /**
@@ -3136,7 +3202,7 @@
             var bb = this, sd; try {
                 utfx.decodeUTF8toUTF16(function() {
                     return begin < end ? bb.view.getUint8(begin++) : null;
-                }, sd = utfx.stringDestination());
+                }, sd = stringDestination());
             } catch (e) {
                 if (begin !== end)
                     throw new RangeError("Illegal range: Truncated data, "+begin+" != "+end);
@@ -3159,9 +3225,9 @@
                 if (typeof str !== 'string')
                     throw new TypeError("Illegal str: Not a string");
             }
-            var bb = new ByteBuffer(utfx.calculateUTF16asUTF8(utfx.stringSource(str), true)[1], littleEndian, noAssert),
+            var bb = new ByteBuffer(utfx.calculateUTF16asUTF8(stringSource(str), true)[1], littleEndian, noAssert),
                 i = 0;
-            utfx.encodeUTF16toUTF8(utfx.stringSource(str), function(b) {
+            utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
                 bb.view.setUint8(i++, b);
             });
             bb.limit = i;

@@ -110,7 +110,7 @@ module.exports = (function() {
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "3.2.3";
+    ByteBuffer.VERSION = "3.3.0";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -165,6 +165,44 @@ module.exports = (function() {
      * @inner
      */
     var EMPTY_BUFFER = new Buffer(0);
+
+    /**
+     * String.fromCharCode reference for compile-time renaming.
+     * @type {function(...number):string}
+     * @inner
+     */
+    var stringFromCharCode = String.fromCharCode;
+
+    /**
+     * Creates a source function for a string.
+     * @param {string} s String to read from
+     * @returns {function():number|null} Source function returning the next char code respectively `null` if there are
+     *  no more characters left.
+     * @throws {TypeError} If the argument is invalid
+     * @inner
+     */
+    function stringSource(s) {
+        var i=0; return function() {
+            return i < s.length ? s.charCodeAt(i++) : null;
+        };
+    }
+
+    /**
+     * Creates a destination function for a string.
+     * @returns {function(number=):undefined|string} Destination function successively called with the next char code.
+     *  Returns the final string when called without arguments.
+     * @inner
+     */
+    function stringDestination() {
+        var cs = [], ps = []; return function() {
+            if (arguments.length === 0)
+                return ps.join('')+stringFromCharCode.apply(String, cs);
+            if (cs.length + arguments.length > 1024)
+                ps.push(stringFromCharCode.apply(String, cs)),
+                    cs.length = 0;
+            Array.prototype.push.apply(cs, arguments);
+        };
+    }
 
     /**
      * Allocates a new ByteBuffer backed by a buffer of the specified capacity.
@@ -1776,7 +1814,7 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.calculateUTF8Chars = function(str) {
-        return utfx.calculateUTF16asUTF8(utfx.stringSource(str))[0];
+        return utfx.calculateUTF16asUTF8(stringSource(str))[0];
     };
 
     /**
@@ -1826,7 +1864,7 @@ module.exports = (function() {
             temp,
             sd;
         if (metrics === ByteBuffer.METRICS_CHARS) { // The same for node and the browser
-            sd = utfx.stringDestination();
+            sd = stringDestination();
             utfx.decodeUTF8(function() {
                 return i < length && offset < this.limit ? this.buffer[offset++] : null;
             }.bind(this), function(cp) {
@@ -2638,7 +2676,7 @@ module.exports = (function() {
             if (begin < 0 || begin > end || end > this.buffer.length)
                 throw new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length);
         }
-        return this.buffer.slice(begin, end).toString("base64");
+        return this.buffer.toString("base64", begin, end);
     };
 
     /**
@@ -2720,7 +2758,7 @@ module.exports = (function() {
             if (begin < 0 || begin > end || end > this.buffer.length)
                 throw new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length);
         }
-        return this.buffer.slice(begin, end).toString("binary");
+        return this.buffer.toString("binary", begin, end);
     };
 
     /**
@@ -2945,7 +2983,7 @@ module.exports = (function() {
             if (begin < 0 || begin > end || end > this.buffer.length)
                 throw new RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length);
         }
-        return this.buffer.slice(begin, end).toString("hex");
+        return this.buffer.toString("hex", begin, end);
     };
 
     /**
@@ -3169,42 +3207,6 @@ module.exports = (function() {
 
         return utfx;
     }();
-
-    /**
-     * String.fromCharCode reference for compile-time renaming.
-     * @type {function(...number):string}
-     * @inner
-     */
-    var stringFromCharCode = String.fromCharCode;
-
-    /**
-     * Creates a source function for a string.
-     * @param {string} s String to read from
-     * @returns {function():number|null} Source function returning the next char code respectively `null` if there are
-     *  no more characters left.
-     * @throws {TypeError} If the argument is invalid
-     */
-    utfx.stringSource = function(s) {
-        var i=0; return function() {
-            return i < s.length ? s.charCodeAt(i++) : null;
-        };
-    };
-
-    /**
-     * Creates a destination function for a string.
-     * @returns {function(number=):undefined|string} Destination function successively called with the next char code.
-     *  Returns the final string when called without arguments.
-     */
-    utfx.stringDestination = function() {
-        var cs = [], ps = []; return function() {
-            if (arguments.length === 0)
-                return ps.join('')+stringFromCharCode.apply(String, cs);
-            if (cs.length + arguments.length > 1024)
-                ps.push(stringFromCharCode.apply(String, cs)),
-                cs.length = 0;
-            Array.prototype.push.apply(cs, arguments);
-        };
-    };
 
     // encodings/utf8
 
