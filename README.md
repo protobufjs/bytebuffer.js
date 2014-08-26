@@ -8,11 +8,11 @@ generated from a single source tree through [MetaScript](https://github.com/dcod
 
 Features
 --------
-* Uses node Buffers under node.js and ArrayBuffers in the browser
+* Available as two API compatible versions, using either node Buffers under node.js or ArrayBuffers in the browser
 * 8, 16, 32 and 64 bit signed and unsigned integers
 * 32 and 64 bit floats
 * Varints as used in protobuf (32 and 64 bit, zig-zag)
-* Base64 via [lxiv-embeddable](https://github.com/dcodeIO/lxiv), utf8 via [utfx-embeddable](https://github.com/dcodeIO/utfx), binary, hex and debug encoding
+* [Base64](https://github.com/dcodeIO/lxiv), [utf8](https://github.com/dcodeIO/utfx), binary, hex and debug encoding
 * Handy string and debugging utilities
 * Big and little endianness
 * Relative and absolute zero-copy operations wherever possible
