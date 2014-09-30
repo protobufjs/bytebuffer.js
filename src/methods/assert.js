@@ -5,7 +5,7 @@
  * @returns {!ByteBuffer} this
  * @expose
  */
-ByteBuffer.prototype.assert = function(assert) {
+ByteBufferPrototype.assert = function(assert) {
     this.noAssert = !assert;
     return this;
 };

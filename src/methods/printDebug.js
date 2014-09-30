@@ -4,7 +4,7 @@
  * @param {function(string)=} out Output function to call, defaults to console.log
  * @expose
  */
-ByteBuffer.prototype.printDebug = function(out) {
+ByteBufferPrototype.printDebug = function(out) {
     if (typeof out !== 'function') out = console.log.bind(console);
     out(
         this.toString()+"\n"+

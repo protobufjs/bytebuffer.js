@@ -11,7 +11,7 @@
 //? }
  * @expose
  */
-ByteBuffer.prototype.toBuffer = function(forceCopy) {
+ByteBufferPrototype.toBuffer = function(forceCopy) {
     var offset = this.offset,
         limit = this.limit;
     if (offset > limit) {
@@ -56,7 +56,7 @@ ByteBuffer.prototype.toBuffer = function(forceCopy) {
  *  Defaults to `false`
  * @returns {!ArrayBuffer} Contents as an ArrayBuffer
  */
-ByteBuffer.prototype.toArrayBuffer = function() {
+ByteBufferPrototype.toArrayBuffer = function() {
     var offset = this.offset,
         limit = this.limit;
     if (offset > limit) {
@@ -90,7 +90,7 @@ ByteBuffer.prototype.toArrayBuffer = function() {
  * @returns {!ArrayBuffer} Contents as an ArrayBuffer
  * @expose
  */
-ByteBuffer.prototype.toArrayBuffer = ByteBuffer.prototype.toBuffer;
+ByteBufferPrototype.toArrayBuffer = ByteBufferPrototype.toBuffer;
 //? }
 
 

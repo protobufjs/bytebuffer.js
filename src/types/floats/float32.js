@@ -8,11 +8,11 @@
  * @returns {!ByteBuffer} this
  * @expose
  */
-ByteBuffer.prototype.writeFloat32 = function(value, offset) {
+ByteBufferPrototype.writeFloat32 = function(value, offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         if (typeof value !== 'number')
-            throw new TypeError("Illegal value: "+value+" (not a number)");
+            throw TypeError("Illegal value: "+value+" (not a number)");
         //? ASSERT_OFFSET();
     }
     //? ENSURE_CAPACITY(4);
@@ -35,7 +35,7 @@ ByteBuffer.prototype.writeFloat32 = function(value, offset) {
  * @returns {!ByteBuffer} this
  * @expose
  */
-ByteBuffer.prototype.writeFloat = ByteBuffer.prototype.writeFloat32;
+ByteBufferPrototype.writeFloat = ByteBufferPrototype.writeFloat32;
 //? }
 
 /**
@@ -44,7 +44,7 @@ ByteBuffer.prototype.writeFloat = ByteBuffer.prototype.writeFloat32;
  * @returns {number}
  * @expose
  */
-ByteBuffer.prototype.readFloat32 = function(offset) {
+ByteBufferPrototype.readFloat32 = function(offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_OFFSET(4);
@@ -67,7 +67,7 @@ ByteBuffer.prototype.readFloat32 = function(offset) {
  * @returns {number}
  * @expose
  */
-ByteBuffer.prototype.readFloat = ByteBuffer.prototype.readFloat32;
+ByteBufferPrototype.readFloat = ByteBufferPrototype.readFloat32;
 //? }
 
 //? }

@@ -17,7 +17,7 @@
  * @example A relative `00<01 02 03>.prepend(<04 05>)` results in `<04 05 01 02 03>, 04 05|`
  * @example An absolute `00<01 02 03>.prepend(<04 05>, 2)` results in `04<05 02 03>, 04 05|`
  */
-ByteBuffer.prototype.prepend = function(source, encoding, offset) {
+ByteBufferPrototype.prepend = function(source, encoding, offset) {
     if (typeof encoding === 'number' || typeof encoding !== 'string') {
         offset = encoding;
         encoding = undefined;
@@ -76,7 +76,7 @@ ByteBuffer.prototype.prepend = function(source, encoding, offset) {
  * @expose
  * @see ByteBuffer#prepend
  */
-ByteBuffer.prototype.prependTo = function(target, offset) {
+ByteBufferPrototype.prependTo = function(target, offset) {
     target.prepend(this, offset);
     return this;
 };

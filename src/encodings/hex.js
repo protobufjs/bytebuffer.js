@@ -8,7 +8,7 @@
  * @returns {string} Hex encoded string
  * @expose
  */
-ByteBuffer.prototype.toHex = function(begin, end) {
+ByteBufferPrototype.toHex = function(begin, end) {
     begin = typeof begin === 'undefined' ? this.offset : begin;
     end = typeof end === 'undefined' ? this.limit : end;
     if (!this.noAssert) {
@@ -21,7 +21,8 @@ ByteBuffer.prototype.toHex = function(begin, end) {
         b;
     while (begin < end) {
         b = this.view.getUint8(begin++);
-        if (b < 0x10) out.push("0", b.toString(16));
+        if (b < 0x10)
+            out.push("0", b.toString(16));
         else out.push(b.toString(16));
     }
     return out.join('');
@@ -41,9 +42,9 @@ ByteBuffer.prototype.toHex = function(begin, end) {
 ByteBuffer.fromHex = function(str, littleEndian, noAssert) {
     if (!noAssert) {
         if (typeof str !== 'string')
-            throw new TypeError("Illegal str: Not a string");
+            throw TypeError("Illegal str: Not a string");
         if (str.length % 2 !== 0)
-            throw new TypeError("Illegal str: Length not a multiple of 2");
+            throw TypeError("Illegal str: Length not a multiple of 2");
     }
     //? if (NODE) {
     var bb = new ByteBuffer(0, littleEndian, true);
@@ -57,10 +58,9 @@ ByteBuffer.fromHex = function(str, littleEndian, noAssert) {
         b;
     for (var i=0, j=0; i<k; i+=2) {
         b = parseInt(str.substring(i, i+2), 16);
-        if (!noAssert) {
+        if (!noAssert)
             if (!isFinite(b) || b < 0 || b > 255)
-                throw new TypeError("Illegal str: Contains non-hex characters");
-        }
+                throw TypeError("Illegal str: Contains non-hex characters");
         bb.view.setUint8(j++, b);
     }
     bb.limit = j;

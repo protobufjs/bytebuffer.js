@@ -4,7 +4,7 @@
  * @returns {!ByteBuffer} this
  * @expose
  */
-ByteBuffer.prototype.flip = function() {
+ByteBufferPrototype.flip = function() {
     this.limit = this.offset;
     this.offset = 0;
     return this;

@@ -10,7 +10,7 @@ if (Long) {
      * @returns {!ByteBuffer} this
      * @expose
      */
-    ByteBuffer.prototype.writeInt64 = function(value, offset) {
+    ByteBufferPrototype.writeInt64 = function(value, offset) {
         //? RELATIVE();
         if (!this.noAssert) {
             //? ASSERT_LONG('value');
@@ -51,7 +51,7 @@ if (Long) {
      * @returns {!ByteBuffer} this
      * @expose
      */
-    ByteBuffer.prototype.writeLong = ByteBuffer.prototype.writeInt64;
+    ByteBufferPrototype.writeLong = ByteBufferPrototype.writeInt64;
     //? }
     
     /**
@@ -60,7 +60,7 @@ if (Long) {
      * @returns {!Long}
      * @expose
      */
-    ByteBuffer.prototype.readInt64 = function(offset) {
+    ByteBufferPrototype.readInt64 = function(offset) {
         //? RELATIVE();
         if (!this.noAssert) {
             //? ASSERT_OFFSET(8);
@@ -94,7 +94,7 @@ if (Long) {
      * @returns {!Long}
      * @expose
      */
-    ByteBuffer.prototype.readLong = ByteBuffer.prototype.readInt64;
+    ByteBufferPrototype.readLong = ByteBufferPrototype.readInt64;
     //? }
     
     /**
@@ -104,7 +104,7 @@ if (Long) {
      * @returns {!ByteBuffer} this
      * @expose
      */
-    ByteBuffer.prototype.writeUint64 = function(value, offset) {
+    ByteBufferPrototype.writeUint64 = function(value, offset) {
         //? RELATIVE();
         if (!this.noAssert) {
             //? ASSERT_LONG('value');
@@ -143,7 +143,7 @@ if (Long) {
      * @returns {!Long}
      * @expose
      */
-    ByteBuffer.prototype.readUint64 = function(offset) {
+    ByteBufferPrototype.readUint64 = function(offset) {
         //? RELATIVE();
         if (!this.noAssert) {
             //? ASSERT_OFFSET(8);

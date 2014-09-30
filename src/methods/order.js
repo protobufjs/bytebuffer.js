@@ -4,10 +4,10 @@
  * @returns {!ByteBuffer} this
  * @expose
  */
-ByteBuffer.prototype.order = function(littleEndian) {
+ByteBufferPrototype.order = function(littleEndian) {
     if (!this.noAssert) {
         if (typeof littleEndian !== 'boolean')
-            throw new TypeError("Illegal littleEndian: Not a boolean");
+            throw TypeError("Illegal littleEndian: Not a boolean");
     }
     this.littleEndian = !!littleEndian;
     return this;
@@ -19,7 +19,7 @@ ByteBuffer.prototype.order = function(littleEndian) {
  * @returns {!ByteBuffer} this
  * @expose
  */
-ByteBuffer.prototype.LE = function(littleEndian) {
+ByteBufferPrototype.LE = function(littleEndian) {
     this.littleEndian = typeof littleEndian !== 'undefined' ? !!littleEndian : true;
     return this;
 };
@@ -30,7 +30,7 @@ ByteBuffer.prototype.LE = function(littleEndian) {
  * @returns {!ByteBuffer} this
  * @expose
  */
-ByteBuffer.prototype.BE = function(bigEndian) {
+ByteBufferPrototype.BE = function(bigEndian) {
     this.littleEndian = typeof bigEndian !== 'undefined' ? !bigEndian : false;
     return this;
 };

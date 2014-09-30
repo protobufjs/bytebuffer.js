@@ -9,7 +9,7 @@
  * @throws {RangeError} If `offset` is out of bounds
  * @expose
  */
-ByteBuffer.prototype.writeInt16 = function(value, offset) {
+ByteBufferPrototype.writeInt16 = function(value, offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_INTEGER('value');
@@ -40,7 +40,7 @@ ByteBuffer.prototype.writeInt16 = function(value, offset) {
  * @throws {RangeError} If `offset` is out of bounds
  * @expose
  */
-ByteBuffer.prototype.writeShort = ByteBuffer.prototype.writeInt16;
+ByteBufferPrototype.writeShort = ByteBufferPrototype.writeInt16;
 //? }
 
 /**
@@ -51,7 +51,7 @@ ByteBuffer.prototype.writeShort = ByteBuffer.prototype.writeInt16;
  * @throws {RangeError} If `offset` is out of bounds
  * @expose
  */
-ByteBuffer.prototype.readInt16 = function(offset) {
+ByteBufferPrototype.readInt16 = function(offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_OFFSET(2);
@@ -82,7 +82,7 @@ ByteBuffer.prototype.readInt16 = function(offset) {
  * @throws {RangeError} If `offset` is out of bounds
  * @expose
  */
-ByteBuffer.prototype.readShort = ByteBuffer.prototype.readInt16;
+ByteBufferPrototype.readShort = ByteBufferPrototype.readInt16;
 //? }
 
 /**
@@ -93,7 +93,7 @@ ByteBuffer.prototype.readShort = ByteBuffer.prototype.readInt16;
  * @throws {RangeError} If `offset` is out of bounds
  * @expose
  */
-ByteBuffer.prototype.writeUint16 = function(value, offset) {
+ByteBufferPrototype.writeUint16 = function(value, offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_INTEGER('value', true);
@@ -122,7 +122,7 @@ ByteBuffer.prototype.writeUint16 = function(value, offset) {
  * @throws {RangeError} If `offset` is out of bounds
  * @expose
  */
-ByteBuffer.prototype.readUint16 = function(offset) {
+ByteBufferPrototype.readUint16 = function(offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_OFFSET(2);

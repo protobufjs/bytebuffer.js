@@ -27,7 +27,8 @@ ByteBuffer.concat = function(buffers, encoding, littleEndian, noAssert) {
         length = buffers[i].limit - buffers[i].offset;
         if (length > 0) capacity += length;
     }
-    if (capacity === 0) return new ByteBuffer(0, littleEndian, noAssert);
+    if (capacity === 0)
+        return new ByteBuffer(0, littleEndian, noAssert);
     var bb = new ByteBuffer(capacity, littleEndian, noAssert),
         bi;
     //? if (!NODE)

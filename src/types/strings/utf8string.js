@@ -24,7 +24,7 @@ ByteBuffer.METRICS_BYTES = 'b';
  * @returns {!ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
  * @expose
  */
-ByteBuffer.prototype.writeUTF8String = function(str, offset) {
+ByteBufferPrototype.writeUTF8String = function(str, offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_OFFSET();
@@ -63,7 +63,7 @@ ByteBuffer.prototype.writeUTF8String = function(str, offset) {
  * @returns {!ByteBuffer|number} this if offset is omitted, else the actual number of bytes written.
  * @expose
  */
-ByteBuffer.prototype.writeString = ByteBuffer.prototype.writeUTF8String;
+ByteBufferPrototype.writeString = ByteBufferPrototype.writeUTF8String;
 //? }
 
 /**
@@ -88,7 +88,7 @@ ByteBuffer.calculateUTF8Chars = function(str) {
 ByteBuffer.calculateUTF8Bytes = function(str) {
     //? if (NODE) {
     if (typeof str !== 'string')
-        throw new TypeError("Illegal argument: "+(typeof str));
+        throw TypeError("Illegal argument: "+(typeof str));
     return Buffer.byteLength(str, "utf8");
     //? } else
     return utfx.calculateUTF16asUTF8(stringSource(str))[1];
@@ -105,7 +105,7 @@ ByteBuffer.calculateUTF8Bytes = function(str) {
  *  read and the actual number of bytes read.
  * @expose
  */
-ByteBuffer.prototype.readUTF8String = function(length, metrics, offset) {
+ByteBufferPrototype.readUTF8String = function(length, metrics, offset) {
     if (typeof metrics === 'number') {
         offset = metrics;
         metrics = undefined;
@@ -132,7 +132,7 @@ ByteBuffer.prototype.readUTF8String = function(length, metrics, offset) {
             ++i; utfx.UTF8toUTF16(cp, sd);
         }.bind(this));
         if (i !== length)
-            throw new RangeError("Illegal range: Truncated data, "+i+" == "+length);
+            throw RangeError("Illegal range: Truncated data, "+i+" == "+length);
         if (relative) {
             this.offset = offset;
             return sd();
@@ -163,7 +163,7 @@ ByteBuffer.prototype.readUTF8String = function(length, metrics, offset) {
             return offset < k ? this.view.getUint8(offset++) : null;
         }.bind(this), sd = stringDestination(), this.noAssert);
         if (offset !== k)
-            throw new RangeError("Illegal range: Truncated data, "+offset+" == "+k);
+            throw RangeError("Illegal range: Truncated data, "+offset+" == "+k);
         if (relative) {
             this.offset = offset;
             return sd();
@@ -175,7 +175,7 @@ ByteBuffer.prototype.readUTF8String = function(length, metrics, offset) {
         }
         //? }
     } else
-        throw new TypeError("Unsupported metrics: "+metrics);
+        throw TypeError("Unsupported metrics: "+metrics);
 };
 //? if (ALIASES) {
 
@@ -191,7 +191,7 @@ ByteBuffer.prototype.readUTF8String = function(length, metrics, offset) {
  *  read and the actual number of bytes read.
  * @expose
  */
-ByteBuffer.prototype.readString = ByteBuffer.prototype.readUTF8String;
+ByteBufferPrototype.readString = ByteBufferPrototype.readUTF8String;
 //? }
 
 //? }

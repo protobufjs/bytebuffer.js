@@ -53,7 +53,7 @@ ByteBuffer.zigZagDecode32 = function(n) {
  * @returns {!ByteBuffer|number} this if `offset` is omitted, else the actual number of bytes written
  * @expose
  */
-ByteBuffer.prototype.writeVarint32 = function(value, offset) {
+ByteBufferPrototype.writeVarint32 = function(value, offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_INTEGER('value');
@@ -135,7 +135,7 @@ ByteBuffer.prototype.writeVarint32 = function(value, offset) {
  * @returns {!ByteBuffer|number} this if `offset` is omitted, else the actual number of bytes written
  * @expose
  */
-ByteBuffer.prototype.writeVarint32ZigZag = function(value, offset) {
+ByteBufferPrototype.writeVarint32ZigZag = function(value, offset) {
     return this.writeVarint32(ByteBuffer.zigZagEncode32(value), offset);
 };
 
@@ -145,23 +145,31 @@ ByteBuffer.prototype.writeVarint32ZigZag = function(value, offset) {
  *  written if omitted.
  * @returns {number|!{value: number, length: number}} The value read if offset is omitted, else the value read
  *  and the actual number of bytes read.
- * @throws {Error} If it's not a valid varint
+ * @throws {Error} If it's not a valid varint. Has a property `truncated = true` if there is not enough data available
+ *  to fully decode the varint.
  * @expose
  */
-ByteBuffer.prototype.readVarint32 = function(offset) {
+ByteBufferPrototype.readVarint32 = function(offset) {
     //? RELATIVE();
     if (!this.noAssert) {
-        //? ASSERT_OFFSET(1); // TODO: Assert offset in logic below
+        //? ASSERT_OFFSET(1);
     }
     // ref: src/google/protobuf/io/coded_stream.cc
     var size = 0,
         value = 0 >>> 0,
-        temp;
+        temp,
+        ioffset;
     do {
+        ioffset = offset+size;
+        if (!this.noAssert && ioffset > this.limit) {
+            var err = Error("Truncated");
+            err['truncated'] = true;
+            throw err;
+        }
         //? if (NODE)
-        temp = this.buffer[offset+size];
+        temp = this.buffer[ioffset];
         //? else
-        temp = this.view.getUint8(offset+size);
+        temp = this.view.getUint8(ioffset);
         if (size < 5)
             value |= ((temp&0x7F)<<(7*size)) >>> 0;
         ++size;
@@ -186,7 +194,7 @@ ByteBuffer.prototype.readVarint32 = function(offset) {
  * @throws {Error} If it's not a valid varint
  * @expose
  */
-ByteBuffer.prototype.readVarint32ZigZag = function(offset) {
+ByteBufferPrototype.readVarint32ZigZag = function(offset) {
     var val = this.readVarint32(offset);
     if (typeof val === 'object')
         val["value"] = ByteBuffer.zigZagDecode32(val["value"]);

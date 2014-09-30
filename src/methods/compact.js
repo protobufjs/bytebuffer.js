@@ -7,7 +7,7 @@
  * @returns {!ByteBuffer} this
  * @expose
  */
-ByteBuffer.prototype.compact = function(begin, end) {
+ByteBufferPrototype.compact = function(begin, end) {
     if (typeof begin === 'undefined') begin = this.offset;
     if (typeof end === 'undefined') end = this.limit;
     if (!this.noAssert) {

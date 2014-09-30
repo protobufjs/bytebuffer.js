@@ -10,16 +10,16 @@
  * @returns {!ByteBuffer|number} this if offset is omitted, else the actual number of bytes written
  * @expose
  */
-ByteBuffer.prototype.writeCString = function(str, offset) {
+ByteBufferPrototype.writeCString = function(str, offset) {
     //? RELATIVE();
     var i,
         k = str.length;
     if (!this.noAssert) {
         if (typeof str !== 'string')
-            throw new TypeError("Illegal str: Not a string");
+            throw TypeError("Illegal str: Not a string");
         for (i=0; i<k; ++i) {
             if (str.charCodeAt(i) === 0)
-                throw new RangeError("Illegal str: Contains NULL-characters");
+                throw RangeError("Illegal str: Contains NULL-characters");
         }
         //? ASSERT_OFFSET();
     }
@@ -54,7 +54,7 @@ ByteBuffer.prototype.writeCString = function(str, offset) {
  *  read and the actual number of bytes read.
  * @expose
  */
-ByteBuffer.prototype.readCString = function(offset) {
+ByteBufferPrototype.readCString = function(offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_OFFSET(1);
@@ -65,7 +65,7 @@ ByteBuffer.prototype.readCString = function(offset) {
     //? if (NODE) {
     do {
         if (offset >= this.buffer.length)
-            throw new RangeError("Index out of range: "+offset+" <= "+this.buffer.length);
+            throw RangeError("Index out of range: "+offset+" <= "+this.buffer.length);
         temp = this.buffer[offset++];
     } while (temp !== 0);
     var str = this.buffer.toString("utf8", start, offset-1);

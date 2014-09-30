@@ -14,9 +14,11 @@
  * @returns {string} Base64 encoded string
  * @expose
  */
-ByteBuffer.prototype.toBase64 = function(begin, end) {
-    if (typeof begin === 'undefined') begin = this.offset;
-    if (typeof end === 'undefined') end = this.limit;
+ByteBufferPrototype.toBase64 = function(begin, end) {
+    if (typeof begin === 'undefined')
+        begin = this.offset;
+    if (typeof end === 'undefined')
+        end = this.limit;
     if (!this.noAssert) {
         //? ASSERT_RANGE();
     }
@@ -43,9 +45,9 @@ ByteBuffer.prototype.toBase64 = function(begin, end) {
 ByteBuffer.fromBase64 = function(str, littleEndian, noAssert) {
     if (!noAssert) {
         if (typeof str !== 'string')
-            throw new TypeError("Illegal str: Not a string");
+            throw TypeError("Illegal str: Not a string");
         if (str.length % 4 !== 0)
-            throw new TypeError("Illegal str: Length not a multiple of 4");
+            throw TypeError("Illegal str: Length not a multiple of 4");
     }
     //? if (NODE) {
     var bb = new ByteBuffer(0, littleEndian, noAssert);

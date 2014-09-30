@@ -7,7 +7,7 @@
  * @see ByteBuffer#reset
  * @expose
  */
-ByteBuffer.prototype.mark = function(offset) {
+ByteBufferPrototype.mark = function(offset) {
     offset = typeof offset === 'undefined' ? this.offset : offset;
     if (!this.noAssert) {
         //? ASSERT_OFFSET();

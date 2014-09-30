@@ -5,7 +5,7 @@
  * @returns {!ByteBuffer} this
  * @expose
  */
-ByteBuffer.prototype.reverse = function(begin, end) {
+ByteBufferPrototype.reverse = function(begin, end) {
     if (typeof begin === 'undefined') begin = this.offset;
     if (typeof end === 'undefined') end = this.limit;
     if (!this.noAssert) {

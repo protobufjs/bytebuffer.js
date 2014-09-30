@@ -5,6 +5,5 @@
  * @expose
  */
 ByteBuffer.isByteBuffer = function(bb) {
-    return bb && bb instanceof ByteBuffer;
+    return (bb && bb instanceof ByteBuffer) === true;
 };
-

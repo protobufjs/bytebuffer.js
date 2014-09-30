@@ -5,7 +5,7 @@
  * @returns {!ByteBuffer} Clone of this ByteBuffer with slicing applied, backed by the same {@link ByteBuffer#buffer}
  * @expose
  */
-ByteBuffer.prototype.slice = function(begin, end) {
+ByteBufferPrototype.slice = function(begin, end) {
     if (typeof begin === 'undefined') begin = this.offset;
     if (typeof end === 'undefined') end = this.limit;
     if (!this.noAssert) {

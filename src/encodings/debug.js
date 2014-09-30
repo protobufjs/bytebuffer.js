@@ -18,7 +18,7 @@
  * @example `00|01 02 03` contains four bytes with `offset=limit=1, markedOffset=-1`
  * @example `|` contains zero bytes with `offset=limit=0, markedOffset=-1`
  */
-ByteBuffer.prototype.toDebug = function(columns) {
+ByteBufferPrototype.toDebug = function(columns) {
     var i = -1,
         //? if (NODE)
         k = this.buffer.length,
@@ -173,7 +173,7 @@ ByteBuffer.fromDebug = function(str, littleEndian, noAssert) {
                 b = parseInt(ch+str.charAt(i++), 16);
                 if (!noAssert) {
                     if (isNaN(b) || b < 0 || b > 255)
-                        throw new TypeError("Illegal str: Not a debug encoded string");
+                        throw TypeError("Illegal str: Not a debug encoded string");
                 }
                 //? if (NODE)
                 bb.buffer[j++] = b;
@@ -182,16 +182,16 @@ ByteBuffer.fromDebug = function(str, littleEndian, noAssert) {
                 rs = true;
         }
         if (fail)
-            throw new TypeError("Illegal str: Invalid symbol at "+i);
+            throw TypeError("Illegal str: Invalid symbol at "+i);
     }
     if (!noAssert) {
         if (!ho || !hl)
-            throw new TypeError("Illegal str: Missing offset or limit");
+            throw TypeError("Illegal str: Missing offset or limit");
         //? if (NODE)
         if (j<bb.buffer.length)
         //? else
         if (j<bb.buffer.byteLength)
-            throw new TypeError("Illegal str: Not a debug encoded string (is it hex?) "+j+" < "+k);
+            throw TypeError("Illegal str: Not a debug encoded string (is it hex?) "+j+" < "+k);
     }
     return bb;
 };

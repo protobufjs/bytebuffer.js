@@ -7,7 +7,7 @@
  * @param {number=} offset Offset to write to. Will use and increase {@link ByteBuffer#offset} by `4` if omitted.
  * @expose
  */
-ByteBuffer.prototype.writeInt32 = function(value, offset) {
+ByteBufferPrototype.writeInt32 = function(value, offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_INTEGER('value');
@@ -29,7 +29,7 @@ ByteBuffer.prototype.writeInt32 = function(value, offset) {
  * @param {number=} offset Offset to write to. Will use and increase {@link ByteBuffer#offset} by `4` if omitted.
  * @expose
  */
-ByteBuffer.prototype.writeInt = ByteBuffer.prototype.writeInt32;
+ByteBufferPrototype.writeInt = ByteBufferPrototype.writeInt32;
 //? }
 
 /**
@@ -38,7 +38,7 @@ ByteBuffer.prototype.writeInt = ByteBuffer.prototype.writeInt32;
  * @returns {number} Value read
  * @expose
  */
-ByteBuffer.prototype.readInt32 = function(offset) {
+ByteBufferPrototype.readInt32 = function(offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_OFFSET(4);
@@ -60,7 +60,7 @@ ByteBuffer.prototype.readInt32 = function(offset) {
  * @returns {number} Value read
  * @expose
  */
-ByteBuffer.prototype.readInt = ByteBuffer.prototype.readInt32;
+ByteBufferPrototype.readInt = ByteBufferPrototype.readInt32;
 //? }
 
 /**
@@ -69,7 +69,7 @@ ByteBuffer.prototype.readInt = ByteBuffer.prototype.readInt32;
  * @param {number=} offset Offset to write to. Will use and increase {@link ByteBuffer#offset} by `4` if omitted.
  * @expose
  */
-ByteBuffer.prototype.writeUint32 = function(value, offset) {
+ByteBufferPrototype.writeUint32 = function(value, offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_INTEGER('value', true);
@@ -90,7 +90,7 @@ ByteBuffer.prototype.writeUint32 = function(value, offset) {
  * @returns {number} Value read
  * @expose
  */
-ByteBuffer.prototype.readUint32 = function(offset) {
+ByteBufferPrototype.readUint32 = function(offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_OFFSET(4);

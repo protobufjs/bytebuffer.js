@@ -6,7 +6,7 @@
  * @see ByteBuffer#mark
  * @expose
  */
-ByteBuffer.prototype.reset = function() {
+ByteBufferPrototype.reset = function() {
     if (this.markedOffset >= 0) {
         this.offset = this.markedOffset;
         this.markedOffset = -1;

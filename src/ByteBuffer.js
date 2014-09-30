@@ -18,11 +18,9 @@ var ByteBuffer = function(capacity, littleEndian, noAssert) {
     if (!noAssert) {
         capacity = capacity | 0;
         if (capacity < 0)
-            throw new RangeError("Illegal capacity: 0 <= "+capacity);
-        if (typeof littleEndian !== 'boolean')
-            throw new TypeError("Illegal littleEndian: Not a boolean");
-        if (typeof noAssert !== 'boolean')
-            throw new TypeError("Illegal noAssert: Not a boolean");
+            throw RangeError("Illegal capacity");
+        littleEndian = !!littleEndian;
+        noAssert = !!noAssert;
     }
     //? if (NODE) {
     
@@ -169,6 +167,12 @@ ByteBuffer.Long = Long;
  */
 ByteBuffer.Long = Long || null;
 //? }
+
+/**
+ * @alias ByteBuffer.prototype
+ * @inner
+ */
+var ByteBufferPrototype = ByteBuffer.prototype;
 
 //? include("helpers.js");
 

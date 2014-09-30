@@ -4,14 +4,14 @@
  * @returns {!ByteBuffer} this
  * @expose
  */
-ByteBuffer.prototype.skip = function(length) {
+ByteBufferPrototype.skip = function(length) {
     if (!this.noAssert) {
         //? ASSERT_INTEGER('length');
     }
     var offset = this.offset + length;
     if (!this.noAssert) {
         if (offset < 0 || offset > /*?= CAPACITY */)
-            throw new RangeError("Illegal length: 0 <= "+this.offset+" + "+length+" <= "+/*?= CAPACITY */);
+            throw RangeError("Illegal length: 0 <= "+this.offset+" + "+length+" <= "+/*?= CAPACITY */);
     }
     this.offset = offset;
     return this;

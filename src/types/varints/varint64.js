@@ -71,7 +71,7 @@ if (Long) {
      * @returns {!ByteBuffer|number} `this` if offset is omitted, else the actual number of bytes written.
      * @expose
      */
-    ByteBuffer.prototype.writeVarint64 = function(value, offset) {
+    ByteBufferPrototype.writeVarint64 = function(value, offset) {
         //? RELATIVE();
         if (!this.noAssert) {
             //? ASSERT_LONG('value');
@@ -124,7 +124,7 @@ if (Long) {
      * @returns {!ByteBuffer|number} `this` if offset is omitted, else the actual number of bytes written.
      * @expose
      */
-    ByteBuffer.prototype.writeVarint64ZigZag = function(value, offset) {
+    ByteBufferPrototype.writeVarint64ZigZag = function(value, offset) {
         return this.writeVarint64(ByteBuffer.zigZagEncode64(value), offset);
     };
     
@@ -137,7 +137,7 @@ if (Long) {
      * @throws {Error} If it's not a valid varint
      * @expose
      */
-    ByteBuffer.prototype.readVarint64 = function(offset) {
+    ByteBufferPrototype.readVarint64 = function(offset) {
         //? RELATIVE(); 
         if (!this.noAssert) {
             //? ASSERT_OFFSET(1);
@@ -160,7 +160,7 @@ if (Long) {
         b = this.buffer[offset++]; part1 |= (b & 0x7F) << 21; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
         b = this.buffer[offset++]; part2  = (b & 0x7F)      ; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
         b = this.buffer[offset++]; part2 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-        throw new Error("Data must be corrupt: Buffer overrun"); }}}}}}}}}}
+        throw Error("Buffer overrun"); }}}}}}}}}}
         //? } else { // Assert as usual
         b = this.buffer.readUint8(offset++, true         ); part0  = (b & 0x7F)      ; if (b & 0x80) {
         b = this.buffer.readUint8(offset++, this.noAssert); part0 |= (b & 0x7F) <<  7; if (b & 0x80) {
@@ -172,7 +172,7 @@ if (Long) {
         b = this.buffer.readUint8(offset++, this.noAssert); part1 |= (b & 0x7F) << 21; if (b & 0x80) {
         b = this.buffer.readUint8(offset++, this.noAssert); part2  = (b & 0x7F)      ; if (b & 0x80) {
         b = this.buffer.readUint8(offset++, this.noAssert); part2 |= (b & 0x7F) <<  7; if (b & 0x80) {
-        throw new Error("Data must be corrupt: Buffer overrun"); }}}}}}}}}}
+        throw Error("Buffer overrun"); }}}}}}}}}}
         //? }
     //? } else { // Asserts on its own
         b = this.view.getUint8(offset++); part0  = (b & 0x7F)      ; if (b & 0x80) {
@@ -185,7 +185,7 @@ if (Long) {
         b = this.view.getUint8(offset++); part1 |= (b & 0x7F) << 21; if (b & 0x80) {
         b = this.view.getUint8(offset++); part2  = (b & 0x7F)      ; if (b & 0x80) {
         b = this.view.getUint8(offset++); part2 |= (b & 0x7F) <<  7; if (b & 0x80) {
-        throw new Error("Data must be corrupt: Buffer overrun"); }}}}}}}}}}
+        throw Error("Buffer overrun"); }}}}}}}}}}
     //? }
         var value = Long.fromBits(part0 | (part1 << 28), (part1 >>> 4) | (part2) << 24, false);
         if (relative) {
@@ -208,7 +208,7 @@ if (Long) {
      * @throws {Error} If it's not a valid varint
      * @expose
      */
-    ByteBuffer.prototype.readVarint64ZigZag = function(offset) {
+    ByteBufferPrototype.readVarint64ZigZag = function(offset) {
         var val = this.readVarint64(offset);
         if (val && val['value'] instanceof Long)
             val["value"] = ByteBuffer.zigZagDecode64(val["value"]);

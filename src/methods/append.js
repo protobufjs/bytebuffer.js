@@ -16,7 +16,7 @@
  * @example A relative `<01 02>03.append(<04 05>)` will result in `<01 02 04 05>, 04 05|`
  * @example An absolute `<01 02>03.append(04 05>, 1)` will result in `<01 04>05, 04 05|`
  */
-ByteBuffer.prototype.append = function(source, encoding, offset) {
+ByteBufferPrototype.append = function(source, encoding, offset) {
     if (typeof encoding === 'number' || typeof encoding !== 'string') {
         offset = encoding;
         encoding = undefined;
@@ -50,7 +50,7 @@ ByteBuffer.prototype.append = function(source, encoding, offset) {
  * @expose
  * @see ByteBuffer#append
  */
-ByteBuffer.prototype.appendTo = function(target, offset) {
+ByteBufferPrototype.appendTo = function(target, offset) {
     target.append(this, offset);
     return this;
 };

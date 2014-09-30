@@ -9,7 +9,7 @@
  * @expose
  * @example `someByteBuffer.clear().fill(0)` fills the entire backing buffer with zeroes
  */
-ByteBuffer.prototype.fill = function(value, begin, end) {
+ByteBufferPrototype.fill = function(value, begin, end) {
     //? RELATIVE(undefined, 'begin');
     if (typeof value === 'string' && value.length > 0)
         value = value.charCodeAt(0);

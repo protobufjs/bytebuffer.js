@@ -22,7 +22,7 @@
  * @throws {RangeError} If `offset > limit`
  * @expose
  */
-ByteBuffer.prototype.toBinary = function(begin, end) {
+ByteBufferPrototype.toBinary = function(begin, end) {
     begin = typeof begin === 'undefined' ? this.offset : begin;
     end = typeof end === 'undefined' ? this.limit : end;
     if (!this.noAssert) {
@@ -31,14 +31,19 @@ ByteBuffer.prototype.toBinary = function(begin, end) {
     //? if (NODE)
     return this.buffer.toString("binary", begin, end);
     //? else {
-    if (begin === end) return "";
-    var out = [];
-    while (begin < end)
+    if (begin === end)
+        return "";
+    var cc = [], pt = [];
+    while (begin < end) {
         //? if (NODE)
-        out.push(this.buffer[begin++]);
+        cc.push(this.buffer[begin++]);
         //? else
-        out.push(this.view.getUint8(begin++));
-    return String.fromCharCode.apply(String, out);
+        cc.push(this.view.getUint8(begin++));
+        if (cc.length >= 1024)
+            pt.push(String.fromCharCode.apply(String, cc)),
+            cc = [];
+    }
+    return pt.join('') + String.fromCharCode.apply(String, cc);
     //? }
 };
 
@@ -55,7 +60,7 @@ ByteBuffer.prototype.toBinary = function(begin, end) {
 ByteBuffer.fromBinary = function(str, littleEndian, noAssert) {
     if (!noAssert) {
         if (typeof str !== 'string')
-            throw new TypeError("Illegal str: Not a string");
+            throw TypeError("Illegal str: Not a string");
     }
     //? if (NODE) {
     var bb = new ByteBuffer(0, littleEndian, noAssert);
@@ -70,7 +75,7 @@ ByteBuffer.fromBinary = function(str, littleEndian, noAssert) {
     while (i<k) {
         charCode = str.charCodeAt(i);
         if (!noAssert && charCode > 255)
-            throw new TypeError("Illegal charCode at "+i+": 0 <= "+charCode+" <= 255");
+            throw RangeError("Illegal charCode at "+i+": 0 <= "+charCode+" <= 255");
         //? if (NODE)
         bb.buffer[i++] = charCode;
         //? else

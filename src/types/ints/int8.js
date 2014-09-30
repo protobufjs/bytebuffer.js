@@ -8,7 +8,7 @@
  * @returns {!ByteBuffer} this
  * @expose
  */
-ByteBuffer.prototype.writeInt8 = function(value, offset) {
+ByteBufferPrototype.writeInt8 = function(value, offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_INTEGER('value');
@@ -31,7 +31,7 @@ ByteBuffer.prototype.writeInt8 = function(value, offset) {
  * @returns {!ByteBuffer} this
  * @expose
  */
-ByteBuffer.prototype.writeByte = ByteBuffer.prototype.writeInt8;
+ByteBufferPrototype.writeByte = ByteBufferPrototype.writeInt8;
 
 /**
  * Reads an 8bit signed integer.
@@ -39,7 +39,7 @@ ByteBuffer.prototype.writeByte = ByteBuffer.prototype.writeInt8;
  * @returns {number} Value read
  * @expose
  */
-ByteBuffer.prototype.readInt8 = function(offset) {
+ByteBufferPrototype.readInt8 = function(offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_OFFSET(1);
@@ -61,7 +61,7 @@ ByteBuffer.prototype.readInt8 = function(offset) {
  * @returns {number} Value read
  * @expose
  */
-ByteBuffer.prototype.readByte = ByteBuffer.prototype.readInt8;
+ByteBufferPrototype.readByte = ByteBufferPrototype.readInt8;
 //? }
 
 /**
@@ -71,7 +71,7 @@ ByteBuffer.prototype.readByte = ByteBuffer.prototype.readInt8;
  * @returns {!ByteBuffer} this
  * @expose
  */
-ByteBuffer.prototype.writeUint8 = function(value, offset) {
+ByteBufferPrototype.writeUint8 = function(value, offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_INTEGER('value', true);
@@ -92,7 +92,7 @@ ByteBuffer.prototype.writeUint8 = function(value, offset) {
  * @returns {number} Value read
  * @expose
  */
-ByteBuffer.prototype.readUint8 = function(offset) {
+ByteBufferPrototype.readUint8 = function(offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_OFFSET(1);

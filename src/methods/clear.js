@@ -4,7 +4,7 @@
  * @returns {!ByteBuffer} this
  * @expose
  */
-ByteBuffer.prototype.clear = function() {
+ByteBufferPrototype.clear = function() {
     this.offset = 0;
     this.limit = /*?= CAPACITY */;
     this.markedOffset = -1;

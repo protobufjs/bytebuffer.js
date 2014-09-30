@@ -5,7 +5,7 @@
  * @returns {!ByteBuffer} Cloned instance
  * @expose
  */
-ByteBuffer.prototype.clone = function(copy) {
+ByteBufferPrototype.clone = function(copy) {
     var bb = new ByteBuffer(0, this.littleEndian, this.noAssert);
     if (copy) {
         //? if (NODE) {

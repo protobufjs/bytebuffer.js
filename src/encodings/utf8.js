@@ -12,22 +12,22 @@
  * @throws {RangeError} If `offset > limit`
  * @expose
  */
-ByteBuffer.prototype.toUTF8 = function(begin, end) {
+ByteBufferPrototype.toUTF8 = function(begin, end) {
     if (typeof begin === 'undefined') begin = this.offset;
     if (typeof end === 'undefined') end = this.limit;
     if (!this.noAssert) {
         //? ASSERT_RANGE();
     }
     //? if (NODE)
-    return this.buffer.slice(begin, end).toString("utf8");
+    return this.buffer.toString("utf8", begin, end);
     //? else {
-    var bb = this, sd; try {
+    var sd; try {
         utfx.decodeUTF8toUTF16(function() {
-            return begin < end ? bb.view.getUint8(begin++) : null;
-        }, sd = stringDestination());
+            return begin < end ? this.view.getUint8(begin++) : null;
+        }.bind(this), sd = stringDestination());
     } catch (e) {
         if (begin !== end)
-            throw new RangeError("Illegal range: Truncated data, "+begin+" != "+end);
+            throw RangeError("Illegal range: Truncated data, "+begin+" != "+end);
     }
     return sd();
     //? }
@@ -44,10 +44,9 @@ ByteBuffer.prototype.toUTF8 = function(begin, end) {
  * @expose
  */
 ByteBuffer.fromUTF8 = function(str, littleEndian, noAssert) {
-    if (!noAssert) {
+    if (!noAssert)
         if (typeof str !== 'string')
-            throw new TypeError("Illegal str: Not a string");
-    }
+            throw TypeError("Illegal str: Not a string");
     //? if (NODE) {
     var bb = new ByteBuffer(0, littleEndian, noAssert);
     bb.buffer = new Buffer(str, "utf8");

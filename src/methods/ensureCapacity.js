@@ -6,7 +6,7 @@
  * @returns {!ByteBuffer} this
  * @expose
  */
-ByteBuffer.prototype.ensureCapacity = function(capacity) {
+ByteBufferPrototype.ensureCapacity = function(capacity) {
     var current = /*?= CAPACITY */;
     if (current < capacity)
         return this.resize((current *= 2) > capacity ? current : capacity);

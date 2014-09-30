@@ -10,11 +10,11 @@
  * @expose
  * @see ByteBuffer#writeVarint32
  */
-ByteBuffer.prototype.writeVString = function(str, offset) {
+ByteBufferPrototype.writeVString = function(str, offset) {
     //? RELATIVE()
     if (!this.noAssert) {
         if (typeof str !== 'string')
-            throw new TypeError("Illegal str: Not a string");
+            throw TypeError("Illegal str: Not a string");
         //? ASSERT_OFFSET();
     }
     var start = offset,
@@ -34,7 +34,7 @@ ByteBuffer.prototype.writeVString = function(str, offset) {
         this.view.setUint8(offset++, b);
     }.bind(this));
     if (offset !== start+k+l)
-        throw new RangeError("Illegal range: Truncated data, "+offset+" == "+(offset+k+l));
+        throw RangeError("Illegal range: Truncated data, "+offset+" == "+(offset+k+l));
     //? }
     if (relative) {
         this.offset = offset;
@@ -52,7 +52,7 @@ ByteBuffer.prototype.writeVString = function(str, offset) {
  * @expose
  * @see ByteBuffer#readVarint32
  */
-ByteBuffer.prototype.readVString = function(offset) {
+ByteBufferPrototype.readVString = function(offset) {
     //? RELATIVE();
     if (!this.noAssert) {
         //? ASSERT_OFFSET(1);
@@ -64,7 +64,7 @@ ByteBuffer.prototype.readVString = function(offset) {
     temp = temp['value'];
     //? if (NODE) {
     if (offset + temp > this.buffer.length)
-        throw new RangeError("Index out of bounds: "+offset+" + "+val.value+" <= "+this.buffer.length);
+        throw RangeError("Index out of bounds: "+offset+" + "+val.value+" <= "+this.buffer.length);
     str = this.buffer.toString("utf8", offset, offset + temp);
     offset += temp;
     //? } else {

@@ -4,6 +4,6 @@
  * @returns {number} Remaining readable bytes. May be negative if `offset > limit`.
  * @expose
  */
-ByteBuffer.prototype.remaining = function() {
+ByteBufferPrototype.remaining = function() {
     return this.limit - this.offset;
 };

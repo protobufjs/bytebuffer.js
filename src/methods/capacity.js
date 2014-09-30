@@ -3,7 +3,7 @@
  * @returns {number} Capacity of the backing buffer
  * @expose
  */
-ByteBuffer.prototype.capacity = function() {
+ByteBufferPrototype.capacity = function() {
     return /*?= CAPACITY */;
 };
 
