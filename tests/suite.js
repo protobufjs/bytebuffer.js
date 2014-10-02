@@ -55,7 +55,8 @@ function makeSuite(ByteBuffer) {
     suite.init = function(test) {
         test.ok(require("../index.js"));
         if (type === Buffer)
-            test.log("\n\n                    --- node Buffer backed ByteBuffer ---\n".bold.white);
+            test.log("\n\n                    --- node Buffer backed ByteBuffer ---\n".bold.white),
+            test.log("[optional] node-memcpy is "+(ByteBuffer.memcpy ? "present" : "not present"));
         else
             test.log("\n\n                    --- ArrayBuffer backed ByteBuffer ---\n".bold.white);
         test.ok(type === Buffer || type === ArrayBuffer);
