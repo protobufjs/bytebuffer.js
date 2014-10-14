@@ -36,8 +36,11 @@
         return ByteBuffer;
     }
 
-    /* CommonJS */ if (typeof module !== 'undefined' && module["exports"])
-        module["exports"] = loadByteBuffer(require("long"));
+    /* CommonJS */ if (typeof require === 'function' && typeof module === 'object' && module && module.id && typeof exports === 'object' && exports)
+        module['exports'] = (function() {
+            var Long; try { Long = require("long"); } catch (e) {}
+            return loadByteBuffer(Long);
+        })();
     /* AMD */ else if (typeof define === 'function' && define["amd"])
         define("ByteBuffer", ["Long"], function(Long) { return loadByteBuffer(Long); });
     /* Global */ else

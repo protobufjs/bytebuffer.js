@@ -941,8 +941,10 @@ function makeSuite(ByteBuffer) {
                 }
             },
             module: {
-                exports: {}
+                exports: {},
+                id: "bytebuffer"
             },
+            exports: {},
             ArrayBuffer: ArrayBuffer,
             DataView: DataView
         });

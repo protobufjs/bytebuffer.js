@@ -1,6 +1,6 @@
 {
     "name": "bytebuffer",
-    "version": "3.4.0",
+    "version": "3.5.0",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "description": "The swiss army knife for binary data in JavaScript.",
     "main": "index.js",
@@ -14,7 +14,7 @@
     },
     "keywords": ["net", "array", "buffer", "arraybuffer", "typed array", "bytebuffer", "json", "websocket", "webrtc"],
     "dependencies": {
-        "long": "~2",
+        "long": "~2 >=2.2",
         "bufferview": "~1"
     },
     "devDependencies": {
