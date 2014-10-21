@@ -108,7 +108,7 @@ module.exports = (function() {
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "3.5.1";
+    ByteBuffer.VERSION = "3.5.2";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -2630,7 +2630,7 @@ module.exports = (function() {
         } else { // Slow
             var dst = new Uint8Array(ab);
             for (var i=offset; i<limit; ++i) {
-                dst[i] = this.buffer[i];
+                dst[i-offset] = this.buffer[i];
             }
         }
         return ab;

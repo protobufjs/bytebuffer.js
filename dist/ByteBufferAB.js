@@ -116,7 +116,7 @@
          * @const
          * @expose
          */
-        ByteBuffer.VERSION = "3.5.1";
+        ByteBuffer.VERSION = "3.5.2";
 
         /**
          * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.

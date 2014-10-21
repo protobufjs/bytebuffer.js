@@ -73,7 +73,7 @@ ByteBufferPrototype.toArrayBuffer = function() {
     } else { // Slow
         var dst = new Uint8Array(ab);
         for (var i=offset; i<limit; ++i) {
-            dst[i] = this.buffer[i];
+            dst[i-offset] = this.buffer[i];
         }
     }
     return ab;
