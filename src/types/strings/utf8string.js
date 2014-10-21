@@ -35,7 +35,7 @@ ByteBufferPrototype.writeUTF8String = function(str, offset) {
     //? ENSURE_CAPACITY('k');
     offset += this.buffer.write(str, offset, k, "utf8");
     if (relative) {
-        this.offset += offset;
+        this.offset = offset;
         return this;
     }
     return k;
