@@ -116,7 +116,7 @@
          * @const
          * @expose
          */
-        ByteBuffer.VERSION = "3.5.2";
+        ByteBuffer.VERSION = "3.5.3";
 
         /**
          * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -3263,7 +3263,7 @@
         return ByteBuffer;
     }
 
-    /* CommonJS */ if (typeof require === 'function' && typeof module === 'object' && module && module.id && typeof exports === 'object' && exports)
+    /* CommonJS */ if (typeof require === 'function' && typeof module === 'object' && module && typeof exports === 'object' && exports)
         module['exports'] = (function() {
             var Long; try { Long = require("long"); } catch (e) {}
             return loadByteBuffer(Long);

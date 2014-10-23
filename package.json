@@ -1,10 +1,10 @@
 {
     "name": "bytebuffer",
-    "version": "3.5.2",
+    "version": "3.5.3",
     "author": "Daniel Wirtz <dcode@dcode.io>",
     "description": "The swiss army knife for binary data in JavaScript.",
     "main": "index.js",
-    "browser": "dist/ByteBufferAB.min.js",
+    "browser": "dist/ByteBufferAB.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/dcodeIO/ByteBuffer.js.git"
@@ -14,7 +14,7 @@
     },
     "keywords": ["net", "array", "buffer", "arraybuffer", "typed array", "bytebuffer", "json", "websocket", "webrtc"],
     "dependencies": {
-        "long": "~2 >=2.2",
+        "long": "~2 >=2.2.3",
         "bufferview": "~1"
     },
     "devDependencies": {

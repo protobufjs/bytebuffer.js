@@ -36,7 +36,7 @@
         return ByteBuffer;
     }
 
-    /* CommonJS */ if (typeof require === 'function' && typeof module === 'object' && module && module.id && typeof exports === 'object' && exports)
+    /* CommonJS */ if (typeof require === 'function' && typeof module === 'object' && module && typeof exports === 'object' && exports)
         module['exports'] = (function() {
             var Long; try { Long = require("long"); } catch (e) {}
             return loadByteBuffer(Long);

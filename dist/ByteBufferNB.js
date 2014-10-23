@@ -108,7 +108,7 @@ module.exports = (function() {
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "3.5.2";
+    ByteBuffer.VERSION = "3.5.3";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
