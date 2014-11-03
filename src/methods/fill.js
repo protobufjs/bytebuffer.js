@@ -19,16 +19,15 @@ ByteBufferPrototype.fill = function(value, begin, end) {
         //? ASSERT_INTEGER('value');
         //? ASSERT_RANGE();
     }
-    if (begin >= end) return this; // Nothing to fill
+    if (begin >= end)
+        return this; // Nothing to fill
     //? if (NODE) {
     this.buffer.fill(value, begin, end);
     begin = end;
     //? } else {
     while (begin < end) this.view.setUint8(begin++, value);
     //? }
-    if (relative) {
-        this.offset = begin;
-    }
+    if (relative) this.offset = begin;
     return this;
 };
 

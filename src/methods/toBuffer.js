@@ -26,7 +26,7 @@ ByteBufferPrototype.toBuffer = function(forceCopy) {
     if (forceCopy) {
         var buffer = new Buffer(limit - offset);
         this.buffer.copy(buffer, 0, offset, limit);
-        return b;
+        return buffer;
     } else {
         if (offset === 0 && limit === this.buffer.length)
             return this.buffer;

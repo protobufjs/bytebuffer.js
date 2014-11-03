@@ -108,7 +108,7 @@ module.exports = (function() {
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "3.5.3";
+    ByteBuffer.VERSION = "3.5.4";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -2285,12 +2285,11 @@ module.exports = (function() {
             if (begin < 0 || begin > end || end > this.buffer.length)
                 throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length);
         }
-        if (begin >= end) return this; // Nothing to fill
+        if (begin >= end)
+            return this; // Nothing to fill
         this.buffer.fill(value, begin, end);
         begin = end;
-        if (relative) {
-            this.offset = begin;
-        }
+        if (relative) this.offset = begin;
         return this;
     };
 
@@ -2590,7 +2589,7 @@ module.exports = (function() {
         if (forceCopy) {
             var buffer = new Buffer(limit - offset);
             this.buffer.copy(buffer, 0, offset, limit);
-            return b;
+            return buffer;
         } else {
             if (offset === 0 && limit === this.buffer.length)
                 return this.buffer;
