@@ -13,9 +13,8 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-var path = require("path"),
-    ByteBufferNB = require(path.join(__dirname, "dist", "ByteBufferNB.js")),
-    ByteBufferAB = require(path.join(__dirname, "dist", "ByteBufferAB.js"));
+var ByteBufferNB = require("./dist/ByteBufferNB.js")),
+    ByteBufferAB = require("./dist/ByteBufferAB.js"));
 
 module.exports = ByteBufferNB;
 module.exports.ByteBufferNB = ByteBufferNB; // node Buffer backed
