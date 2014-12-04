@@ -26,7 +26,6 @@ module.exports = (function() {
     
     var buffer = require("buffer"),
         Buffer = buffer['Buffer'],
-        SlowBuffer = buffer['SlowBuffer'],
         //? if (BUFFERVIEW)
         BufferView = require("bufferview"),
         Long = require("long"),
