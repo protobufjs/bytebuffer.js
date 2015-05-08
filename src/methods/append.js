@@ -41,8 +41,8 @@ ByteBufferPrototype.append = function(source, encoding, offset) {
 };
 
 /**
- * Appends this ByteBuffer's contents to another ByteBuffer. This will overwrite any contents behind the specified
- *  offset up to the length of this ByteBuffer's data.
+ * Appends this ByteBuffer's contents to another ByteBuffer. This will overwrite any contents at and after the
+    specified offset up to the length of this ByteBuffer's data.
  * @param {!ByteBuffer} target Target ByteBuffer
  * @param {number=} offset Offset to append to. Will use and increase {@link ByteBuffer#offset} by the number of bytes
  *  read if omitted.
