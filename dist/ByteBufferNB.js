@@ -25,7 +25,6 @@ module.exports = (function() {
 
     var buffer = require("buffer"),
         Buffer = buffer['Buffer'],
-        SlowBuffer = buffer['SlowBuffer'],
         Long = require("long"),
         memcpy = null; try { memcpy = require("memcpy"); } catch (e) {}
 
