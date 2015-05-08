@@ -1619,7 +1619,6 @@ module.exports = (function() {
             if (offset < 0 || offset + 0 > this.buffer.length)
                 throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
         }
-        var start = offset;
         // UTF8 strings do not contain zero bytes in between except for the zero character, so:
         k = Buffer.byteLength(str, "utf8");
         offset += k+1;
@@ -1630,7 +1629,7 @@ module.exports = (function() {
         offset += this.buffer.write(str, offset, k, "utf8");
         this.buffer[offset++] = 0;
         if (relative) {
-            this.offset = offset - start;
+            this.offset = offset;
             return this;
         }
         return k;

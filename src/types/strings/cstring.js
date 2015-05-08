@@ -23,7 +23,6 @@ ByteBufferPrototype.writeCString = function(str, offset) {
         }
         //? ASSERT_OFFSET();
     }
-    var start = offset;
     // UTF8 strings do not contain zero bytes in between except for the zero character, so:
     //? if (NODE) {
     k = Buffer.byteLength(str, "utf8");
@@ -39,7 +38,7 @@ ByteBufferPrototype.writeCString = function(str, offset) {
     this.view.setUint8(offset++, 0);
     //? }
     if (relative) {
-        this.offset = offset - start;
+        this.offset = offset;
         return this;
     }
     return k;

@@ -777,7 +777,12 @@ function makeSuite(ByteBuffer) {
     
     suite.types.cstring = function(test) {
         var bb = new ByteBuffer(2);
-        bb.writeCString("ab"); // resizes to 4
+        bb.writeCString("a");
+        test.equal(bb.capacity(), 2);
+        test.equal(bb.offset, 2);
+        test.equal(bb.limit, 2);
+        bb.offset = 1;
+        bb.writeCString("b"); // resizes to 4
         test.equal(bb.capacity(), 4);
         test.equal(bb.offset, 3);
         test.equal(bb.limit, 2);

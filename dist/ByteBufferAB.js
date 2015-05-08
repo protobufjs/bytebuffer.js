@@ -1468,7 +1468,6 @@
                 if (offset < 0 || offset + 0 > this.buffer.byteLength)
                     throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
-            var start = offset;
             // UTF8 strings do not contain zero bytes in between except for the zero character, so:
             k = utfx.calculateUTF16asUTF8(stringSource(str))[1];
             offset += k+1;
@@ -1481,7 +1480,7 @@
             }.bind(this));
             this.view.setUint8(offset++, 0);
             if (relative) {
-                this.offset = offset - start;
+                this.offset = offset;
                 return this;
             }
             return k;
