@@ -26,7 +26,10 @@ ByteBufferPrototype.toBase64 = function(begin, end) {
     return this.buffer.toString("base64", begin, end);
     //? else {
     var sd; lxiv.encode(function() {
+        //? if (DATAVIEW)
         return begin < end ? this.view.getUint8(begin++) : null;
+        //? else
+        return begin < end ? this.view[begin++] : null;
     }.bind(this), sd = stringDestination());
     return sd();
     //? }
@@ -59,7 +62,10 @@ ByteBuffer.fromBase64 = function(str, littleEndian, noAssert) {
     var bb = new ByteBuffer(str.length/4*3, littleEndian, noAssert),
         i = 0;
     lxiv.decode(stringSource(str), function(b) {
+        //? if (DATAVIEW)
         bb.view.setUint8(i++, b);
+        //? else
+        bb.view[i++] = b;
     });
     bb.limit = i;
     //? }

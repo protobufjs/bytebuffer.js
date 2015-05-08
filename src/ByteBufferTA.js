@@ -13,13 +13,13 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-//? NODE = false; DATAVIEW = true;
+//? NODE = false; DATAVIEW = false;
 
 /**
- * @license ByteBuffer.js (c) 2013-2014 Daniel Wirtz <dcode@dcode.io>  
- * This version of ByteBuffer.js uses an ArrayBuffer as its backing buffer which is accessed through a DataView and is
+ * @license ByteBuffer.js (c) 2013-2014 Daniel Wirtz <dcode@dcode.io>
+ * This version of ByteBuffer.js uses an ArrayBuffer as its backing buffer which is accessed through typed arrays and is
  * compatible with modern browsers.
- * Released under the Apache License, Version 2.0  
+ * Released under the Apache License, Version 2.0
  * see: https://github.com/dcodeIO/ByteBuffer.js for details
  */ //
 (function(global) {

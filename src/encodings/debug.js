@@ -32,8 +32,10 @@ ByteBufferPrototype.toDebug = function(columns) {
         if (i !== -1) {
             //? if (NODE)
             b = this.buffer[i];
-            //? else
+            //? else if (DATAVIEW)
             b = this.view.getUint8(i);
+            //? else
+            b = this.view[i];
             if (b < 0x10) hex += "0"+b.toString(16).toUpperCase();
             else hex += b.toString(16).toUpperCase();
             if (columns) {
@@ -177,8 +179,10 @@ ByteBuffer.fromDebug = function(str, littleEndian, noAssert) {
                 }
                 //? if (NODE)
                 bb.buffer[j++] = b;
-                //? else
+                //? else if (DATAVIEW)
                 bb.view.setUint8(j++, b);
+                //? else
+                bb.view[j++] = b;
                 rs = true;
         }
         if (fail)

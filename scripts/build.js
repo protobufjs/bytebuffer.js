@@ -82,7 +82,7 @@ if (!scope.UTF8) scope.STRINGS = false;
 
 // Build node ByteBuffer
 scope.NODE = true;
-console.log("Building node ByteBuffer with scope", JSON.stringify(scope, null, 2));
+console.log("Building ByteBufferNB with scope", JSON.stringify(scope, null, 2));
 fs.writeFileSync(
     path.join(distDir, "ByteBufferNB.js"),
     MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "ByteBufferNB.js")), filename, scope, srcDir)
@@ -90,8 +90,9 @@ fs.writeFileSync(
 
 // Build browser ByteBuffer
 scope.NODE = false;
+scope.DATAVIEW = true;
 delete scope.BUFFERVIEW;
-console.log("Building browser ByteBuffer with scope", JSON.stringify(scope, null, 2));
+console.log("Building ByteBufferAB with scope", JSON.stringify(scope, null, 2));
 fs.writeFileSync(
     path.join(distDir, "ByteBufferAB.js"),
     MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "ByteBufferAB.js")), filename, scope)

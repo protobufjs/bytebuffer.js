@@ -37,8 +37,10 @@ ByteBufferPrototype.toBinary = function(begin, end) {
     while (begin < end) {
         //? if (NODE)
         cc.push(this.buffer[begin++]);
-        //? else
+        //? else if (DATAVIEW)
         cc.push(this.view.getUint8(begin++));
+        //? else
+        cc.push(this.view[begin++]);
         if (cc.length >= 1024)
             pt.push(String.fromCharCode.apply(String, cc)),
             cc = [];
@@ -78,8 +80,10 @@ ByteBuffer.fromBinary = function(str, littleEndian, noAssert) {
             throw RangeError("Illegal charCode at "+i+": 0 <= "+charCode+" <= 255");
         //? if (NODE)
         bb.buffer[i++] = charCode;
-        //? else
+        //? else if (DATAVIEW)
         bb.view.setUint8(i++, charCode);
+        //? else
+        bb.view[i++] = charCode;
     }
     bb.limit = k;
     //? }

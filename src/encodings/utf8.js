@@ -23,7 +23,10 @@ ByteBufferPrototype.toUTF8 = function(begin, end) {
     //? else {
     var sd; try {
         utfx.decodeUTF8toUTF16(function() {
+            //? if (DATAVIEW)
             return begin < end ? this.view.getUint8(begin++) : null;
+            //? else
+            return begin < end ? this.view[begin++] : null;
         }.bind(this), sd = stringDestination());
     } catch (e) {
         if (begin !== end)
@@ -57,7 +60,10 @@ ByteBuffer.fromUTF8 = function(str, littleEndian, noAssert) {
     var bb = new ByteBuffer(utfx.calculateUTF16asUTF8(stringSource(str), true)[1], littleEndian, noAssert),
         i = 0;
     utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
+        //? if (DATAVIEW)
         bb.view.setUint8(i++, b);
+        //? else
+        bb.view[i++] = b;
     });
     bb.limit = i;
     //? }

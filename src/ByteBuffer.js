@@ -56,7 +56,10 @@ var ByteBuffer = function(capacity, littleEndian, noAssert) {
      * @type {?DataView}
      * @expose
      */
+    //? if (DATAVIEW)
     this.view = capacity === 0 ? null : new DataView(this.buffer);
+    //? else
+    this.view = capacity === 0 ? null : new Uint8Array(this.buffer);
     //? }
     
     /**

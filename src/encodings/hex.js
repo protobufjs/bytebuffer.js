@@ -20,7 +20,10 @@ ByteBufferPrototype.toHex = function(begin, end) {
     var out = new Array(end - begin),
         b;
     while (begin < end) {
+        //? if (DATAVIEW)
         b = this.view.getUint8(begin++);
+        //? else
+        b = this.view[begin++];
         if (b < 0x10)
             out.push("0", b.toString(16));
         else out.push(b.toString(16));
@@ -61,7 +64,10 @@ ByteBuffer.fromHex = function(str, littleEndian, noAssert) {
         if (!noAssert)
             if (!isFinite(b) || b < 0 || b > 255)
                 throw TypeError("Illegal str: Contains non-hex characters");
+        //? if (DATAVIEW)
         bb.view.setUint8(j++, b);
+        //? else
+        bb.view[j++] = b;
     }
     bb.limit = j;
     //? }

@@ -108,7 +108,7 @@ module.exports = (function() {
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "3.5.4";
+    ByteBuffer.VERSION = "3.5.5";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -823,6 +823,8 @@ module.exports = (function() {
             if (!this.noAssert) {
                 if (typeof value === 'number')
                     value = Long.fromNumber(value);
+                else if (typeof value === 'string')
+                    value = Long.fromString(value);
                 else if (!(value && value instanceof Long))
                     throw TypeError("Illegal value: "+value+" (not an integer or Long)");
                 if (typeof offset !== 'number' || offset % 1 !== 0)
@@ -833,6 +835,8 @@ module.exports = (function() {
             }
             if (typeof value === 'number')
                 value = Long.fromNumber(value);
+            else if (typeof value === 'string')
+                value = Long.fromString(value);
             offset += 8;
             var capacity6 = this.buffer.length;
             if (offset > capacity6)
@@ -939,6 +943,8 @@ module.exports = (function() {
             if (!this.noAssert) {
                 if (typeof value === 'number')
                     value = Long.fromNumber(value);
+                else if (typeof value === 'string')
+                    value = Long.fromString(value);
                 else if (!(value && value instanceof Long))
                     throw TypeError("Illegal value: "+value+" (not an integer or Long)");
                 if (typeof offset !== 'number' || offset % 1 !== 0)
@@ -949,6 +955,8 @@ module.exports = (function() {
             }
             if (typeof value === 'number')
                 value = Long.fromNumber(value);
+            else if (typeof value === 'string')
+                value = Long.fromString(value);
             offset += 8;
             var capacity7 = this.buffer.length;
             if (offset > capacity7)
@@ -1390,6 +1398,8 @@ module.exports = (function() {
         ByteBuffer.calculateVarint64 = function(value) {
             if (typeof value === 'number')
                 value = Long.fromNumber(value);
+            else if (typeof value === 'string')
+                value = Long.fromString(value);
             // ref: src/google/protobuf/io/coded_stream.cc
             var part0 = value.toInt() >>> 0,
                 part1 = value.shiftRightUnsigned(28).toInt() >>> 0,
@@ -1419,6 +1429,8 @@ module.exports = (function() {
         ByteBuffer.zigZagEncode64 = function(value) {
             if (typeof value === 'number')
                 value = Long.fromNumber(value, false);
+            else if (typeof value === 'string')
+                value = Long.fromString(value, false);
             else if (value.unsigned !== false) value = value.toSigned();
             // ref: src/google/protobuf/wire_format_lite.h
             return value.shiftLeft(1).xor(value.shiftRight(63)).toUnsigned();
@@ -1433,6 +1445,8 @@ module.exports = (function() {
         ByteBuffer.zigZagDecode64 = function(value) {
             if (typeof value === 'number')
                 value = Long.fromNumber(value, false);
+            else if (typeof value === 'string')
+                value = Long.fromString(value, false);
             else if (value.unsigned !== false) value = value.toSigned();
             // ref: src/google/protobuf/wire_format_lite.h
             return value.shiftRightUnsigned(1).xor(value.and(Long.ONE).toSigned().negate()).toSigned();
@@ -1452,6 +1466,8 @@ module.exports = (function() {
             if (!this.noAssert) {
                 if (typeof value === 'number')
                     value = Long.fromNumber(value);
+                else if (typeof value === 'string')
+                    value = Long.fromString(value);
                 else if (!(value && value instanceof Long))
                     throw TypeError("Illegal value: "+value+" (not an integer or Long)");
                 if (typeof offset !== 'number' || offset % 1 !== 0)
@@ -1462,6 +1478,8 @@ module.exports = (function() {
             }
             if (typeof value === 'number')
                 value = Long.fromNumber(value, false);
+            else if (typeof value === 'string')
+                value = Long.fromString(value, false);
             else if (value.unsigned !== false) value = value.toSigned();
             var size = ByteBuffer.calculateVarint64(value),
                 part0 = value.toInt() >>> 0,

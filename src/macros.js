@@ -24,6 +24,8 @@ ASSERT_LONG = function(varValue, unsigned) {
     if (INLINE) {
         writeln(__+'if (typeof '+varValue+' === \'number\')');
         writeln(__+'    '+varValue+' = Long.fromNumber('+varValue+');');
+        writeln(__+'else if (typeof '+varValue+' === \'string\')');
+        writeln(__+'    '+varValue+' = Long.fromString('+varValue+');');
         if (typeof unsigned !== 'undefined') { // When explicitly specified only
             writeln(__+'else if ('+varValue+' && '+varValue+' instanceof Long)');
             if (unsigned) {
@@ -48,6 +50,8 @@ LONG = function(varValue, unsigned) {
     if (VERBOSE_MS) writeln(__+'// <LONG'+(typeof unsigned === 'boolean' ? ' unsigned='+unsigned : '')+'>');
     writeln(__+'if (typeof '+varValue+' === \'number\')');
     writeln(__+'    '+varValue+' = Long.fromNumber('+varValue+(typeof unsigned === 'boolean' ? ', '+unsigned : '')+');');
+    writeln(__+'else if (typeof '+varValue+' === \'string\')');
+    writeln(__+'    '+varValue+' = Long.fromString('+varValue+(typeof unsigned === 'boolean' ? ', '+unsigned : '')+');');
     if (typeof unsigned === 'boolean') {
         writeln(__+'else if ('+varValue+'.unsigned !== '+unsigned+') '+varValue+' = '+varValue+'.'+(unsigned ? 'toUnsigned' : 'toSigned')+'();');
     }
