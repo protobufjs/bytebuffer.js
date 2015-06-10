@@ -20,8 +20,10 @@ ByteBufferPrototype.writeFloat64 = function(value, offset) {
     this.littleEndian
         ? this.buffer.writeDoubleLE(value, offset, true)
         : this.buffer.writeDoubleBE(value, offset, true);
-    //? } else
+    //? } else if (DATAVIEW)
     this.view.setFloat64(offset, value, this.littleEndian);
+    //? else
+    ieee754_write(this.view, value, offset, this.littleEndian, 52, 8);
     //? RELATIVE(8);
     return this;
 };
@@ -53,8 +55,10 @@ ByteBufferPrototype.readFloat64 = function(offset) {
     var value = this.littleEndian
         ? this.buffer.readDoubleLE(offset, true)
         : this.buffer.readDoubleBE(offset, true);
-    //? } else
+    //? } else if (DATAVIEW)
     var value = this.view.getFloat64(offset, this.littleEndian);
+    //? else
+    var value = ieee754_read(this.view, offset, this.littleEndian, 52, 8);
     //? RELATIVE(8);
     return value;
 };

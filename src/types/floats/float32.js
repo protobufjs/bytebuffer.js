@@ -1,5 +1,9 @@
 //? if (FLOAT32) {
 // types/floats/float32
+//? if (!NODE && !DATAVIEW) {
+
+//? include("ieee754.js");
+//? }
 
 /**
  * Writes a 32bit float.
@@ -20,8 +24,10 @@ ByteBufferPrototype.writeFloat32 = function(value, offset) {
     this.littleEndian
         ? this.buffer.writeFloatLE(value, offset, true)
         : this.buffer.writeFloatBE(value, offset, true);
-    //? } else
+    //? } else if (DATAVIEW)
     this.view.setFloat32(offset, value, this.littleEndian);
+    //? else
+    ieee754_write(this.view, value, offset, this.littleEndian, 23, 4);
     //? RELATIVE(4);
     return this;
 };
@@ -53,8 +59,10 @@ ByteBufferPrototype.readFloat32 = function(offset) {
     var value = this.littleEndian
         ? this.buffer.readFloatLE(offset, true)
         : this.buffer.readFloatBE(offset, true);
-    //? } else
+    //? } else if (DATAVIEW)
     var value = this.view.getFloat32(offset, this.littleEndian);
+    //? else
+    var value = ieee754_read(this.view, offset, this.littleEndian, 23, 4);
     //? RELATIVE(4);
     return value;
 };

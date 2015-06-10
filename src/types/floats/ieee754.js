@@ -30,7 +30,7 @@ function ieee754_read(buffer, offset, isLE, mLen, nBytes) {
         e = e - eBias;
     }
     return (s ? -1 : 1) * m * Math.pow(2, e - mLen);
-};
+}
 
 // ref: https://github.com/feross/ieee754
 function ieee754_write(buffer, value, offset, isLE, mLen, nBytes) {
@@ -83,4 +83,4 @@ function ieee754_write(buffer, value, offset, isLE, mLen, nBytes) {
     for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8);
 
     buffer[offset + i - d] |= s * 128;
-};
+}
