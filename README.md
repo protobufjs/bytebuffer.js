@@ -8,7 +8,10 @@ generated from a single source tree through [MetaScript](https://github.com/dcod
 
 Features
 --------
-* Two API compatible versions, using either node Buffers under node.js or ArrayBuffers in the browser
+* Three API compatible versions:  
+  1. ByteBufferNB - Backing buffer: node Buffer, Accessor: none
+  2. ByteBufferAB - Backing buffer: ArrayBuffer, Accessor: DataView
+  3. ByteBufferTA - Backing buffer: ArrayBuffer, Accessor: Uint8Array
 * 8, 16, 32 and 64 bit signed and unsigned integers
 * 32 and 64 bit floats
 * Varints as used in protobuf (32 and 64 bit, zig-zag)
