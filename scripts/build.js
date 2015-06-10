@@ -80,7 +80,7 @@ var scope = {
 
 if (!scope.UTF8) scope.STRINGS = false;
 
-// Build node ByteBuffer
+// Build node ByteBuffer using Buffers
 scope.NODE = true;
 console.log("Building ByteBufferNB with scope", JSON.stringify(scope, null, 2));
 fs.writeFileSync(
@@ -88,9 +88,9 @@ fs.writeFileSync(
     MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "ByteBufferNB.js")), filename, scope, srcDir)
 );
 
-// Build browser ByteBuffer
+// Build browser ByteBuffer using Typed Arrays
 scope.NODE = false;
-scope.DATAVIEW = true;
+scope.DATAVIEW = false;
 delete scope.BUFFERVIEW;
 console.log("Building ByteBufferAB with scope", JSON.stringify(scope, null, 2));
 fs.writeFileSync(
@@ -98,13 +98,13 @@ fs.writeFileSync(
     MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "ByteBufferAB.js")), filename, scope)
 );
 
-// Build alternative browser ByteBuffer using Typed Arrays
+// Build alternative browser ByteBuffer using a DataView
 scope.NODE = false;
-scope.DATAVIEW = false;
-console.log("Building ByteBufferTA with scope", JSON.stringify(scope, null, 2));
+scope.DATAVIEW = true;
+console.log("Building ByteBufferAB_DataView with scope", JSON.stringify(scope, null, 2));
 fs.writeFileSync(
-    path.join(distDir, "experimental", "ByteBufferTA.js"),
-    MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "ByteBufferTA.js")), filename, scope)
+    path.join(distDir, "ByteBufferAB_DataView.js"),
+    MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "ByteBufferAB_DataView.js")), filename, scope)
 );
 
 // Update bower.json

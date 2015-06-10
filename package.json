@@ -33,7 +33,9 @@
         "test": "node node_modules/testjs/bin/testjs tests/suite.js",
         "make": "npm run-script build && npm run-script compile && npm run-script compress && npm test",
         "build": "node scripts/build.js",
-        "compile": "ccjs dist/ByteBufferAB.js --create_source_map=dist/ByteBufferAB.min.map --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --externs=node_modules/long/externs/Long.js > dist/ByteBufferAB.min.js",
-        "compress": "gzip -c -9 dist/ByteBufferAB.min.js > dist/ByteBufferAB.min.js.gz"
+        "compile": "npm run-script compileAB && npm run-script compileAB_DataView",
+        "compileAB": "ccjs dist/ByteBufferAB.js --create_source_map=dist/ByteBufferAB.min.map --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --externs=node_modules/long/externs/Long.js > dist/ByteBufferAB.min.js",
+        "compileAB_DataView": "ccjs dist/ByteBufferAB_DataView.js --create_source_map=dist/ByteBufferAB_DataView.min.map --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --externs=node_modules/long/externs/Long.js > dist/ByteBufferAB_DataView.min.js",
+        "compress": "gzip -c -9 dist/ByteBufferAB.min.js > dist/ByteBufferAB.min.js.gz && gzip -c -9 dist/ByteBufferAB_DataView.min.js > dist/ByteBufferAB_DataView.min.js.gz"
     }
 }

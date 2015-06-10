@@ -16,7 +16,7 @@
 
 /**
  * @license ByteBuffer.js (c) 2015 Daniel Wirtz <dcode@dcode.io>
- * [BUILD] ByteBufferTA - Backing buffer: ArrayBuffer, Accessor: Uint8Array
+ * [BUILD] ByteBufferAB - Backing buffer: ArrayBuffer, Accessor: DataView
  * Released under the Apache License, Version 2.0
  * see: https://github.com/dcodeIO/ByteBuffer.js for details
  */ //
@@ -65,11 +65,11 @@
             this.buffer = capacity === 0 ? EMPTY_BUFFER : new ArrayBuffer(capacity);
 
             /**
-             * Uint8Array utilized to manipulate the backing buffer. Becomes `null` if the backing buffer has a capacity of `0`.
-             * @type {?Uint8Array}
+             * DataView utilized to manipulate the backing buffer. Becomes `null` if the backing buffer has a capacity of `0`.
+             * @type {?DataView}
              * @expose
              */
-            this.view = capacity === 0 ? null : new Uint8Array(this.buffer);
+            this.view = capacity === 0 ? null : new DataView(this.buffer);
 
             /**
              * Absolute read/write offset.
@@ -263,11 +263,12 @@
                 return new ByteBuffer(0, littleEndian, noAssert);
             var bb = new ByteBuffer(capacity, littleEndian, noAssert),
                 bi;
+            var view = new Uint8Array(bb.buffer);
             i=0; while (i<k) {
                 bi = buffers[i++];
                 length = bi.limit - bi.offset;
                 if (length <= 0) continue;
-                bb.view.set(bi.view.subarray(bi.offset, bi.limit), bb.offset);
+                view.set(new Uint8Array(bi.buffer).subarray(bi.offset, bi.limit), bb.offset);
                 bb.offset += length;
             }
             bb.limit = bb.offset;
@@ -344,7 +345,7 @@
                     bb.buffer = buffer.buffer;
                     bb.offset = buffer.byteOffset;
                     bb.limit = buffer.byteOffset + buffer.byteLength;
-                    bb.view = new Uint8Array(buffer.buffer);
+                    bb.view = new DataView(buffer.buffer);
                 }
             } else if (buffer instanceof ArrayBuffer) { // Reuse ArrayBuffer
                 bb = new ByteBuffer(0, littleEndian, noAssert);
@@ -352,13 +353,13 @@
                     bb.buffer = buffer;
                     bb.offset = 0;
                     bb.limit = buffer.byteLength;
-                    bb.view = buffer.byteLength > 0 ? new Uint8Array(buffer) : null;
+                    bb.view = buffer.byteLength > 0 ? new DataView(buffer) : null;
                 }
             } else if (Object.prototype.toString.call(buffer) === "[object Array]") { // Create from octets
                 bb = new ByteBuffer(buffer.length, littleEndian, noAssert);
                 bb.limit = buffer.length;
                 for (i=0; i<buffer.length; ++i)
-                    bb.view[i] = buffer[i];
+                    bb.view.setUint8(i, buffer[i]);
             } else
                 throw TypeError("Illegal buffer"); // Otherwise fail
             return bb;
@@ -391,7 +392,7 @@
             if (offset > capacity0)
                 this.resize((capacity0 *= 2) > offset ? capacity0 : offset);
             offset -= 1;
-            this.view[offset] = value;
+            this.view.setInt8(offset, value);
             if (relative) this.offset += 1;
             return this;
         };
@@ -422,8 +423,7 @@
                 if (offset < 0 || offset + 1 > this.buffer.byteLength)
                     throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength);
             }
-            var value = this.view[offset];
-            if ((value & 0x80) === 0x80) value = -(0xFF - value + 1); // Cast to signed
+            var value = this.view.getInt8(offset);
             if (relative) this.offset += 1;
             return value;
         };
@@ -462,7 +462,7 @@
             if (offset > capacity1)
                 this.resize((capacity1 *= 2) > offset ? capacity1 : offset);
             offset -= 1;
-            this.view[offset] = value;
+            this.view.setUint8(offset, value);
             if (relative) this.offset += 1;
             return this;
         };
@@ -493,7 +493,7 @@
                 if (offset < 0 || offset + 1 > this.buffer.byteLength)
                     throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength);
             }
-            var value = this.view[offset];
+            var value = this.view.getUint8(offset);
             if (relative) this.offset += 1;
             return value;
         };
@@ -535,13 +535,7 @@
             if (offset > capacity2)
                 this.resize((capacity2 *= 2) > offset ? capacity2 : offset);
             offset -= 2;
-            if (this.littleEndian) {
-                this.view[offset+1] = (value & 0xFF00) >>> 8;
-                this.view[offset  ] =  value & 0x00FF;
-            } else {
-                this.view[offset]   = (value & 0xFF00) >>> 8;
-                this.view[offset+1] =  value & 0x00FF;
-            }
+            this.view.setInt16(offset, value, this.littleEndian);
             if (relative) this.offset += 2;
             return this;
         };
@@ -575,15 +569,7 @@
                 if (offset < 0 || offset + 2 > this.buffer.byteLength)
                     throw RangeError("Illegal offset: 0 <= "+offset+" (+"+2+") <= "+this.buffer.byteLength);
             }
-            var value = 0;
-            if (this.littleEndian) {
-                value  = this.view[offset  ];
-                value |= this.view[offset+1] << 8;
-            } else {
-                value  = this.view[offset  ] << 8;
-                value |= this.view[offset+1];
-            }
-            if ((value & 0x8000) === 0x8000) value = -(0xFFFF - value + 1); // Cast to signed
+            var value = this.view.getInt16(offset, this.littleEndian);
             if (relative) this.offset += 2;
             return value;
         };
@@ -625,13 +611,7 @@
             if (offset > capacity3)
                 this.resize((capacity3 *= 2) > offset ? capacity3 : offset);
             offset -= 2;
-            if (this.littleEndian) {
-                this.view[offset+1] = (value & 0xFF00) >>> 8;
-                this.view[offset  ] =  value & 0x00FF;
-            } else {
-                this.view[offset]   = (value & 0xFF00) >>> 8;
-                this.view[offset+1] =  value & 0x00FF;
-            }
+            this.view.setUint16(offset, value, this.littleEndian);
             if (relative) this.offset += 2;
             return this;
         };
@@ -665,14 +645,7 @@
                 if (offset < 0 || offset + 2 > this.buffer.byteLength)
                     throw RangeError("Illegal offset: 0 <= "+offset+" (+"+2+") <= "+this.buffer.byteLength);
             }
-            var value = 0;
-            if (this.littleEndian) {
-                value  = this.view[offset  ];
-                value |= this.view[offset+1] << 8;
-            } else {
-                value  = this.view[offset  ] << 8;
-                value |= this.view[offset+1];
-            }
+            var value = this.view.getUint16(offset, this.littleEndian);
             if (relative) this.offset += 2;
             return value;
         };
@@ -714,17 +687,7 @@
             if (offset > capacity4)
                 this.resize((capacity4 *= 2) > offset ? capacity4 : offset);
             offset -= 4;
-            if (this.littleEndian) {
-                this.view[offset+3] = (value >>> 24) & 0xFF;
-                this.view[offset+2] = (value >>> 16) & 0xFF;
-                this.view[offset+1] = (value >>>  8) & 0xFF;
-                this.view[offset  ] =  value         & 0xFF;
-            } else {
-                this.view[offset  ] = (value >>> 24) & 0xFF;
-                this.view[offset+1] = (value >>> 16) & 0xFF;
-                this.view[offset+2] = (value >>>  8) & 0xFF;
-                this.view[offset+3] =  value         & 0xFF;
-            }
+            this.view.setInt32(offset, value, this.littleEndian);
             if (relative) this.offset += 4;
             return this;
         };
@@ -753,19 +716,7 @@
                 if (offset < 0 || offset + 4 > this.buffer.byteLength)
                     throw RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength);
             }
-            var value = 0;
-            if (this.littleEndian) {
-                value  = this.view[offset+2] << 16;
-                value |= this.view[offset+1] <<  8;
-                value |= this.view[offset  ];
-                value += this.view[offset+3] << 24 >>> 0;
-            } else {
-                value  = this.view[offset+1] << 16;
-                value |= this.view[offset+2] <<  8;
-                value |= this.view[offset+3];
-                value += this.view[offset  ] << 24 >>> 0;
-            }
-            value |= 0; // Cast to signed
+            var value = this.view.getInt32(offset, this.littleEndian);
             if (relative) this.offset += 4;
             return value;
         };
@@ -802,17 +753,7 @@
             if (offset > capacity5)
                 this.resize((capacity5 *= 2) > offset ? capacity5 : offset);
             offset -= 4;
-            if (this.littleEndian) {
-                this.view[offset+3] = (value >>> 24) & 0xFF;
-                this.view[offset+2] = (value >>> 16) & 0xFF;
-                this.view[offset+1] = (value >>>  8) & 0xFF;
-                this.view[offset  ] =  value         & 0xFF;
-            } else {
-                this.view[offset  ] = (value >>> 24) & 0xFF;
-                this.view[offset+1] = (value >>> 16) & 0xFF;
-                this.view[offset+2] = (value >>>  8) & 0xFF;
-                this.view[offset+3] =  value         & 0xFF;
-            }
+            this.view.setUint32(offset, value, this.littleEndian);
             if (relative) this.offset += 4;
             return this;
         };
@@ -842,18 +783,7 @@
                 if (offset < 0 || offset + 4 > this.buffer.byteLength)
                     throw RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength);
             }
-            var value = 0;
-            if (this.littleEndian) {
-                value  = this.view[offset+2] << 16;
-                value |= this.view[offset+1] <<  8;
-                value |= this.view[offset  ];
-                value += this.view[offset+3] << 24 >>> 0;
-            } else {
-                value  = this.view[offset+1] << 16;
-                value |= this.view[offset+2] <<  8;
-                value |= this.view[offset+3];
-                value += this.view[offset  ] << 24 >>> 0;
-            }
+            var value = this.view.getUint32(offset, this.littleEndian);
             if (relative) this.offset += 4;
             return value;
         };
@@ -903,28 +833,12 @@
                 if (offset > capacity6)
                     this.resize((capacity6 *= 2) > offset ? capacity6 : offset);
                 offset -= 8;
-                var lo = value.low,
-                    hi = value.high;
                 if (this.littleEndian) {
-                    this.view[offset+3] = (lo >>> 24) & 0xFF;
-                    this.view[offset+2] = (lo >>> 16) & 0xFF;
-                    this.view[offset+1] = (lo >>>  8) & 0xFF;
-                    this.view[offset  ] =  lo         & 0xFF;
-                    offset += 4;
-                    this.view[offset+3] = (hi >>> 24) & 0xFF;
-                    this.view[offset+2] = (hi >>> 16) & 0xFF;
-                    this.view[offset+1] = (hi >>>  8) & 0xFF;
-                    this.view[offset  ] =  hi         & 0xFF;
+                    this.view.setInt32(offset  , value.low , true);
+                    this.view.setInt32(offset+4, value.high, true);
                 } else {
-                    this.view[offset  ] = (hi >>> 24) & 0xFF;
-                    this.view[offset+1] = (hi >>> 16) & 0xFF;
-                    this.view[offset+2] = (hi >>>  8) & 0xFF;
-                    this.view[offset+3] =  hi         & 0xFF;
-                    offset += 4;
-                    this.view[offset  ] = (lo >>> 24) & 0xFF;
-                    this.view[offset+1] = (lo >>> 16) & 0xFF;
-                    this.view[offset+2] = (lo >>>  8) & 0xFF;
-                    this.view[offset+3] =  lo         & 0xFF;
+                    this.view.setInt32(offset  , value.high, false);
+                    this.view.setInt32(offset+4, value.low , false);
                 }
                 if (relative) this.offset += 8;
                 return this;
@@ -955,30 +869,9 @@
                     if (offset < 0 || offset + 8 > this.buffer.byteLength)
                         throw RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.byteLength);
                 }
-                var lo = 0,
-                    hi = 0;
-                if (this.littleEndian) {
-                    lo  = this.view[offset+2] << 16;
-                    lo |= this.view[offset+1] <<  8;
-                    lo |= this.view[offset  ];
-                    lo += this.view[offset+3] << 24 >>> 0;
-                    offset += 4;
-                    hi  = this.view[offset+2] << 16;
-                    hi |= this.view[offset+1] <<  8;
-                    hi |= this.view[offset  ];
-                    hi += this.view[offset+3] << 24 >>> 0;
-                } else {
-                    hi  = this.view[offset+1] << 16;
-                    hi |= this.view[offset+2] <<  8;
-                    hi |= this.view[offset+3];
-                    hi += this.view[offset  ] << 24 >>> 0;
-                    offset += 4;
-                    lo  = this.view[offset+1] << 16;
-                    lo |= this.view[offset+2] <<  8;
-                    lo |= this.view[offset+3];
-                    lo += this.view[offset  ] << 24 >>> 0;
-                }
-                var value = new Long(lo, hi, false);
+                var value = this.littleEndian
+                    ? new Long(this.view.getInt32(offset  , true ), this.view.getInt32(offset+4, true ), false)
+                    : new Long(this.view.getInt32(offset+4, false), this.view.getInt32(offset  , false), false);
                 if (relative) this.offset += 8;
                 return value;
             };
@@ -1023,28 +916,12 @@
                 if (offset > capacity7)
                     this.resize((capacity7 *= 2) > offset ? capacity7 : offset);
                 offset -= 8;
-                var lo = value.low,
-                    hi = value.high;
                 if (this.littleEndian) {
-                    this.view[offset+3] = (lo >>> 24) & 0xFF;
-                    this.view[offset+2] = (lo >>> 16) & 0xFF;
-                    this.view[offset+1] = (lo >>>  8) & 0xFF;
-                    this.view[offset  ] =  lo         & 0xFF;
-                    offset += 4;
-                    this.view[offset+3] = (hi >>> 24) & 0xFF;
-                    this.view[offset+2] = (hi >>> 16) & 0xFF;
-                    this.view[offset+1] = (hi >>>  8) & 0xFF;
-                    this.view[offset  ] =  hi         & 0xFF;
+                    this.view.setInt32(offset  , value.low , true);
+                    this.view.setInt32(offset+4, value.high, true);
                 } else {
-                    this.view[offset  ] = (hi >>> 24) & 0xFF;
-                    this.view[offset+1] = (hi >>> 16) & 0xFF;
-                    this.view[offset+2] = (hi >>>  8) & 0xFF;
-                    this.view[offset+3] =  hi         & 0xFF;
-                    offset += 4;
-                    this.view[offset  ] = (lo >>> 24) & 0xFF;
-                    this.view[offset+1] = (lo >>> 16) & 0xFF;
-                    this.view[offset+2] = (lo >>>  8) & 0xFF;
-                    this.view[offset+3] =  lo         & 0xFF;
+                    this.view.setInt32(offset  , value.high, false);
+                    this.view.setInt32(offset+4, value.low , false);
                 }
                 if (relative) this.offset += 8;
                 return this;
@@ -1076,30 +953,9 @@
                     if (offset < 0 || offset + 8 > this.buffer.byteLength)
                         throw RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.byteLength);
                 }
-                var lo = 0,
-                    hi = 0;
-                if (this.littleEndian) {
-                    lo  = this.view[offset+2] << 16;
-                    lo |= this.view[offset+1] <<  8;
-                    lo |= this.view[offset  ];
-                    lo += this.view[offset+3] << 24 >>> 0;
-                    offset += 4;
-                    hi  = this.view[offset+2] << 16;
-                    hi |= this.view[offset+1] <<  8;
-                    hi |= this.view[offset  ];
-                    hi += this.view[offset+3] << 24 >>> 0;
-                } else {
-                    hi  = this.view[offset+1] << 16;
-                    hi |= this.view[offset+2] <<  8;
-                    hi |= this.view[offset+3];
-                    hi += this.view[offset  ] << 24 >>> 0;
-                    offset += 4;
-                    lo  = this.view[offset+1] << 16;
-                    lo |= this.view[offset+2] <<  8;
-                    lo |= this.view[offset+3];
-                    lo += this.view[offset  ] << 24 >>> 0;
-                }
-                var value = new Long(lo, hi, true);
+                var value = this.littleEndian
+                    ? new Long(this.view.getInt32(offset  , true ), this.view.getInt32(offset+4, true ), true)
+                    : new Long(this.view.getInt32(offset+4, false), this.view.getInt32(offset  , false), true);
                 if (relative) this.offset += 8;
                 return value;
             };
@@ -1117,117 +973,6 @@
 
 
         // types/floats/float32
-
-        /*
-         ieee754 - https://github.com/feross/ieee754
-
-         The MIT License (MIT)
-
-         Copyright (c) Feross Aboukhadijeh
-
-         Permission is hereby granted, free of charge, to any person obtaining a copy
-         of this software and associated documentation files (the "Software"), to deal
-         in the Software without restriction, including without limitation the rights
-         to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-         copies of the Software, and to permit persons to whom the Software is
-         furnished to do so, subject to the following conditions:
-
-         The above copyright notice and this permission notice shall be included in
-         all copies or substantial portions of the Software.
-
-         THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-         IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-         FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-         AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-         THE SOFTWARE.
-        */
-
-        function ieee754_read(buffer, offset, isLE, mLen, nBytes) {
-            var e, m,
-                eLen = nBytes * 8 - mLen - 1,
-                eMax = (1 << eLen) - 1,
-                eBias = eMax >> 1,
-                nBits = -7,
-                i = isLE ? (nBytes - 1) : 0,
-                d = isLE ? -1 : 1,
-                s = buffer[offset + i];
-
-            i += d;
-
-            e = s & ((1 << (-nBits)) - 1);
-            s >>= (-nBits);
-            nBits += eLen;
-            for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8);
-
-            m = e & ((1 << (-nBits)) - 1);
-            e >>= (-nBits);
-            nBits += mLen;
-            for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8);
-
-            if (e === 0) {
-                e = 1 - eBias;
-            } else if (e === eMax) {
-                return m ? NaN : ((s ? -1 : 1) * Infinity);
-            } else {
-                m = m + Math.pow(2, mLen);
-                e = e - eBias;
-            }
-            return (s ? -1 : 1) * m * Math.pow(2, e - mLen);
-        }
-
-        function ieee754_write(buffer, value, offset, isLE, mLen, nBytes) {
-            var e, m, c,
-                eLen = nBytes * 8 - mLen - 1,
-                eMax = (1 << eLen) - 1,
-                eBias = eMax >> 1,
-                rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0),
-                i = isLE ? 0 : (nBytes - 1),
-                d = isLE ? 1 : -1,
-                s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0;
-
-            value = Math.abs(value);
-
-            if (isNaN(value) || value === Infinity) {
-                m = isNaN(value) ? 1 : 0;
-                e = eMax;
-            } else {
-                e = Math.floor(Math.log(value) / Math.LN2);
-                if (value * (c = Math.pow(2, -e)) < 1) {
-                    e--;
-                    c *= 2;
-                }
-                if (e + eBias >= 1) {
-                    value += rt / c;
-                } else {
-                    value += rt * Math.pow(2, 1 - eBias);
-                }
-                if (value * c >= 2) {
-                    e++;
-                    c /= 2;
-                }
-
-                if (e + eBias >= eMax) {
-                    m = 0;
-                    e = eMax;
-                } else if (e + eBias >= 1) {
-                    m = (value * c - 1) * Math.pow(2, mLen);
-                    e = e + eBias;
-                } else {
-                    m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
-                    e = 0;
-                }
-            }
-
-            for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8);
-
-            e = (e << mLen) | m;
-            eLen += mLen;
-            for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8);
-
-            buffer[offset + i - d] |= s * 128;
-        }
 
         /**
          * Writes a 32bit float.
@@ -1253,7 +998,7 @@
             if (offset > capacity8)
                 this.resize((capacity8 *= 2) > offset ? capacity8 : offset);
             offset -= 4;
-            ieee754_write(this.view, value, offset, this.littleEndian, 23, 4);
+            this.view.setFloat32(offset, value, this.littleEndian);
             if (relative) this.offset += 4;
             return this;
         };
@@ -1284,7 +1029,7 @@
                 if (offset < 0 || offset + 4 > this.buffer.byteLength)
                     throw RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength);
             }
-            var value = ieee754_read(this.view, offset, this.littleEndian, 23, 4);
+            var value = this.view.getFloat32(offset, this.littleEndian);
             if (relative) this.offset += 4;
             return value;
         };
@@ -1324,7 +1069,7 @@
             if (offset > capacity9)
                 this.resize((capacity9 *= 2) > offset ? capacity9 : offset);
             offset -= 8;
-            ieee754_write(this.view, value, offset, this.littleEndian, 52, 8);
+            this.view.setFloat64(offset, value, this.littleEndian);
             if (relative) this.offset += 8;
             return this;
         };
@@ -1355,7 +1100,7 @@
                 if (offset < 0 || offset + 8 > this.buffer.byteLength)
                     throw RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.byteLength);
             }
-            var value = ieee754_read(this.view, offset, this.littleEndian, 52, 8);
+            var value = this.view.getFloat64(offset, this.littleEndian);
             if (relative) this.offset += 8;
             return value;
         };
@@ -1445,34 +1190,34 @@
                 this.resize((capacity10 *= 2) > offset ? capacity10 : offset);
             offset -= size;
             // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
-            this.view[offset] = b = value | 0x80;
+            this.view.setUint8(offset, b = value | 0x80);
             value >>>= 0;
             if (value >= 1 << 7) {
                 b = (value >> 7) | 0x80;
-                this.view[offset+1] = b;
+                this.view.setUint8(offset+1, b);
                 if (value >= 1 << 14) {
                     b = (value >> 14) | 0x80;
-                    this.view[offset+2] = b;
+                    this.view.setUint8(offset+2, b);
                     if (value >= 1 << 21) {
                         b = (value >> 21) | 0x80;
-                        this.view[offset+3] = b;
+                        this.view.setUint8(offset+3, b);
                         if (value >= 1 << 28) {
-                            this.view[offset+4] = (value >> 28) & 0x0F;
+                            this.view.setUint8(offset+4, (value >> 28) & 0x0F);
                             size = 5;
                         } else {
-                            this.view[offset+3] = b & 0x7F;
+                            this.view.setUint8(offset+3, b & 0x7F);
                             size = 4;
                         }
                     } else {
-                        this.view[offset+2] = b & 0x7F;
+                        this.view.setUint8(offset+2, b & 0x7F);
                         size = 3;
                     }
                 } else {
-                    this.view[offset+1] = b & 0x7F;
+                    this.view.setUint8(offset+1, b & 0x7F);
                     size = 2;
                 }
             } else {
-                this.view[offset] = b & 0x7F;
+                this.view.setUint8(offset, b & 0x7F);
                 size = 1;
             }
             if (relative) {
@@ -1526,7 +1271,7 @@
                     err['truncated'] = true;
                     throw err;
                 }
-                temp = this.view[ioffset];
+                temp = this.view.getUint8(ioffset);
                 if (size < 5)
                     value |= ((temp&0x7F)<<(7*size)) >>> 0;
                 ++size;
@@ -1674,16 +1419,16 @@
                     this.resize((capacity11 *= 2) > offset ? capacity11 : offset);
                 offset -= size;
                 switch (size) {
-                    case 10: this.view[offset+9] = (part2 >>>  7) & 0x01;
-                    case 9 : this.view[offset+8] = size !== 9 ? (part2       ) | 0x80 : (part2       ) & 0x7F;
-                    case 8 : this.view[offset+7] = size !== 8 ? (part1 >>> 21) | 0x80 : (part1 >>> 21) & 0x7F;
-                    case 7 : this.view[offset+6] = size !== 7 ? (part1 >>> 14) | 0x80 : (part1 >>> 14) & 0x7F;
-                    case 6 : this.view[offset+5] = size !== 6 ? (part1 >>>  7) | 0x80 : (part1 >>>  7) & 0x7F;
-                    case 5 : this.view[offset+4] = size !== 5 ? (part1       ) | 0x80 : (part1       ) & 0x7F;
-                    case 4 : this.view[offset+3] = size !== 4 ? (part0 >>> 21) | 0x80 : (part0 >>> 21) & 0x7F;
-                    case 3 : this.view[offset+2] = size !== 3 ? (part0 >>> 14) | 0x80 : (part0 >>> 14) & 0x7F;
-                    case 2 : this.view[offset+1] = size !== 2 ? (part0 >>>  7) | 0x80 : (part0 >>>  7) & 0x7F;
-                    case 1 : this.view[offset  ] = size !== 1 ? (part0       ) | 0x80 : (part0       ) & 0x7F;
+                    case 10: this.view.setUint8(offset+9, (part2 >>>  7) & 0x01);
+                    case 9 : this.view.setUint8(offset+8, size !== 9 ? (part2       ) | 0x80 : (part2       ) & 0x7F);
+                    case 8 : this.view.setUint8(offset+7, size !== 8 ? (part1 >>> 21) | 0x80 : (part1 >>> 21) & 0x7F);
+                    case 7 : this.view.setUint8(offset+6, size !== 7 ? (part1 >>> 14) | 0x80 : (part1 >>> 14) & 0x7F);
+                    case 6 : this.view.setUint8(offset+5, size !== 6 ? (part1 >>>  7) | 0x80 : (part1 >>>  7) & 0x7F);
+                    case 5 : this.view.setUint8(offset+4, size !== 5 ? (part1       ) | 0x80 : (part1       ) & 0x7F);
+                    case 4 : this.view.setUint8(offset+3, size !== 4 ? (part0 >>> 21) | 0x80 : (part0 >>> 21) & 0x7F);
+                    case 3 : this.view.setUint8(offset+2, size !== 3 ? (part0 >>> 14) | 0x80 : (part0 >>> 14) & 0x7F);
+                    case 2 : this.view.setUint8(offset+1, size !== 2 ? (part0 >>>  7) | 0x80 : (part0 >>>  7) & 0x7F);
+                    case 1 : this.view.setUint8(offset  , size !== 1 ? (part0       ) | 0x80 : (part0       ) & 0x7F);
                 }
                 if (relative) {
                     this.offset += size;
@@ -1730,16 +1475,16 @@
                     part1 = 0,
                     part2 = 0,
                     b  = 0;
-                b = this.view[offset++]; part0  = (b & 0x7F)      ; if ( b & 0x80                                                   ) {
-                b = this.view[offset++]; part0 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-                b = this.view[offset++]; part0 |= (b & 0x7F) << 14; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-                b = this.view[offset++]; part0 |= (b & 0x7F) << 21; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-                b = this.view[offset++]; part1  = (b & 0x7F)      ; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-                b = this.view[offset++]; part1 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-                b = this.view[offset++]; part1 |= (b & 0x7F) << 14; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-                b = this.view[offset++]; part1 |= (b & 0x7F) << 21; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-                b = this.view[offset++]; part2  = (b & 0x7F)      ; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-                b = this.view[offset++]; part2 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+                b = this.view.getUint8(offset++); part0  = (b & 0x7F)      ; if (b & 0x80) {
+                b = this.view.getUint8(offset++); part0 |= (b & 0x7F) <<  7; if (b & 0x80) {
+                b = this.view.getUint8(offset++); part0 |= (b & 0x7F) << 14; if (b & 0x80) {
+                b = this.view.getUint8(offset++); part0 |= (b & 0x7F) << 21; if (b & 0x80) {
+                b = this.view.getUint8(offset++); part1  = (b & 0x7F)      ; if (b & 0x80) {
+                b = this.view.getUint8(offset++); part1 |= (b & 0x7F) <<  7; if (b & 0x80) {
+                b = this.view.getUint8(offset++); part1 |= (b & 0x7F) << 14; if (b & 0x80) {
+                b = this.view.getUint8(offset++); part1 |= (b & 0x7F) << 21; if (b & 0x80) {
+                b = this.view.getUint8(offset++); part2  = (b & 0x7F)      ; if (b & 0x80) {
+                b = this.view.getUint8(offset++); part2 |= (b & 0x7F) <<  7; if (b & 0x80) {
                 throw Error("Buffer overrun"); }}}}}}}}}}
                 var value = Long.fromBits(part0 | (part1 << 28), (part1 >>> 4) | (part2) << 24, false);
                 if (relative) {
@@ -1811,9 +1556,9 @@
                 this.resize((capacity12 *= 2) > offset ? capacity12 : offset);
             offset -= k+1;
             utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
-                this.view[offset++] = b;
+                this.view.setUint8(offset++, b);
             }.bind(this));
-            this.view[offset++] = 0;
+            this.view.setUint8(offset++, 0);
             if (relative) {
                 this.offset = offset;
                 return this;
@@ -1848,7 +1593,7 @@
                 if (b === 0) return null;
                 if (offset >= this.limit)
                     throw RangeError("Illegal range: Truncated data, "+offset+" < "+this.limit);
-                b = this.view[offset++];
+                b = this.view.getUint8(offset++);
                 return b === 0 ? null : b;
             }.bind(this), sd = stringDestination(), true);
             if (relative) {
@@ -1893,20 +1638,10 @@
             if (offset > capacity13)
                 this.resize((capacity13 *= 2) > offset ? capacity13 : offset);
             offset -= 4+k;
-            if (this.littleEndian) {
-                this.view[offset+3] = (k >>> 24) & 0xFF;
-                this.view[offset+2] = (k >>> 16) & 0xFF;
-                this.view[offset+1] = (k >>>  8) & 0xFF;
-                this.view[offset  ] =  k         & 0xFF;
-            } else {
-                this.view[offset  ] = (k >>> 24) & 0xFF;
-                this.view[offset+1] = (k >>> 16) & 0xFF;
-                this.view[offset+2] = (k >>>  8) & 0xFF;
-                this.view[offset+3] =  k         & 0xFF;
-            }
+            this.view.setUint32(offset, k, this.littleEndian);
             offset += 4;
             utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
-                this.view[offset++] = b;
+                this.view.setUint8(offset++, b);
             }.bind(this));
             if (offset !== start + 4 + k)
                 throw RangeError("Illegal range: Truncated data, "+offset+" == "+(offset+4+k));
@@ -1939,22 +1674,12 @@
             var temp = 0,
                 start = offset,
                 str;
-            if (this.littleEndian) {
-                temp  = this.view[offset+2] << 16;
-                temp |= this.view[offset+1] <<  8;
-                temp |= this.view[offset  ];
-                temp += this.view[offset+3] << 24 >>> 0;
-            } else {
-                temp  = this.view[offset+1] << 16;
-                temp |= this.view[offset+2] <<  8;
-                temp |= this.view[offset+3];
-                temp += this.view[offset  ] << 24 >>> 0;
-            }
+            temp = this.view.getUint32(offset, this.littleEndian);
             offset += 4;
             var k = offset + temp,
                 sd;
             utfx.decodeUTF8toUTF16(function() {
-                return offset < k ? this.view[offset++] : null;
+                return offset < k ? this.view.getUint8(offset++) : null;
             }.bind(this), sd = stringDestination(), this.noAssert);
             str = sd();
             if (relative) {
@@ -2012,7 +1737,7 @@
                 this.resize((capacity14 *= 2) > offset ? capacity14 : offset);
             offset -= k;
             utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
-                this.view[offset++] = b;
+                this.view.setUint8(offset++, b);
             }.bind(this));
             if (relative) {
                 this.offset = offset;
@@ -2089,7 +1814,7 @@
             if (metrics === ByteBuffer.METRICS_CHARS) { // The same for node and the browser
                 sd = stringDestination();
                 utfx.decodeUTF8(function() {
-                    return i < length && offset < this.limit ? this.view[offset++] : null;
+                    return i < length && offset < this.limit ? this.view.getUint8(offset++) : null;
                 }.bind(this), function(cp) {
                     ++i; utfx.UTF8toUTF16(cp, sd);
                 }.bind(this));
@@ -2114,7 +1839,7 @@
                 }
                 var k = offset + length;
                 utfx.decodeUTF8toUTF16(function() {
-                    return offset < k ? this.view[offset++] : null;
+                    return offset < k ? this.view.getUint8(offset++) : null;
                 }.bind(this), sd = stringDestination(), this.noAssert);
                 if (offset !== k)
                     throw RangeError("Illegal range: Truncated data, "+offset+" == "+k);
@@ -2179,7 +1904,7 @@
             offset -= l+k;
             offset += this.writeVarint32(k, offset);
             utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
-                this.view[offset++] = b;
+                this.view.setUint8(offset++, b);
             }.bind(this));
             if (offset !== start+k+l)
                 throw RangeError("Illegal range: Truncated data, "+offset+" == "+(offset+k+l));
@@ -2217,7 +1942,7 @@
             var k = offset + temp,
                 sd = stringDestination();
             utfx.decodeUTF8toUTF16(function() {
-                return offset < k ? this.view[offset++] : null;
+                return offset < k ? this.view.getUint8(offset++) : null;
             }.bind(this), sd, this.noAssert);
             str = sd();
             if (relative) {
@@ -2268,7 +1993,7 @@
             if (offset > capacity16)
                 this.resize((capacity16 *= 2) > offset ? capacity16 : offset);
             offset -= length;
-            this.view.set(source.view.subarray(source.offset, source.limit), offset);
+            new Uint8Array(this.buffer, offset).set(new Uint8Array(source.buffer).subarray(source.offset, source.limit));
             source.offset += length;
             if (relative) this.offset += length;
             return this;
@@ -2334,7 +2059,8 @@
             var bb = new ByteBuffer(0, this.littleEndian, this.noAssert);
             if (copy) {
                 bb.buffer = new ArrayBuffer(this.buffer.byteLength);
-                bb.view = new Uint8Array(bb.buffer);
+                new Uint8Array(bb.buffer).set(this.buffer);
+                bb.view = new DataView(bb.buffer);
             } else {
                 bb.buffer = this.buffer;
                 bb.view = this.view;
@@ -2379,10 +2105,9 @@
                 return this;
             }
             var buffer = new ArrayBuffer(len);
-            var view = new Uint8Array(buffer);
-            view.set(this.view.subarray(begin, end));
+            new Uint8Array(buffer).set(new Uint8Array(this.buffer).subarray(begin, end));
             this.buffer = buffer;
-            this.view = view;
+            this.view = new DataView(buffer);
             if (this.markedOffset >= 0) this.markedOffset -= begin;
             this.offset = 0;
             this.limit = len;
@@ -2455,7 +2180,7 @@
 
             target.ensureCapacity(targetOffset + len);
 
-            target.view.set(this.view.subarray(sourceOffset, sourceLimit), targetOffset);
+            new Uint8Array(target.buffer).set(new Uint8Array(this.buffer).subarray(sourceOffset, sourceLimit), targetOffset);
 
             if (relative) this.offset += len;
             if (targetRelative) target.offset += len;
@@ -2511,7 +2236,7 @@
             }
             if (begin >= end)
                 return this; // Nothing to fill
-            while (begin < end) this.view[begin++] = value;
+            while (begin < end) this.view.setUint8(begin++, value);
             if (relative) this.offset = begin;
             return this;
         };
@@ -2619,10 +2344,10 @@
             var diff = len - offset;
             if (diff > 0) { // Not enough space before offset, so resize + move
                 var buffer = new ArrayBuffer(this.buffer.byteLength + diff);
-                var view = new Uint8Array(buffer);
-                view.set(this.view.subarray(offset, this.buffer.byteLength), len);
+                var arrayView = new Uint8Array(buffer);
+                arrayView.set(new Uint8Array(this.buffer).subarray(offset, this.buffer.byteLength), len);
                 this.buffer = buffer;
-                this.view = view;
+                this.view = new DataView(buffer);
                 this.offset += diff;
                 if (this.markedOffset >= 0) this.markedOffset += diff;
                 this.limit += diff;
@@ -2630,7 +2355,7 @@
             } else {
                 var arrayView = new Uint8Array(this.buffer);
             }
-            this.view.set(source.view.subarray(source.offset, source.limit), offset - len);
+            arrayView.set(new Uint8Array(source.buffer).subarray(source.offset, source.limit), offset - len);
 
             source.offset = source.limit;
             if (relative)
@@ -2712,10 +2437,9 @@
             }
             if (this.buffer.byteLength < capacity) {
                 var buffer = new ArrayBuffer(capacity);
-                var view = new Uint8Array(buffer);
-                view.set(this.view);
+                new Uint8Array(buffer).set(new Uint8Array(this.buffer));
                 this.buffer = buffer;
-                this.view = view;
+                this.view = new DataView(buffer);
             }
             return this;
         };
@@ -2741,7 +2465,8 @@
             }
             if (begin === end)
                 return this; // Nothing to reverse
-            Array.prototype.reverse.call(this.view.subarray(begin, end));
+            Array.prototype.reverse.call(new Uint8Array(this.buffer).subarray(begin, end));
+            this.view = new DataView(this.buffer); // FIXME: Why exactly is this necessary?
             return this;
         };
         /**
@@ -3018,7 +2743,7 @@
                     throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
             }
             var sd; lxiv.encode(function() {
-                return begin < end ? this.view[begin++] : null;
+                return begin < end ? this.view.getUint8(begin++) : null;
             }.bind(this), sd = stringDestination());
             return sd();
         };
@@ -3043,7 +2768,7 @@
             var bb = new ByteBuffer(str.length/4*3, littleEndian, noAssert),
                 i = 0;
             lxiv.decode(stringSource(str), function(b) {
-                bb.view[i++] = b;
+                bb.view.setUint8(i++, b);
             });
             bb.limit = i;
             return bb;
@@ -3098,7 +2823,7 @@
                 return "";
             var cc = [], pt = [];
             while (begin < end) {
-                cc.push(this.view[begin++]);
+                cc.push(this.view.getUint8(begin++));
                 if (cc.length >= 1024)
                     pt.push(String.fromCharCode.apply(String, cc)),
                     cc = [];
@@ -3127,7 +2852,7 @@
                 charCode = str.charCodeAt(i);
                 if (!noAssert && charCode > 255)
                     throw RangeError("Illegal charCode at "+i+": 0 <= "+charCode+" <= 255");
-                bb.view[i++] = charCode;
+                bb.view.setUint8(i++, charCode);
             }
             bb.limit = k;
             return bb;
@@ -3161,7 +2886,7 @@
                 out = "";
             while (i<k) {
                 if (i !== -1) {
-                    b = this.view[i];
+                    b = this.view.getUint8(i);
                     if (b < 0x10) hex += "0"+b.toString(16).toUpperCase();
                     else hex += b.toString(16).toUpperCase();
                     if (columns) {
@@ -3296,7 +3021,7 @@
                             if (isNaN(b) || b < 0 || b > 255)
                                 throw TypeError("Illegal str: Not a debug encoded string");
                         }
-                        bb.view[j++] = b;
+                        bb.view.setUint8(j++, b);
                         rs = true;
                 }
                 if (fail)
@@ -3336,7 +3061,7 @@
             var out = new Array(end - begin),
                 b;
             while (begin < end) {
-                b = this.view[begin++];
+                b = this.view.getUint8(begin++);
                 if (b < 0x10)
                     out.push("0", b.toString(16));
                 else out.push(b.toString(16));
@@ -3369,7 +3094,7 @@
                 if (!noAssert)
                     if (!isFinite(b) || b < 0 || b > 255)
                         throw TypeError("Illegal str: Contains non-hex characters");
-                bb.view[j++] = b;
+                bb.view.setUint8(j++, b);
             }
             bb.limit = j;
             return bb;
@@ -3598,7 +3323,7 @@
             }
             var sd; try {
                 utfx.decodeUTF8toUTF16(function() {
-                    return begin < end ? this.view[begin++] : null;
+                    return begin < end ? this.view.getUint8(begin++) : null;
                 }.bind(this), sd = stringDestination());
             } catch (e) {
                 if (begin !== end)
@@ -3624,7 +3349,7 @@
             var bb = new ByteBuffer(utfx.calculateUTF16asUTF8(stringSource(str), true)[1], littleEndian, noAssert),
                 i = 0;
             utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
-                bb.view[i++] = b;
+                bb.view.setUint8(i++, b);
             });
             bb.limit = i;
             return bb;

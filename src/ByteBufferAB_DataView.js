@@ -13,11 +13,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-//? NODE = false; DATAVIEW = false;
+//? NODE = false; DATAVIEW = true;
 
 /**
  * @license ByteBuffer.js (c) 2015 Daniel Wirtz <dcode@dcode.io>
- * [BUILD] ByteBufferTA - Backing buffer: ArrayBuffer, Accessor: Uint8Array
+ * [BUILD] ByteBufferAB - Backing buffer: ArrayBuffer, Accessor: DataView
  * Released under the Apache License, Version 2.0
  * see: https://github.com/dcodeIO/ByteBuffer.js for details
  */ //

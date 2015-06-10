@@ -21,7 +21,7 @@
 var ByteBuffer = require("../dist/ByteBufferNB.js");
 var ByteBufferNB = ByteBuffer.ByteBufferNB = ByteBuffer;
 var ByteBufferAB = ByteBuffer.ByteBufferAB = require("../dist/ByteBufferAB.min.js");
-var ByteBufferTA = ByteBuffer.ByteBufferTA = require("../dist/experimental/ByteBufferTA.js");
+var ByteBufferAB_DataView = ByteBuffer.ByteBufferAB_DataView = require("../dist/ByteBufferAB_DataView.js");
 
 /**
  * Constructs a new Sandbox for module loaders and shim testing.
@@ -56,12 +56,12 @@ function makeSuite(ByteBuffer) {
     suite.init = function(test) {
         test.ok(require("../index.js"));
         if (ByteBuffer == ByteBufferNB)
-            test.log("\n\n                   --- ByteBufferNB using node Buffers ---\n".bold.white),
+            test.log("\n\n                           --- ByteBufferNB ---\n".bold.white),
             test.log("[optional] node-memcpy is "+(ByteBuffer.memcpy ? "present" : "not present"));
         else if (ByteBuffer == ByteBufferAB)
-            test.log("\n\n                     --- ByteBufferAB using DataView ---\n".bold.white);
-        else if (ByteBuffer == ByteBufferTA)
-            test.log("\n\n                   --- ByteBufferTA using Typed Arrays ---\n".bold.white);
+            test.log("\n\n                           --- ByteBufferAB ---\n".bold.white);
+        else if (ByteBuffer == ByteBufferAB_DataView)
+            test.log("\n\n                      --- ByteBufferAB_DataView ---\n".bold.white);
         test.ok(type === Buffer || type === ArrayBuffer);
         test.ok(typeof ByteBuffer == "function");
         test.done();
@@ -1040,5 +1040,5 @@ module.exports = {
     },
     "NB": makeSuite(ByteBufferNB),
     "AB": makeSuite(ByteBufferAB),
-    "TA": makeSuite(ByteBufferTA)
+    "TA": makeSuite(ByteBufferAB_DataView)
 };
