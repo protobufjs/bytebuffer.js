@@ -95,11 +95,11 @@ ByteBuffer.wrap = function(buffer, encoding, littleEndian, noAssert) {
         if (buffer.length > 0) { // Avoid references to more than one EMPTY_BUFFER
             bb.buffer = buffer.buffer;
             bb.offset = buffer.byteOffset;
-            bb.limit = buffer.byteOffset + buffer.length;
+            bb.limit = buffer.byteOffset + buffer.byteLength;
             //? if (DATAVIEW)
-            bb.view = buffer.length > 0 ? new DataView(buffer.buffer) : null;
+            bb.view = new DataView(buffer.buffer);
             //? else
-            bb.view = buffer.length > 0 ? buffer : null;
+            bb.view = new Uint8Array(buffer.buffer);
         }
     } else if (buffer instanceof ArrayBuffer) { // Reuse ArrayBuffer
         bb = new ByteBuffer(0, littleEndian, noAssert);

@@ -285,7 +285,7 @@
         };
         /**
          * Gets the backing buffer type.
-         * @returns {Function} `Buffer` for NB builds, `ArrayBuffer` for AB builds (classes)
+         * @returns {Function} `Buffer` under node.js, `ArrayBuffer` in the browser (classes)
          * @expose
          */
         ByteBuffer.type = function() {
@@ -342,8 +342,8 @@
                 if (buffer.length > 0) { // Avoid references to more than one EMPTY_BUFFER
                     bb.buffer = buffer.buffer;
                     bb.offset = buffer.byteOffset;
-                    bb.limit = buffer.byteOffset + buffer.length;
-                    bb.view = buffer.length > 0 ? new DataView(buffer.buffer) : null;
+                    bb.limit = buffer.byteOffset + buffer.byteLength;
+                    bb.view = new DataView(buffer.buffer);
                 }
             } else if (buffer instanceof ArrayBuffer) { // Reuse ArrayBuffer
                 bb = new ByteBuffer(0, littleEndian, noAssert);

@@ -265,7 +265,7 @@
                 bi = buffers[i++];
                 length = bi.limit - bi.offset;
                 if (length <= 0) continue;
-                this.view.set(bi.view.subarray(bi.offset, bi.limit), bb.offset);
+                bb.view.set(bi.view.subarray(bi.offset, bi.limit), bb.offset);
                 bb.offset += length;
             }
             bb.limit = bb.offset;
@@ -284,11 +284,11 @@
         };
         /**
          * Gets the backing buffer type.
-         * @returns {Function} `Buffer` for NB builds, `ArrayBuffer` for AB builds (classes)
+         * @returns {Function} `Buffer` under node.js, `ArrayBuffer` in the browser (classes)
          * @expose
          */
         ByteBuffer.type = function() {
-            return Uint8Array;
+            return ArrayBuffer;
         };
 
         /**
@@ -341,8 +341,8 @@
                 if (buffer.length > 0) { // Avoid references to more than one EMPTY_BUFFER
                     bb.buffer = buffer.buffer;
                     bb.offset = buffer.byteOffset;
-                    bb.limit = buffer.byteOffset + buffer.length;
-                    bb.view = buffer.length > 0 ? buffer : null;
+                    bb.limit = buffer.byteOffset + buffer.byteLength;
+                    bb.view = new Uint8Array(buffer.buffer);
                 }
             } else if (buffer instanceof ArrayBuffer) { // Reuse ArrayBuffer
                 bb = new ByteBuffer(0, littleEndian, noAssert);
@@ -633,7 +633,14 @@
                 if (offset < 0 || offset + 2 > this.buffer.byteLength)
                     throw RangeError("Illegal offset: 0 <= "+offset+" (+"+2+") <= "+this.buffer.byteLength);
             }
-            var value = this.view.getUint16(offset, this.littleEndian);
+            var value = 0;
+            if (this.littleEndian) {
+                value  = this.view[offset  ];
+                value |= this.view[offset+1] << 8;
+            } else {
+                value  = this.view[offset  ] << 8;
+                value |= this.view[offset+1];
+            }
             if (relative) this.offset += 2;
             return value;
         };
@@ -664,7 +671,17 @@
             if (offset > capacity4)
                 this.resize((capacity4 *= 2) > offset ? capacity4 : offset);
             offset -= 4;
-            this.view.setUint32(value, offset, undefined);
+            if (this.littleEndian) {
+                this.view[offset+3] = (value >>> 24) & 0xFF;
+                this.view[offset+2] = (value >>> 16) & 0xFF;
+                this.view[offset+1] = (value >>>  8) & 0xFF;
+                this.view[offset  ] =  value         & 0xFF;
+            } else {
+                this.view[offset  ] = (value >>> 24) & 0xFF;
+                this.view[offset+1] = (value >>> 16) & 0xFF;
+                this.view[offset+2] = (value >>>  8) & 0xFF;
+                this.view[offset+3] =  value         & 0xFF;
+            }
             if (relative) this.offset += 4;
             return this;
         };
@@ -694,7 +711,17 @@
                     throw RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength);
             }
             var value = 0;
-            this.view.getUint32(offset, undefined);
+            if (this.littleEndian) {
+                value  = this.view[offset+2] << 16;
+                value |= this.view[offset+1] <<  8;
+                value |= this.view[offset  ];
+                value += this.view[offset+3] << 24 >>> 0;
+            } else {
+                value  = this.view[offset+1] << 16;
+                value |= this.view[offset+2] <<  8;
+                value |= this.view[offset+3];
+                value += this.view[offset  ] << 24 >>> 0;
+            }
             value |= 0; // Cast to signed
             if (relative) this.offset += 4;
             return value;
@@ -732,7 +759,17 @@
             if (offset > capacity5)
                 this.resize((capacity5 *= 2) > offset ? capacity5 : offset);
             offset -= 4;
-            this.view.setUint32(value, offset, undefined);
+            if (this.littleEndian) {
+                this.view[offset+3] = (value >>> 24) & 0xFF;
+                this.view[offset+2] = (value >>> 16) & 0xFF;
+                this.view[offset+1] = (value >>>  8) & 0xFF;
+                this.view[offset  ] =  value         & 0xFF;
+            } else {
+                this.view[offset  ] = (value >>> 24) & 0xFF;
+                this.view[offset+1] = (value >>> 16) & 0xFF;
+                this.view[offset+2] = (value >>>  8) & 0xFF;
+                this.view[offset+3] =  value         & 0xFF;
+            }
             if (relative) this.offset += 4;
             return this;
         };
@@ -754,7 +791,17 @@
                     throw RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength);
             }
             var value = 0;
-            this.view.getUint32(offset, undefined);
+            if (this.littleEndian) {
+                value  = this.view[offset+2] << 16;
+                value |= this.view[offset+1] <<  8;
+                value |= this.view[offset  ];
+                value += this.view[offset+3] << 24 >>> 0;
+            } else {
+                value  = this.view[offset+1] << 16;
+                value |= this.view[offset+2] <<  8;
+                value |= this.view[offset+3];
+                value += this.view[offset  ] << 24 >>> 0;
+            }
             if (relative) this.offset += 4;
             return value;
         };
@@ -798,13 +845,25 @@
                 var lo = value.low,
                     hi = value.high;
                 if (this.littleEndian) {
-                    this.view.setUint32(lo, offset, true);
+                    this.view[offset+3] = (lo >>> 24) & 0xFF;
+                    this.view[offset+2] = (lo >>> 16) & 0xFF;
+                    this.view[offset+1] = (lo >>>  8) & 0xFF;
+                    this.view[offset  ] =  lo         & 0xFF;
                     offset += 4;
-                    this.view.setUint32(hi, offset, true);
+                    this.view[offset+3] = (hi >>> 24) & 0xFF;
+                    this.view[offset+2] = (hi >>> 16) & 0xFF;
+                    this.view[offset+1] = (hi >>>  8) & 0xFF;
+                    this.view[offset  ] =  hi         & 0xFF;
                 } else {
-                    this.view.setUint32(hi, offset, false);
+                    this.view[offset  ] = (hi >>> 24) & 0xFF;
+                    this.view[offset+1] = (hi >>> 16) & 0xFF;
+                    this.view[offset+2] = (hi >>>  8) & 0xFF;
+                    this.view[offset+3] =  hi         & 0xFF;
                     offset += 4;
-                    this.view.setUint32(lo, offset, false);
+                    this.view[offset  ] = (lo >>> 24) & 0xFF;
+                    this.view[offset+1] = (lo >>> 16) & 0xFF;
+                    this.view[offset+2] = (lo >>>  8) & 0xFF;
+                    this.view[offset+3] =  lo         & 0xFF;
                 }
                 if (relative) this.offset += 8;
                 return this;
@@ -838,13 +897,25 @@
                 var lo = 0,
                     hi = 0;
                 if (this.littleEndian) {
-                    this.view.getUint32(offset, true);
+                    lo  = this.view[offset+2] << 16;
+                    lo |= this.view[offset+1] <<  8;
+                    lo |= this.view[offset  ];
+                    lo += this.view[offset+3] << 24 >>> 0;
                     offset += 4;
-                    this.view.getUint32(offset, true);
+                    hi  = this.view[offset+2] << 16;
+                    hi |= this.view[offset+1] <<  8;
+                    hi |= this.view[offset  ];
+                    hi += this.view[offset+3] << 24 >>> 0;
                 } else {
-                    this.view.getUint32(offset, false);
+                    hi  = this.view[offset+1] << 16;
+                    hi |= this.view[offset+2] <<  8;
+                    hi |= this.view[offset+3];
+                    hi += this.view[offset  ] << 24 >>> 0;
                     offset += 4;
-                    this.view.getUint32(offset, false);
+                    lo  = this.view[offset+1] << 16;
+                    lo |= this.view[offset+2] <<  8;
+                    lo |= this.view[offset+3];
+                    lo += this.view[offset  ] << 24 >>> 0;
                 }
                 var value = new Long(lo, hi, false);
                 if (relative) this.offset += 8;
@@ -894,13 +965,25 @@
                 var lo = value.low,
                     hi = value.high;
                 if (this.littleEndian) {
-                    this.view.setUint32(lo, offset, true);
+                    this.view[offset+3] = (lo >>> 24) & 0xFF;
+                    this.view[offset+2] = (lo >>> 16) & 0xFF;
+                    this.view[offset+1] = (lo >>>  8) & 0xFF;
+                    this.view[offset  ] =  lo         & 0xFF;
                     offset += 4;
-                    this.view.setUint32(hi, offset, true);
+                    this.view[offset+3] = (hi >>> 24) & 0xFF;
+                    this.view[offset+2] = (hi >>> 16) & 0xFF;
+                    this.view[offset+1] = (hi >>>  8) & 0xFF;
+                    this.view[offset  ] =  hi         & 0xFF;
                 } else {
-                    this.view.setUint32(hi, offset, false);
+                    this.view[offset  ] = (hi >>> 24) & 0xFF;
+                    this.view[offset+1] = (hi >>> 16) & 0xFF;
+                    this.view[offset+2] = (hi >>>  8) & 0xFF;
+                    this.view[offset+3] =  hi         & 0xFF;
                     offset += 4;
-                    this.view.setUint32(lo, offset, false);
+                    this.view[offset  ] = (lo >>> 24) & 0xFF;
+                    this.view[offset+1] = (lo >>> 16) & 0xFF;
+                    this.view[offset+2] = (lo >>>  8) & 0xFF;
+                    this.view[offset+3] =  lo         & 0xFF;
                 }
                 if (relative) this.offset += 8;
                 return this;
@@ -925,13 +1008,25 @@
                 var lo = 0,
                     hi = 0;
                 if (this.littleEndian) {
-                    this.view.getUint32(offset, true);
+                    lo  = this.view[offset+2] << 16;
+                    lo |= this.view[offset+1] <<  8;
+                    lo |= this.view[offset  ];
+                    lo += this.view[offset+3] << 24 >>> 0;
                     offset += 4;
-                    this.view.getUint32(offset, true);
+                    hi  = this.view[offset+2] << 16;
+                    hi |= this.view[offset+1] <<  8;
+                    hi |= this.view[offset  ];
+                    hi += this.view[offset+3] << 24 >>> 0;
                 } else {
-                    this.view.getUint32(offset, false);
+                    hi  = this.view[offset+1] << 16;
+                    hi |= this.view[offset+2] <<  8;
+                    hi |= this.view[offset+3];
+                    hi += this.view[offset  ] << 24 >>> 0;
                     offset += 4;
-                    this.view.getUint32(offset, false);
+                    lo  = this.view[offset+1] << 16;
+                    lo |= this.view[offset+2] <<  8;
+                    lo |= this.view[offset+3];
+                    lo += this.view[offset  ] << 24 >>> 0;
                 }
                 var value = new Long(lo, hi, true);
                 if (relative) this.offset += 8;
@@ -1607,7 +1702,17 @@
             if (offset > capacity13)
                 this.resize((capacity13 *= 2) > offset ? capacity13 : offset);
             offset -= 4+k;
-            this.view.setUint32(k, offset, undefined);
+            if (this.littleEndian) {
+                this.view[offset+3] = (k >>> 24) & 0xFF;
+                this.view[offset+2] = (k >>> 16) & 0xFF;
+                this.view[offset+1] = (k >>>  8) & 0xFF;
+                this.view[offset  ] =  k         & 0xFF;
+            } else {
+                this.view[offset  ] = (k >>> 24) & 0xFF;
+                this.view[offset+1] = (k >>> 16) & 0xFF;
+                this.view[offset+2] = (k >>>  8) & 0xFF;
+                this.view[offset+3] =  k         & 0xFF;
+            }
             offset += 4;
             utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
                 this.view[offset++] = b;
@@ -1643,7 +1748,17 @@
             var temp = 0,
                 start = offset,
                 str;
-            this.view.getUint32(offset, undefined);
+            if (this.littleEndian) {
+                temp  = this.view[offset+2] << 16;
+                temp |= this.view[offset+1] <<  8;
+                temp |= this.view[offset  ];
+                temp += this.view[offset+3] << 24 >>> 0;
+            } else {
+                temp  = this.view[offset+1] << 16;
+                temp |= this.view[offset+2] <<  8;
+                temp |= this.view[offset+3];
+                temp += this.view[offset  ] << 24 >>> 0;
+            }
             offset += 4;
             var k = offset + temp,
                 sd;
@@ -2435,7 +2550,7 @@
             }
             if (begin === end)
                 return this; // Nothing to reverse
-            Array.prototype.reverse.call(this.view).subarray(begin, end);
+            Array.prototype.reverse.call(this.view.subarray(begin, end));
             return this;
         };
         /**

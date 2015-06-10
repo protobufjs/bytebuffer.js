@@ -44,7 +44,7 @@ ByteBuffer.concat = function(buffers, encoding, littleEndian, noAssert) {
         //? if (DATAVIEW)
         view.set(new Uint8Array(bi.buffer).subarray(bi.offset, bi.limit), bb.offset);
         //? else
-        this.view.set(bi.view.subarray(bi.offset, bi.limit), bb.offset);
+        bb.view.set(bi.view.subarray(bi.offset, bi.limit), bb.offset);
         bb.offset += length;
         //? }
     }

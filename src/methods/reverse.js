@@ -19,7 +19,7 @@ ByteBufferPrototype.reverse = function(begin, end) {
     Array.prototype.reverse.call(new Uint8Array(this.buffer).subarray(begin, end));
     this.view = new DataView(this.buffer); // FIXME: Why exactly is this necessary?
     //? } else {
-    Array.prototype.reverse.call(this.view).subarray(begin, end);
+    Array.prototype.reverse.call(this.view.subarray(begin, end));
     //? }
     return this;
 };

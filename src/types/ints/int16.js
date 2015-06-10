@@ -16,25 +16,16 @@ ByteBufferPrototype.writeInt16 = function(value, offset) {
         //? ASSERT_OFFSET();
     }
     //? ENSURE_CAPACITY(2);
-    //? if (NODE) {
+    //? if (NODE || !DATAVIEW) { var dst = NODE ? 'this.buffer' : 'this.view';
     if (this.littleEndian) {
-        this.buffer[offset+1] = (value & 0xFF00) >>> 8;
-        this.buffer[offset  ] =  value & 0x00FF;
+        /*?= dst */[offset+1] = (value & 0xFF00) >>> 8;
+        /*?= dst */[offset  ] =  value & 0x00FF;
     } else {
-        this.buffer[offset]   = (value & 0xFF00) >>> 8;
-        this.buffer[offset+1] =  value & 0x00FF;
+        /*?= dst */[offset]   = (value & 0xFF00) >>> 8;
+        /*?= dst */[offset+1] =  value & 0x00FF;
     }
-    //? } else if (DATAVIEW) {
+    //? } else
     this.view.setInt16(offset, value, this.littleEndian);
-    //? } else {
-    if (this.littleEndian) {
-        this.view[offset+1] = (value & 0xFF00) >>> 8;
-        this.view[offset  ] =  value & 0x00FF;
-    } else {
-        this.view[offset]   = (value & 0xFF00) >>> 8;
-        this.view[offset+1] =  value & 0x00FF;
-    }
-    //? }
     //? RELATIVE(2);
     return this;
 };
@@ -65,29 +56,18 @@ ByteBufferPrototype.readInt16 = function(offset) {
     if (!this.noAssert) {
         //? ASSERT_OFFSET(2);
     }
-    //? if (NODE) {
+    //? if (NODE || !DATAVIEW) { var dst = NODE ? 'this.buffer' : 'this.view';
     var value = 0;
     if (this.littleEndian) {
-        value  = this.buffer[offset  ];
-        value |= this.buffer[offset+1] << 8;
+        value  = /*?= dst */[offset  ];
+        value |= /*?= dst */[offset+1] << 8;
     } else {
-        value  = this.buffer[offset  ] << 8;
-        value |= this.buffer[offset+1];
+        value  = /*?= dst */[offset  ] << 8;
+        value |= /*?= dst */[offset+1];
     }
     if ((value & 0x8000) === 0x8000) value = -(0xFFFF - value + 1); // Cast to signed
-    //? } else if (DATAVIEW) {
+    //? } else
     var value = this.view.getInt16(offset, this.littleEndian);
-    //? } else {
-    var value = 0;
-    if (this.littleEndian) {
-        value  = this.view[offset  ];
-        value |= this.view[offset+1] << 8;
-    } else {
-        value  = this.view[offset  ] << 8;
-        value |= this.view[offset+1];
-    }
-    if ((value & 0x8000) === 0x8000) value = -(0xFFFF - value + 1); // Cast to signed
-    //? }
     //? RELATIVE(2);
     return value;
 };
@@ -120,25 +100,16 @@ ByteBufferPrototype.writeUint16 = function(value, offset) {
         //? ASSERT_OFFSET();
     }
     //? ENSURE_CAPACITY(2);
-    //? if (NODE) {
+    //? if (NODE || !DATAVIEW) { var dst = NODE ? 'this.buffer' : 'this.view';
     if (this.littleEndian) {
-        this.buffer[offset+1] = (value & 0xFF00) >>> 8;
-        this.buffer[offset  ] =  value & 0x00FF;
+        /*?= dst */[offset+1] = (value & 0xFF00) >>> 8;
+        /*?= dst */[offset  ] =  value & 0x00FF;
     } else {
-        this.buffer[offset]   = (value & 0xFF00) >>> 8;
-        this.buffer[offset+1] =  value & 0x00FF;
+        /*?= dst */[offset]   = (value & 0xFF00) >>> 8;
+        /*?= dst */[offset+1] =  value & 0x00FF;
     }
-    //? } else if (DATAVIEW) {
+    //? } else
     this.view.setUint16(offset, value, this.littleEndian);
-    //? } else {
-    if (this.littleEndian) {
-        this.view[offset+1] = (value & 0xFF00) >>> 8;
-        this.view[offset  ] =  value & 0x00FF;
-    } else {
-        this.view[offset]   = (value & 0xFF00) >>> 8;
-        this.view[offset+1] =  value & 0x00FF;
-    }
-    //? }
     //? RELATIVE(2);
     return this;
 };
@@ -156,14 +127,14 @@ ByteBufferPrototype.readUint16 = function(offset) {
     if (!this.noAssert) {
         //? ASSERT_OFFSET(2);
     }
-    //? if (NODE) {
+    //? if (NODE || !DATAVIEW) { var dst = NODE ? 'this.buffer' : 'this.view';
     var value = 0;
     if (this.littleEndian) {
-        value  = this.buffer[offset  ];
-        value |= this.buffer[offset+1] << 8;
+        value  = /*?= dst */[offset  ];
+        value |= /*?= dst */[offset+1] << 8;
     } else {
-        value  = this.buffer[offset  ] << 8;
-        value |= this.buffer[offset+1];
+        value  = /*?= dst */[offset  ] << 8;
+        value |= /*?= dst */[offset+1];
     }
     //? } else
     var value = this.view.getUint16(offset, this.littleEndian);

@@ -273,7 +273,7 @@ module.exports = (function() {
     };
     /**
      * Gets the backing buffer type.
-     * @returns {Function} `Buffer` for NB builds, `ArrayBuffer` for AB builds (classes)
+     * @returns {Function} `Buffer` under node.js, `ArrayBuffer` in the browser (classes)
      * @expose
      */
     ByteBuffer.type = function() {

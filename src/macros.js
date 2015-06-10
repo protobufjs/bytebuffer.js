@@ -138,7 +138,7 @@ READ_UINT32_ARRAY = function(varValue, varOffset, varTarget, varEndian) {
     if (typeof varTarget === 'undefined') varTarget = NODE ? 'this.buffer' : 'this.view';
     var ____ = typeof varEndian !== 'boolean' ? '    ' : '';
     if (VERBOSE_MS) writeln(__+'// <READ_UINT32'+(typeof varEndian === 'boolean' ? ' le='+varEndian : '')+'>');
-    if (NODE) {
+    if (NODE || !DATAVIEW) {
         if (typeof varEndian !== 'boolean')
             writeln(__+'if ('+(varEndian || 'this.littleEndian')+') {');
         if (typeof varEndian !== 'boolean' || varEndian === true) {
@@ -170,7 +170,7 @@ WRITE_UINT32_ARRAY = function(varValue, varOffset, varTarget, varEndian) {
     if (typeof varTarget === 'undefined') varTarget = NODE ? 'this.buffer' : 'this.view';
     var ____ = typeof varEndian !== 'boolean' ? '    ' : '';
     if (VERBOSE_MS) writeln(__+'// <WRITE_UINT32'+(typeof varEndian === 'boolean' ? ' le='+varEndian : '')+'>');
-    if (NODE) {
+    if (NODE || !DATAVIEW) {
         if (typeof varEndian !== 'boolean')
             writeln(__+'if ('+(varEndian || 'this.littleEndian')+') {');
         if (typeof varEndian !== 'boolean' || varEndian === true) {

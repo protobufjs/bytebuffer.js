@@ -19,8 +19,9 @@
  * @author Daniel Wirtz <dcode@dcode.io>
  */ //
 var ByteBuffer = require("../dist/ByteBufferNB.js");
-ByteBuffer.ByteBufferNB = ByteBuffer;
-ByteBuffer.ByteBufferAB = require("../dist/ByteBufferAB.min.js");
+var ByteBufferNB = ByteBuffer.ByteBufferNB = ByteBuffer;
+var ByteBufferAB = ByteBuffer.ByteBufferAB = require("../dist/ByteBufferAB.min.js");
+var ByteBufferTA = ByteBuffer.ByteBufferTA = require("../dist/experimental/ByteBufferTA.js");
 
 /**
  * Constructs a new Sandbox for module loaders and shim testing.
@@ -54,11 +55,13 @@ function makeSuite(ByteBuffer) {
     
     suite.init = function(test) {
         test.ok(require("../index.js"));
-        if (type === Buffer)
-            test.log("\n\n                    --- node Buffer backed ByteBuffer ---\n".bold.white),
+        if (ByteBuffer == ByteBufferNB)
+            test.log("\n\n                   --- ByteBufferNB using node Buffers ---\n".bold.white),
             test.log("[optional] node-memcpy is "+(ByteBuffer.memcpy ? "present" : "not present"));
-        else
-            test.log("\n\n                    --- ArrayBuffer backed ByteBuffer ---\n".bold.white);
+        else if (ByteBuffer == ByteBufferAB)
+            test.log("\n\n                     --- ByteBufferAB using DataView ---\n".bold.white);
+        else if (ByteBuffer == ByteBufferTA)
+            test.log("\n\n                   --- ByteBufferTA using Typed Arrays ---\n".bold.white);
         test.ok(type === Buffer || type === ArrayBuffer);
         test.ok(typeof ByteBuffer == "function");
         test.done();
@@ -1035,6 +1038,7 @@ module.exports = {
         test.log("Version "+ByteBuffer.VERSION+", "+new Date().toISOString()+"\n");
         test.done();
     },
-    "NB": makeSuite(ByteBuffer.ByteBufferNB),
-    "AB": makeSuite(ByteBuffer.ByteBufferAB)
+    "NB": makeSuite(ByteBufferNB),
+    "AB": makeSuite(ByteBufferAB),
+    "TA": makeSuite(ByteBufferTA)
 };
