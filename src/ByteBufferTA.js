@@ -16,9 +16,8 @@
 //? NODE = false; DATAVIEW = false;
 
 /**
- * @license ByteBuffer.js (c) 2013-2014 Daniel Wirtz <dcode@dcode.io>
- * This version of ByteBuffer.js uses an ArrayBuffer as its backing buffer which is accessed through typed arrays and is
- * compatible with modern browsers.
+ * @license ByteBuffer.js (c) 2015 Daniel Wirtz <dcode@dcode.io>
+ * [BUILD] ByteBufferTA - Backing buffer: ArrayBuffer, Accessor: Uint8Array
  * Released under the Apache License, Version 2.0
  * see: https://github.com/dcodeIO/ByteBuffer.js for details
  */ //

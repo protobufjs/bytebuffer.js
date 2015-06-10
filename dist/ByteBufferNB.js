@@ -15,8 +15,8 @@
  */
 
 /**
- * @license ByteBuffer.js (c) 2013-2014 Daniel Wirtz <dcode@dcode.io>
- * This version of ByteBuffer.js uses a node Buffer (NB) as its backing buffer and is compatible with node.js only.
+ * @license ByteBuffer.js (c) 2015 Daniel Wirtz <dcode@dcode.io>
+ * [BUILD] ByteBufferNB - Backing buffer / Accessor: node Buffer
  * Released under the Apache License, Version 2.0
  * see: https://github.com/dcodeIO/ByteBuffer.js for details
  */
