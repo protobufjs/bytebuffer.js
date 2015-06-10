@@ -43,9 +43,12 @@
          * @expose
          */
         var ByteBuffer = function(capacity, littleEndian, noAssert) {
-            if (typeof capacity     === 'undefined') capacity     = ByteBuffer.DEFAULT_CAPACITY;
-            if (typeof littleEndian === 'undefined') littleEndian = ByteBuffer.DEFAULT_ENDIAN;
-            if (typeof noAssert     === 'undefined') noAssert     = ByteBuffer.DEFAULT_NOASSERT;
+            if (typeof capacity === 'undefined')
+                capacity = ByteBuffer.DEFAULT_CAPACITY;
+            if (typeof littleEndian === 'undefined')
+                littleEndian = ByteBuffer.DEFAULT_ENDIAN;
+            if (typeof noAssert === 'undefined')
+                noAssert = ByteBuffer.DEFAULT_NOASSERT;
             if (!noAssert) {
                 capacity = capacity | 0;
                 if (capacity < 0)
@@ -55,7 +58,7 @@
             }
 
             /**
-             * Backing buffer.
+             * Backing ArrayBuffer.
              * @type {!ArrayBuffer}
              * @expose
              */
