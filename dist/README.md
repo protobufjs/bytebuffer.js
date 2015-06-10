@@ -27,3 +27,5 @@ Also available as `bytebuffer` on [npm](https://www.npmjs.org/package/bytebuffer
 
 When installed as an [npm package](https://www.npmjs.org/package/bytebuffer), both versions are available.
 `exports` and `exports.ByteBufferNB` point at ByteBufferNB, `exports.ByteBufferAB` points at ByteBufferAB.
+
+**See also:** **[Experimental distributions](https://github.com/dcodeIO/ByteBuffer.js/tree/master/dist/experimental)
