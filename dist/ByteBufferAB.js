@@ -62,7 +62,7 @@
             this.buffer = capacity === 0 ? EMPTY_BUFFER : new ArrayBuffer(capacity);
 
             /**
-             * Data view to manipulate the backing buffer. Becomes `null` if the backing buffer has a capacity of `0`.
+             * DataView utilized to manipulate the backing buffer. Becomes `null` if the backing buffer has a capacity of `0`.
              * @type {?DataView}
              * @expose
              */
