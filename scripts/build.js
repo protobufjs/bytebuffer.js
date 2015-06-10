@@ -98,6 +98,15 @@ fs.writeFileSync(
     MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "ByteBufferAB.js")), filename, scope)
 );
 
+// Build alternative browser ByteBuffer using Typed Arrays
+scope.NODE = false;
+scope.DATAVIEW = false;
+console.log("Building ByteBufferTA with scope", JSON.stringify(scope, null, 2));
+fs.writeFileSync(
+    path.join(distDir, "experimental", "ByteBufferTA.js"),
+    MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "ByteBufferTA.js")), filename, scope)
+);
+
 // Update bower.json
 scope = { VERSION: pkg.version };
 console.log("Updating bower.json with scope", JSON.stringify(scope, null, 2));

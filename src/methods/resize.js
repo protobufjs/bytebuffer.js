@@ -23,10 +23,18 @@ ByteBufferPrototype.resize = function(capacity) {
     }
     //? } else {
     if (this.buffer.byteLength < capacity) {
+        //? if (DATAVIEW) {
         var buffer = new ArrayBuffer(capacity);
         new Uint8Array(buffer).set(new Uint8Array(this.buffer));
         this.buffer = buffer;
         this.view = new DataView(buffer);
+        //? } else {
+        var buffer = new ArrayBuffer(capacity);
+        var view = new Uint8Array(buffer);
+        view.set(this.view);
+        this.buffer = buffer;
+        this.view = view;
+        //? }
     }
     //? }
     return this;

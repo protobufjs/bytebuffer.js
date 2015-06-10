@@ -60,8 +60,10 @@ ByteBufferPrototype.copyTo = function(target, targetOffset, sourceOffset, source
 
     //? if (NODE)
     this.buffer.copy(target.buffer, targetOffset, sourceOffset, sourceLimit);
-    //? else
+    //? else if (DATAVIEW)
     new Uint8Array(target.buffer).set(new Uint8Array(this.buffer).subarray(sourceOffset, sourceLimit), targetOffset);
+    //? else
+    target.view.set(this.view.subarray(sourceOffset, sourceLimit), targetOffset);
 
     if (relative) this.offset += len;
     if (targetRelative) target.offset += len;

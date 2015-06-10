@@ -18,7 +18,7 @@ if (Long) {
         }
         //? LONG('value');
         //? ENSURE_CAPACITY(8);
-        //? if (NODE) {
+        //? if (NODE || !DATAVIEW) {
         var lo = value.low,
             hi = value.high;
         if (this.littleEndian) {
@@ -65,7 +65,7 @@ if (Long) {
         if (!this.noAssert) {
             //? ASSERT_OFFSET(8);
         }
-        //? if (NODE) {
+        //? if (NODE || !DATAVIEW) {
         var lo = 0,
             hi = 0;
         if (this.littleEndian) {
@@ -112,7 +112,7 @@ if (Long) {
         }
         //? LONG('value');
         //? ENSURE_CAPACITY(8);
-        //? if (NODE) {
+        //? if (NODE || !DATAVIEW) {
         var lo = value.low,
             hi = value.high;
         if (this.littleEndian) {
@@ -148,7 +148,7 @@ if (Long) {
         if (!this.noAssert) {
             //? ASSERT_OFFSET(8);
         }
-        //? if (NODE) {
+        //? if (NODE || !DATAVIEW) {
         var lo = 0,
             hi = 0;
         if (this.littleEndian) {

@@ -28,10 +28,16 @@ ByteBufferPrototype.writeIString = function(str, offset) {
     //? } else {
     k = utfx.calculateUTF16asUTF8(stringSource(str), this.noAssert)[1];
     //? ENSURE_CAPACITY('4+k');
+    //? if (DATAVIEW)
     this.view.setUint32(offset, k, this.littleEndian);
+    //? else
+    //? WRITE_UINT32_ARRAY('k');
     offset += 4;
     utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
+        //? if (DATAVIEW)
         this.view.setUint8(offset++, b);
+        //? else
+        this.view[offset++] = b;
     }.bind(this));
     if (offset !== start + 4 + k)
         throw RangeError("Illegal range: Truncated data, "+offset+" == "+(offset+4+k));
@@ -68,12 +74,18 @@ ByteBufferPrototype.readIString = function(offset) {
     str = this.buffer.toString("utf8", offset, offset + temp);
     offset += temp;
     //? } else {
+    //? if (DATAVIEW)
     temp = this.view.getUint32(offset, this.littleEndian);
+    //? else
+    //? READ_UINT32_ARRAY('temp');
     offset += 4;
     var k = offset + temp,
         sd;
     utfx.decodeUTF8toUTF16(function() {
+        //? if (DATAVIEW)
         return offset < k ? this.view.getUint8(offset++) : null;
+        //? else
+        return offset < k ? this.view[offset++] : null;
     }.bind(this), sd = stringDestination(), this.noAssert);
     str = sd();
     //? }

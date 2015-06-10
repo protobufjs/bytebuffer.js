@@ -31,11 +31,17 @@ ByteBufferPrototype.compact = function(begin, end) {
     this.buffer = buffer;
     //? if (BUFFERVIEW)
     this.view = new BufferView(buffer);
-    //? } else {
+    //? } else if (DATAVIEW) {
     var buffer = new ArrayBuffer(len);
     new Uint8Array(buffer).set(new Uint8Array(this.buffer).subarray(begin, end));
     this.buffer = buffer;
     this.view = new DataView(buffer);
+    //? } else {
+    var buffer = new ArrayBuffer(len);
+    var view = new Uint8Array(buffer);
+    view.set(this.view.subarray(begin, end));
+    this.buffer = buffer;
+    this.view = view;
     //? }
     if (this.markedOffset >= 0) this.markedOffset -= begin;
     this.offset = 0;

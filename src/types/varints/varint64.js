@@ -84,17 +84,17 @@ if (Long) {
             part2 = value.shiftRightUnsigned(56).toInt() >>> 0;
         //? ENSURE_CAPACITY('size');
         switch (size) {
-        //? if (NODE) {
-            case 10: this.buffer[offset+9] = (part2 >>>  7) & 0x01;
-            case 9 : this.buffer[offset+8] = size !== 9 ? (part2       ) | 0x80 : (part2       ) & 0x7F;
-            case 8 : this.buffer[offset+7] = size !== 8 ? (part1 >>> 21) | 0x80 : (part1 >>> 21) & 0x7F;
-            case 7 : this.buffer[offset+6] = size !== 7 ? (part1 >>> 14) | 0x80 : (part1 >>> 14) & 0x7F;
-            case 6 : this.buffer[offset+5] = size !== 6 ? (part1 >>>  7) | 0x80 : (part1 >>>  7) & 0x7F;
-            case 5 : this.buffer[offset+4] = size !== 5 ? (part1       ) | 0x80 : (part1       ) & 0x7F;
-            case 4 : this.buffer[offset+3] = size !== 4 ? (part0 >>> 21) | 0x80 : (part0 >>> 21) & 0x7F;
-            case 3 : this.buffer[offset+2] = size !== 3 ? (part0 >>> 14) | 0x80 : (part0 >>> 14) & 0x7F;
-            case 2 : this.buffer[offset+1] = size !== 2 ? (part0 >>>  7) | 0x80 : (part0 >>>  7) & 0x7F;
-            case 1 : this.buffer[offset  ] = size !== 1 ? (part0       ) | 0x80 : (part0       ) & 0x7F;
+        //? if (NODE || !DATAVIEW) { var dst = NODE ? 'this.buffer' : 'this.view';
+            case 10: /*?= dst */[offset+9] = (part2 >>>  7) & 0x01;
+            case 9 : /*?= dst */[offset+8] = size !== 9 ? (part2       ) | 0x80 : (part2       ) & 0x7F;
+            case 8 : /*?= dst */[offset+7] = size !== 8 ? (part1 >>> 21) | 0x80 : (part1 >>> 21) & 0x7F;
+            case 7 : /*?= dst */[offset+6] = size !== 7 ? (part1 >>> 14) | 0x80 : (part1 >>> 14) & 0x7F;
+            case 6 : /*?= dst */[offset+5] = size !== 6 ? (part1 >>>  7) | 0x80 : (part1 >>>  7) & 0x7F;
+            case 5 : /*?= dst */[offset+4] = size !== 5 ? (part1       ) | 0x80 : (part1       ) & 0x7F;
+            case 4 : /*?= dst */[offset+3] = size !== 4 ? (part0 >>> 21) | 0x80 : (part0 >>> 21) & 0x7F;
+            case 3 : /*?= dst */[offset+2] = size !== 3 ? (part0 >>> 14) | 0x80 : (part0 >>> 14) & 0x7F;
+            case 2 : /*?= dst */[offset+1] = size !== 2 ? (part0 >>>  7) | 0x80 : (part0 >>>  7) & 0x7F;
+            case 1 : /*?= dst */[offset  ] = size !== 1 ? (part0       ) | 0x80 : (part0       ) & 0x7F;
         //? } else {
             case 10: this.view.setUint8(offset+9, (part2 >>>  7) & 0x01);
             case 9 : this.view.setUint8(offset+8, size !== 9 ? (part2       ) | 0x80 : (part2       ) & 0x7F);
@@ -148,32 +148,18 @@ if (Long) {
             part1 = 0,
             part2 = 0,
             b  = 0;
-    //? if (NODE) {
-        //? if (INLINE) { // Assert through checking for undefined (not optimal but coherent)
-        b = this.buffer[offset++]; part0  = (b & 0x7F)      ; if ( b & 0x80                                                   ) {
-        b = this.buffer[offset++]; part0 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-        b = this.buffer[offset++]; part0 |= (b & 0x7F) << 14; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-        b = this.buffer[offset++]; part0 |= (b & 0x7F) << 21; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-        b = this.buffer[offset++]; part1  = (b & 0x7F)      ; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-        b = this.buffer[offset++]; part1 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-        b = this.buffer[offset++]; part1 |= (b & 0x7F) << 14; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-        b = this.buffer[offset++]; part1 |= (b & 0x7F) << 21; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-        b = this.buffer[offset++]; part2  = (b & 0x7F)      ; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-        b = this.buffer[offset++]; part2 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+    //? if (NODE || !DATAVIEW) { var dst = NODE ? 'this.buffer' : 'this.view';
+        b = /*?= dst */[offset++]; part0  = (b & 0x7F)      ; if ( b & 0x80                                                   ) {
+        b = /*?= dst */[offset++]; part0 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+        b = /*?= dst */[offset++]; part0 |= (b & 0x7F) << 14; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+        b = /*?= dst */[offset++]; part0 |= (b & 0x7F) << 21; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+        b = /*?= dst */[offset++]; part1  = (b & 0x7F)      ; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+        b = /*?= dst */[offset++]; part1 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+        b = /*?= dst */[offset++]; part1 |= (b & 0x7F) << 14; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+        b = /*?= dst */[offset++]; part1 |= (b & 0x7F) << 21; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+        b = /*?= dst */[offset++]; part2  = (b & 0x7F)      ; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+        b = /*?= dst */[offset++]; part2 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
         throw Error("Buffer overrun"); }}}}}}}}}}
-        //? } else { // Assert as usual
-        b = this.buffer.readUint8(offset++, true         ); part0  = (b & 0x7F)      ; if (b & 0x80) {
-        b = this.buffer.readUint8(offset++, this.noAssert); part0 |= (b & 0x7F) <<  7; if (b & 0x80) {
-        b = this.buffer.readUint8(offset++, this.noAssert); part0 |= (b & 0x7F) << 14; if (b & 0x80) {
-        b = this.buffer.readUint8(offset++, this.noAssert); part0 |= (b & 0x7F) << 21; if (b & 0x80) {
-        b = this.buffer.readUint8(offset++, this.noAssert); part1  = (b & 0x7F)      ; if (b & 0x80) {
-        b = this.buffer.readUint8(offset++, this.noAssert); part1 |= (b & 0x7F) <<  7; if (b & 0x80) {
-        b = this.buffer.readUint8(offset++, this.noAssert); part1 |= (b & 0x7F) << 14; if (b & 0x80) {
-        b = this.buffer.readUint8(offset++, this.noAssert); part1 |= (b & 0x7F) << 21; if (b & 0x80) {
-        b = this.buffer.readUint8(offset++, this.noAssert); part2  = (b & 0x7F)      ; if (b & 0x80) {
-        b = this.buffer.readUint8(offset++, this.noAssert); part2 |= (b & 0x7F) <<  7; if (b & 0x80) {
-        throw Error("Buffer overrun"); }}}}}}}}}}
-        //? }
     //? } else { // Asserts on its own
         b = this.view.getUint8(offset++); part0  = (b & 0x7F)      ; if (b & 0x80) {
         b = this.view.getUint8(offset++); part0 |= (b & 0x7F) <<  7; if (b & 0x80) {

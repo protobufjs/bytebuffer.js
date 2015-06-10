@@ -31,8 +31,6 @@ ByteBufferPrototype.prepend = function(source, encoding, offset) {
     var len = source.limit - source.offset;
     if (len <= 0) return this; // Nothing to prepend
     var diff = len - offset;
-    //? if (!NODE)
-    var arrayView;
     if (diff > 0) { // Not enough space before offset, so resize + move
         //? if (NODE) {
         var buffer = new Buffer(this.buffer.length + diff);
@@ -40,25 +38,34 @@ ByteBufferPrototype.prepend = function(source, encoding, offset) {
         this.buffer = buffer;
         //? if (BUFFERVIEW)
         this.view = new BufferView(buffer);
-        //? } else {
+        //? } else if (DATAVIEW) {
         var buffer = new ArrayBuffer(this.buffer.byteLength + diff);
-        arrayView = new Uint8Array(buffer);
+        var arrayView = new Uint8Array(buffer);
         arrayView.set(new Uint8Array(this.buffer).subarray(offset, this.buffer.byteLength), len);
         this.buffer = buffer;
         this.view = new DataView(buffer);
+        //? } else {
+        var buffer = new ArrayBuffer(this.buffer.byteLength + diff);
+        var view = new Uint8Array(buffer);
+        view.set(this.view.subarray(offset, this.buffer.byteLength), len);
+        this.buffer = buffer;
+        this.view = view;
         //? }
         this.offset += diff;
         if (this.markedOffset >= 0) this.markedOffset += diff;
         this.limit += diff;
         offset += diff;
     }/*? if (!NODE) { */ else {
-        arrayView = new Uint8Array(this.buffer);
+        var arrayView = new Uint8Array(this.buffer);
     }
     //? }
     //? if (NODE)
     source.buffer.copy(this.buffer, offset - len, source.offset, source.limit);
-    //? else
+    //? else if (DATAVIEW)
     arrayView.set(new Uint8Array(source.buffer).subarray(source.offset, source.limit), offset - len);
+    //? else
+    this.view.set(source.view.subarray(source.offset, source.limit), offset - len);
+
     source.offset = source.limit;
     if (relative)
         this.offset -= len;

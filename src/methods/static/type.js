@@ -6,7 +6,9 @@
 ByteBuffer.type = function() {
     //? if (NODE)
     return Buffer;
-    //? else
+    //? else if (DATAVIEW)
     return ArrayBuffer;
+    //? else
+    return Uint8Array;
 };
 

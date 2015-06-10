@@ -44,7 +44,10 @@ ByteBufferPrototype.writeUTF8String = function(str, offset) {
     k = utfx.calculateUTF16asUTF8(stringSource(str))[1];
     //? ENSURE_CAPACITY('k');
     utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
+        //? if (DATAVIEW)
         this.view.setUint8(offset++, b);
+        //? else
+        this.view[offset++] = b;
     }.bind(this));
     if (relative) {
         this.offset = offset;
@@ -126,8 +129,10 @@ ByteBufferPrototype.readUTF8String = function(length, metrics, offset) {
         utfx.decodeUTF8(function() {
             //? if (NODE)
             return i < length && offset < this.limit ? this.buffer[offset++] : null;
-            //? else
+            //? else if (DATAVIEW)
             return i < length && offset < this.limit ? this.view.getUint8(offset++) : null;
+            //? else
+            return i < length && offset < this.limit ? this.view[offset++] : null;
         }.bind(this), function(cp) {
             ++i; utfx.UTF8toUTF16(cp, sd);
         }.bind(this));
@@ -160,7 +165,10 @@ ByteBufferPrototype.readUTF8String = function(length, metrics, offset) {
         //? } else {
         var k = offset + length;
         utfx.decodeUTF8toUTF16(function() {
+            //? if (DATAVIEW)
             return offset < k ? this.view.getUint8(offset++) : null;
+            //? else
+            return offset < k ? this.view[offset++] : null;
         }.bind(this), sd = stringDestination(), this.noAssert);
         if (offset !== k)
             throw RangeError("Illegal range: Truncated data, "+offset+" == "+k);

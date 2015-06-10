@@ -2419,6 +2419,7 @@ module.exports = (function() {
             this.limit += diff;
             offset += diff;
         }        source.buffer.copy(this.buffer, offset - len, source.offset, source.limit);
+
         source.offset = source.limit;
         if (relative)
             this.offset -= len;
@@ -2650,7 +2651,6 @@ module.exports = (function() {
         }
         return ab;
     };
-
 
     /**
      * Converts the ByteBuffer's contents to a string.

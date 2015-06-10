@@ -24,8 +24,17 @@ ByteBufferPrototype.writeInt16 = function(value, offset) {
         this.buffer[offset]   = (value & 0xFF00) >>> 8;
         this.buffer[offset+1] =  value & 0x00FF;
     }
-    //? } else
+    //? } else if (DATAVIEW) {
     this.view.setInt16(offset, value, this.littleEndian);
+    //? } else {
+    if (this.littleEndian) {
+        this.view[offset+1] = (value & 0xFF00) >>> 8;
+        this.view[offset  ] =  value & 0x00FF;
+    } else {
+        this.view[offset]   = (value & 0xFF00) >>> 8;
+        this.view[offset+1] =  value & 0x00FF;
+    }
+    //? }
     //? RELATIVE(2);
     return this;
 };
@@ -66,8 +75,19 @@ ByteBufferPrototype.readInt16 = function(offset) {
         value |= this.buffer[offset+1];
     }
     if ((value & 0x8000) === 0x8000) value = -(0xFFFF - value + 1); // Cast to signed
-    //? } else
+    //? } else if (DATAVIEW) {
     var value = this.view.getInt16(offset, this.littleEndian);
+    //? } else {
+    var value = 0;
+    if (this.littleEndian) {
+        value  = this.view[offset  ];
+        value |= this.view[offset+1] << 8;
+    } else {
+        value  = this.view[offset  ] << 8;
+        value |= this.view[offset+1];
+    }
+    if ((value & 0x8000) === 0x8000) value = -(0xFFFF - value + 1); // Cast to signed
+    //? }
     //? RELATIVE(2);
     return value;
 };
@@ -108,8 +128,17 @@ ByteBufferPrototype.writeUint16 = function(value, offset) {
         this.buffer[offset]   = (value & 0xFF00) >>> 8;
         this.buffer[offset+1] =  value & 0x00FF;
     }
-    //? } else
+    //? } else if (DATAVIEW) {
     this.view.setUint16(offset, value, this.littleEndian);
+    //? } else {
+    if (this.littleEndian) {
+        this.view[offset+1] = (value & 0xFF00) >>> 8;
+        this.view[offset  ] =  value & 0x00FF;
+    } else {
+        this.view[offset]   = (value & 0xFF00) >>> 8;
+        this.view[offset+1] =  value & 0x00FF;
+    }
+    //? }
     //? RELATIVE(2);
     return this;
 };

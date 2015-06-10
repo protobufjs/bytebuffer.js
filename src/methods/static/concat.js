@@ -31,7 +31,7 @@ ByteBuffer.concat = function(buffers, encoding, littleEndian, noAssert) {
         return new ByteBuffer(0, littleEndian, noAssert);
     var bb = new ByteBuffer(capacity, littleEndian, noAssert),
         bi;
-    //? if (!NODE)
+    //? if (!NODE && DATAVIEW)
     var view = new Uint8Array(bb.buffer);
     i=0; while (i<k) {
         bi = buffers[i++];
@@ -41,7 +41,10 @@ ByteBuffer.concat = function(buffers, encoding, littleEndian, noAssert) {
         bi.buffer.copy(bb.buffer, bb.offset, bi.offset, bi.limit);
         bb.offset += length;
         //? } else {
+        //? if (DATAVIEW)
         view.set(new Uint8Array(bi.buffer).subarray(bi.offset, bi.limit), bb.offset);
+        //? else
+        this.view.set(bi.view.subarray(bi.offset, bi.limit), bb.offset);
         bb.offset += length;
         //? }
     }

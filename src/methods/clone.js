@@ -15,10 +15,13 @@ ByteBufferPrototype.clone = function(copy) {
         //? if (BUFFERVIEW)
         bb.view = new BufferView(this.buffer);
         //? } else {
-        var buffer = new ArrayBuffer(this.buffer.byteLength);
-        new Uint8Array(buffer).set(this.buffer);
-        bb.buffer = buffer;
-        bb.view = new DataView(buffer);
+        bb.buffer = new ArrayBuffer(this.buffer.byteLength);
+        //? if (DATAVIEW) {
+        new Uint8Array(bb.buffer).set(this.buffer);
+        bb.view = new DataView(bb.buffer);
+        //? } else {
+        bb.view = new Uint8Array(bb.buffer);
+        //? }
         //? }
     } else {
         bb.buffer = this.buffer;

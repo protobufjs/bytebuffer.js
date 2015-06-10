@@ -24,8 +24,10 @@ ByteBufferPrototype.fill = function(value, begin, end) {
     //? if (NODE) {
     this.buffer.fill(value, begin, end);
     begin = end;
-    //? } else {
+    //? } else if (DATAVIEW) {
     while (begin < end) this.view.setUint8(begin++, value);
+    //? } else {
+    while (begin < end) this.view[begin++] = value;
     //? }
     if (relative) this.offset = begin;
     return this;

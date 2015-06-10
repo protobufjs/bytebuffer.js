@@ -30,11 +30,12 @@ ByteBufferPrototype.append = function(source, encoding, offset) {
     var length = source.limit - source.offset;
     if (length <= 0) return this; // Nothing to append
     //? ENSURE_CAPACITY('length');
-    //? if (NODE) {
+    //? if (NODE)
     source.buffer.copy(this.buffer, offset, source.offset, source.limit);
-    //? } else {
+    //? else if (DATAVIEW)
     new Uint8Array(this.buffer, offset).set(new Uint8Array(source.buffer).subarray(source.offset, source.limit));
-    //? }
+    //? else
+    this.view.set(source.view.subarray(source.offset, source.limit), offset);
     source.offset += length;
     //? RELATIVE('length');
     return this;

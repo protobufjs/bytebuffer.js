@@ -96,7 +96,10 @@ ByteBuffer.wrap = function(buffer, encoding, littleEndian, noAssert) {
             bb.buffer = buffer.buffer;
             bb.offset = buffer.byteOffset;
             bb.limit = buffer.byteOffset + buffer.length;
+            //? if (DATAVIEW)
             bb.view = buffer.length > 0 ? new DataView(buffer.buffer) : null;
+            //? else
+            bb.view = buffer.length > 0 ? buffer : null;
         }
     } else if (buffer instanceof ArrayBuffer) { // Reuse ArrayBuffer
         bb = new ByteBuffer(0, littleEndian, noAssert);
@@ -104,13 +107,19 @@ ByteBuffer.wrap = function(buffer, encoding, littleEndian, noAssert) {
             bb.buffer = buffer;
             bb.offset = 0;
             bb.limit = buffer.byteLength;
+            //? if (DATAVIEW)
             bb.view = buffer.byteLength > 0 ? new DataView(buffer) : null;
+            //? else
+            bb.view = buffer.byteLength > 0 ? new Uint8Array(buffer) : null;
         }
     } else if (Object.prototype.toString.call(buffer) === "[object Array]") { // Create from octets
         bb = new ByteBuffer(buffer.length, littleEndian, noAssert);
         bb.limit = buffer.length;
         for (i=0; i<buffer.length; ++i)
+            //? if (DATAVIEW)
             bb.view.setUint8(i, buffer[i]);
+            //? else
+            bb.view[i] = buffer[i];
     } else
         throw TypeError("Illegal buffer"); // Otherwise fail
     //? }

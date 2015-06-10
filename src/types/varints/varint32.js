@@ -63,60 +63,61 @@ ByteBufferPrototype.writeVarint32 = function(value, offset) {
         b;
     //? ENSURE_CAPACITY('size');
     // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
-    //? if (NODE)
-    this.buffer[offset] = b = value | 0x80;
-    //? else
+    //? var dst = NODE ? 'this.buffer' : 'this.view';
+    //? if (NODE || !DATAVIEW) {
+    /*?= dst */[offset] = b = value | 0x80;
+    //? } else
     this.view.setUint8(offset, b = value | 0x80);
     value >>>= 0;
     if (value >= 1 << 7) {
         b = (value >> 7) | 0x80;
-        //? if (NODE)
-        this.buffer[offset+1] = b;
-        //? else
+        //? if (NODE || !DATAVIEW) {
+        /*?= dst */[offset+1] = b;
+        //? } else
         this.view.setUint8(offset+1, b);
         if (value >= 1 << 14) {
             b = (value >> 14) | 0x80;
-            //? if (NODE)
-            this.buffer[offset+2] = b;
-            //? else
+            //? if (NODE || !DATAVIEW) {
+            /*?= dst */[offset+2] = b;
+            //? } else
             this.view.setUint8(offset+2, b);
             if (value >= 1 << 21) {
                 b = (value >> 21) | 0x80;
-                //? if (NODE)
-                this.buffer[offset+3] = b;
-                //? else
+                //? if (NODE || !DATAVIEW) {
+                /*?= dst */[offset+3] = b;
+                //? } else
                 this.view.setUint8(offset+3, b);
                 if (value >= 1 << 28) {
-                    //? if (NODE)
-                    this.buffer[offset+4] = (value >> 28) & 0x0F;
-                    //? else
+                    //? if (NODE || !DATAVIEW) {
+                    /*?= dst */[offset+4] = (value >> 28) & 0x0F;
+                    //? } else
                     this.view.setUint8(offset+4, (value >> 28) & 0x0F);
                     size = 5;
                 } else {
-                    //? if (NODE)
-                    this.buffer[offset+3] = b & 0x7F;
-                    //? else
+                    //? if (NODE || !DATAVIEW) {
+                    /*?= dst */[offset+3] = b & 0x7F;
+                    //? } else
                     this.view.setUint8(offset+3, b & 0x7F);
                     size = 4;
                 }
             } else {
-                //? if (NODE)
-                this.buffer[offset+2] = b & 0x7F;
-                //? else
+                //? if (NODE || !DATAVIEW) {
+                /*?= dst */[offset+2] = b & 0x7F;
+                //? } else
                 this.view.setUint8(offset+2, b & 0x7F);
                 size = 3;
             }
         } else {
-            //? if (NODE)
-            this.buffer[offset+1] = b & 0x7F;
-            //? else
+            //? if (NODE || !DATAVIEW) {
+            /*?= dst */[offset+1] = b & 0x7F;
+            //? } else
             this.view.setUint8(offset+1, b & 0x7F);
             size = 2;
         }
     } else {
-        //? if (NODE)
-        this.buffer[offset] = b & 0x7F;
-        //? else
+        //? if (NODE || !DATAVIEW) {
+        /*?= dst */[offset] = b & 0x7F;
+        //? } else
         this.view.setUint8(offset, b & 0x7F);
         size = 1;
     }
@@ -168,8 +169,10 @@ ByteBufferPrototype.readVarint32 = function(offset) {
         }
         //? if (NODE)
         temp = this.buffer[ioffset];
-        //? else
+        //? else if (DATAVIEW)
         temp = this.view.getUint8(ioffset);
+        //? else
+        temp = this.view[ioffset];
         if (size < 5)
             value |= ((temp&0x7F)<<(7*size)) >>> 0;
         ++size;

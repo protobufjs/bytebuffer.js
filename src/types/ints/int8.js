@@ -17,8 +17,10 @@ ByteBufferPrototype.writeInt8 = function(value, offset) {
     //? ENSURE_CAPACITY(1);
     //? if (NODE)
     this.buffer[offset] = value;
-    //? else
+    //? else if (DATAVIEW)
     this.view.setInt8(offset, value);
+    //? else
+    this.view[offset] = value;
     //? RELATIVE(1);
     return this;
 };
@@ -47,8 +49,12 @@ ByteBufferPrototype.readInt8 = function(offset) {
     //? if (NODE) {
     var value = this.buffer[offset];
     if ((value & 0x80) === 0x80) value = -(0xFF - value + 1); // Cast to signed
-    //? } else
+    //? } else if (DATAVIEW) {
     var value = this.view.getInt8(offset);
+    //? } else {
+    var value = this.view[offset];
+    if ((value & 0x80) === 0x80) value = -(0xFF - value + 1); // Cast to signed
+    //? }
     //? RELATIVE(1);
     return value;
 };
@@ -80,8 +86,10 @@ ByteBufferPrototype.writeUint8 = function(value, offset) {
     //? ENSURE_CAPACITY(1);
     //? if (NODE)
     this.buffer[offset] = value;
-    //? else
+    //? else if (DATAVIEW)
     this.view.setUint8(offset, value);
+    //? else
+    this.view[offset] = value;
     //? RELATIVE(1);
     return this;
 };
@@ -99,8 +107,10 @@ ByteBufferPrototype.readUint8 = function(offset) {
     }
     //? if (NODE)
     var value = this.buffer[offset];
-    //? else
+    //? else if (DATAVIEW)
     var value = this.view.getUint8(offset);
+    //? else
+    var value = this.view[offset];
     //? RELATIVE(1);
     return value;
 };

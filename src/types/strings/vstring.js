@@ -31,7 +31,10 @@ ByteBufferPrototype.writeVString = function(str, offset) {
     //? ENSURE_CAPACITY('l+k');
     offset += this.writeVarint32(k, offset);
     utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
+        //? if (DATAVIEW)
         this.view.setUint8(offset++, b);
+        //? else
+        this.view[offset++] = b;
     }.bind(this));
     if (offset !== start+k+l)
         throw RangeError("Illegal range: Truncated data, "+offset+" == "+(offset+k+l));
@@ -71,7 +74,10 @@ ByteBufferPrototype.readVString = function(offset) {
     var k = offset + temp,
         sd = stringDestination();
     utfx.decodeUTF8toUTF16(function() {
+        //? if (DATAVIEW)
         return offset < k ? this.view.getUint8(offset++) : null;
+        //? else
+        return offset < k ? this.view[offset++] : null;
     }.bind(this), sd, this.noAssert);
     str = sd();
     //? }

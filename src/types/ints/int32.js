@@ -14,7 +14,7 @@ ByteBufferPrototype.writeInt32 = function(value, offset) {
         //? ASSERT_OFFSET();
     }
     //? ENSURE_CAPACITY(4);
-    //? if (NODE) {
+    //? if (NODE || !DATAVIEW) {
     //? WRITE_UINT32_ARRAY();
     //? } else
     this.view.setInt32(offset, value, this.littleEndian);
@@ -43,7 +43,7 @@ ByteBufferPrototype.readInt32 = function(offset) {
     if (!this.noAssert) {
         //? ASSERT_OFFSET(4);
     }
-    //? if (NODE) {
+    //? if (NODE || !DATAVIEW) {
     var value = 0;
     //? READ_UINT32_ARRAY();
     value |= 0; // Cast to signed
@@ -76,7 +76,7 @@ ByteBufferPrototype.writeUint32 = function(value, offset) {
         //? ASSERT_OFFSET();
     }
     //? ENSURE_CAPACITY(4);
-    //? if (NODE) {
+    //? if (NODE || !DATAVIEW) {
     //? WRITE_UINT32_ARRAY();
     //? } else
     this.view.setUint32(offset, value, this.littleEndian);
@@ -95,7 +95,7 @@ ByteBufferPrototype.readUint32 = function(offset) {
     if (!this.noAssert) {
         //? ASSERT_OFFSET(4);
     }
-    //? if (NODE) {
+    //? if (NODE || !DATAVIEW) {
     var value = 0;
     //? READ_UINT32_ARRAY();
     //? } else
