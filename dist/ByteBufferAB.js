@@ -119,7 +119,7 @@
          * @const
          * @expose
          */
-        ByteBuffer.VERSION = "3.5.5";
+        ByteBuffer.VERSION = "4.0.0-pre";
 
         /**
          * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
