@@ -9,7 +9,7 @@ generated from a single source tree through [MetaScript](https://github.com/dcod
 Features
 --------
 * Three API-compatible versions:
-  * **ByteBufferNB** : Backing buffer: node Buffer, Accessor: none
+  * **ByteBufferNB** : Backing buffer / Accessor: node Buffer
   * **ByteBufferAB** : Backing buffer: ArrayBuffer, Accessor: DataView
   * **ByteBufferTA** : Backing buffer: ArrayBuffer, Accessor: Uint8Array
 * 8, 16, 32 and 64 bit signed and unsigned integers
