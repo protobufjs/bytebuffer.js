@@ -115,6 +115,17 @@ ByteBufferPrototype.writeUint16 = function(value, offset) {
 };
 
 /**
+ * Writes a 16bit unsigned integer. This is an alias of {@link ByteBuffer#writeUint16}.
+ * @function
+ * @param {number} value Value to write
+ * @param {number=} offset Offset to write to. Will use and advance {@link ByteBuffer#offset} by `2` if omitted.
+ * @throws {TypeError} If `offset` or `value` is not a valid number
+ * @throws {RangeError} If `offset` is out of bounds
+ * @expose
+ */
+ByteBufferPrototype.writeUInt16 = ByteBufferPrototype.writeUint16;
+
+/**
  * Reads a 16bit unsigned integer.
  * @param {number=} offset Offset to read from. Will use and advance {@link ByteBuffer#offset} by `2` if omitted.
  * @returns {number} Value read
@@ -141,5 +152,16 @@ ByteBufferPrototype.readUint16 = function(offset) {
     //? RELATIVE(2);
     return value;
 };
+
+/**
+ * Reads a 16bit unsigned integer. This is an alias of {@link ByteBuffer#readUint16}.
+ * @function
+ * @param {number=} offset Offset to read from. Will use and advance {@link ByteBuffer#offset} by `2` if omitted.
+ * @returns {number} Value read
+ * @throws {TypeError} If `offset` is not a valid number
+ * @throws {RangeError} If `offset` is out of bounds
+ * @expose
+ */
+ByteBufferPrototype.readUInt16 = ByteBufferPrototype.readUint16;
 
 //? }

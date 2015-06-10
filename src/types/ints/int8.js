@@ -95,6 +95,16 @@ ByteBufferPrototype.writeUint8 = function(value, offset) {
 };
 
 /**
+ * Writes an 8bit unsigned integer. This is an alias of {@link ByteBuffer#writeUint8}.
+ * @function
+ * @param {number} value Value to write
+ * @param {number=} offset Offset to write to. Will use and advance {@link ByteBuffer#offset} by `1` if omitted.
+ * @returns {!ByteBuffer} this
+ * @expose
+ */
+ByteBufferPrototype.writeUInt8 = ByteBufferPrototype.writeUint8;
+
+/**
  * Reads an 8bit unsigned integer.
  * @param {number=} offset Offset to read from. Will use and advance {@link ByteBuffer#offset} by `1` if omitted.
  * @returns {number} Value read
@@ -114,5 +124,14 @@ ByteBufferPrototype.readUint8 = function(offset) {
     //? RELATIVE(1);
     return value;
 };
+
+/**
+ * Reads an 8bit unsigned integer. This is an alias of {@link ByteBuffer#readUint8}.
+ * @function
+ * @param {number=} offset Offset to read from. Will use and advance {@link ByteBuffer#offset} by `1` if omitted.
+ * @returns {number} Value read
+ * @expose
+ */
+ByteBufferPrototype.readUInt8 = ByteBufferPrototype.readUint8;
 
 //? }

@@ -136,6 +136,16 @@ if (Long) {
         //? RELATIVE(8);
         return this;
     };
+
+    /**
+     * Writes a 64bit unsigned integer. This is an alias of {@link ByteBuffer#writeUint64}.
+     * @function
+     * @param {number|!Long} value Value to write
+     * @param {number=} offset Offset to write to. Will use and increase {@link ByteBuffer#offset} by `8` if omitted.
+     * @returns {!ByteBuffer} this
+     * @expose
+     */
+    ByteBufferPrototype.writeUInt64 = ByteBufferPrototype.writeUint64;
     
     /**
      * Reads a 64bit unsigned integer.
@@ -169,6 +179,15 @@ if (Long) {
         //? RELATIVE(8);
         return value;
     };
+
+    /**
+     * Reads a 64bit unsigned integer. This is an alias of {@link ByteBuffer#readUint64}.
+     * @function
+     * @param {number=} offset Offset to read from. Will use and increase {@link ByteBuffer#offset} by `8` if omitted.
+     * @returns {!Long}
+     * @expose
+     */
+    ByteBufferPrototype.readUInt64 = ByteBufferPrototype.readUint64;
     
 } // Long
 

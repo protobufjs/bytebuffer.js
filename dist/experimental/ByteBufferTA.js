@@ -468,6 +468,16 @@
         };
 
         /**
+         * Writes an 8bit unsigned integer. This is an alias of {@link ByteBuffer#writeUint8}.
+         * @function
+         * @param {number} value Value to write
+         * @param {number=} offset Offset to write to. Will use and advance {@link ByteBuffer#offset} by `1` if omitted.
+         * @returns {!ByteBuffer} this
+         * @expose
+         */
+        ByteBufferPrototype.writeUInt8 = ByteBufferPrototype.writeUint8;
+
+        /**
          * Reads an 8bit unsigned integer.
          * @param {number=} offset Offset to read from. Will use and advance {@link ByteBuffer#offset} by `1` if omitted.
          * @returns {number} Value read
@@ -487,6 +497,15 @@
             if (relative) this.offset += 1;
             return value;
         };
+
+        /**
+         * Reads an 8bit unsigned integer. This is an alias of {@link ByteBuffer#readUint8}.
+         * @function
+         * @param {number=} offset Offset to read from. Will use and advance {@link ByteBuffer#offset} by `1` if omitted.
+         * @returns {number} Value read
+         * @expose
+         */
+        ByteBufferPrototype.readUInt8 = ByteBufferPrototype.readUint8;
 
         // types/ints/int16
 
@@ -618,6 +637,17 @@
         };
 
         /**
+         * Writes a 16bit unsigned integer. This is an alias of {@link ByteBuffer#writeUint16}.
+         * @function
+         * @param {number} value Value to write
+         * @param {number=} offset Offset to write to. Will use and advance {@link ByteBuffer#offset} by `2` if omitted.
+         * @throws {TypeError} If `offset` or `value` is not a valid number
+         * @throws {RangeError} If `offset` is out of bounds
+         * @expose
+         */
+        ByteBufferPrototype.writeUInt16 = ByteBufferPrototype.writeUint16;
+
+        /**
          * Reads a 16bit unsigned integer.
          * @param {number=} offset Offset to read from. Will use and advance {@link ByteBuffer#offset} by `2` if omitted.
          * @returns {number} Value read
@@ -646,6 +676,17 @@
             if (relative) this.offset += 2;
             return value;
         };
+
+        /**
+         * Reads a 16bit unsigned integer. This is an alias of {@link ByteBuffer#readUint16}.
+         * @function
+         * @param {number=} offset Offset to read from. Will use and advance {@link ByteBuffer#offset} by `2` if omitted.
+         * @returns {number} Value read
+         * @throws {TypeError} If `offset` is not a valid number
+         * @throws {RangeError} If `offset` is out of bounds
+         * @expose
+         */
+        ByteBufferPrototype.readUInt16 = ByteBufferPrototype.readUint16;
 
         // types/ints/int32
 
@@ -777,6 +818,15 @@
         };
 
         /**
+         * Writes a 32bit unsigned integer. This is an alias of {@link ByteBuffer#writeUint32}.
+         * @function
+         * @param {number} value Value to write
+         * @param {number=} offset Offset to write to. Will use and increase {@link ByteBuffer#offset} by `4` if omitted.
+         * @expose
+         */
+        ByteBufferPrototype.writeUInt32 = ByteBufferPrototype.writeUint32;
+
+        /**
          * Reads a 32bit unsigned integer.
          * @param {number=} offset Offset to read from. Will use and increase {@link ByteBuffer#offset} by `4` if omitted.
          * @returns {number} Value read
@@ -807,6 +857,15 @@
             if (relative) this.offset += 4;
             return value;
         };
+
+        /**
+         * Reads a 32bit unsigned integer. This is an alias of {@link ByteBuffer#readUint32}.
+         * @function
+         * @param {number=} offset Offset to read from. Will use and increase {@link ByteBuffer#offset} by `4` if omitted.
+         * @returns {number} Value read
+         * @expose
+         */
+        ByteBufferPrototype.readUInt32 = ByteBufferPrototype.readUint32;
 
         // types/ints/int64
 
@@ -992,6 +1051,16 @@
             };
 
             /**
+             * Writes a 64bit unsigned integer. This is an alias of {@link ByteBuffer#writeUint64}.
+             * @function
+             * @param {number|!Long} value Value to write
+             * @param {number=} offset Offset to write to. Will use and increase {@link ByteBuffer#offset} by `8` if omitted.
+             * @returns {!ByteBuffer} this
+             * @expose
+             */
+            ByteBufferPrototype.writeUInt64 = ByteBufferPrototype.writeUint64;
+
+            /**
              * Reads a 64bit unsigned integer.
              * @param {number=} offset Offset to read from. Will use and increase {@link ByteBuffer#offset} by `8` if omitted.
              * @returns {!Long}
@@ -1034,6 +1103,15 @@
                 if (relative) this.offset += 8;
                 return value;
             };
+
+            /**
+             * Reads a 64bit unsigned integer. This is an alias of {@link ByteBuffer#readUint64}.
+             * @function
+             * @param {number=} offset Offset to read from. Will use and increase {@link ByteBuffer#offset} by `8` if omitted.
+             * @returns {!Long}
+             * @expose
+             */
+            ByteBufferPrototype.readUInt64 = ByteBufferPrototype.readUint64;
 
         } // Long
 

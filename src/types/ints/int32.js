@@ -85,6 +85,15 @@ ByteBufferPrototype.writeUint32 = function(value, offset) {
 };
 
 /**
+ * Writes a 32bit unsigned integer. This is an alias of {@link ByteBuffer#writeUint32}.
+ * @function
+ * @param {number} value Value to write
+ * @param {number=} offset Offset to write to. Will use and increase {@link ByteBuffer#offset} by `4` if omitted.
+ * @expose
+ */
+ByteBufferPrototype.writeUInt32 = ByteBufferPrototype.writeUint32;
+
+/**
  * Reads a 32bit unsigned integer.
  * @param {number=} offset Offset to read from. Will use and increase {@link ByteBuffer#offset} by `4` if omitted.
  * @returns {number} Value read
@@ -103,5 +112,14 @@ ByteBufferPrototype.readUint32 = function(offset) {
     //? RELATIVE(4);
     return value;
 };
+
+/**
+ * Reads a 32bit unsigned integer. This is an alias of {@link ByteBuffer#readUint32}.
+ * @function
+ * @param {number=} offset Offset to read from. Will use and increase {@link ByteBuffer#offset} by `4` if omitted.
+ * @returns {number} Value read
+ * @expose
+ */
+ByteBufferPrototype.readUInt32 = ByteBufferPrototype.readUint32;
 
 //? }
