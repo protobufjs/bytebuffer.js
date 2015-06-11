@@ -11,7 +11,7 @@
  */
 ByteBufferPrototype.toString = function(encoding, begin, end) {
     if (typeof encoding === 'undefined')
-        return "ByteBuffer/*?= NODE ? 'NB' : 'AB' */(offset="+this.offset+",markedOffset="+this.markedOffset+",limit="+this.limit+",capacity="+this.capacity()+")";
+        return "ByteBuffer/*?= NODE ? 'NB' : 'AB'+(DATAVIEW ? '_DataView' : '') */(offset="+this.offset+",markedOffset="+this.markedOffset+",limit="+this.limit+",capacity="+this.capacity()+")";
     if (typeof encoding === 'number')
         encoding = "utf8",
         begin = encoding,

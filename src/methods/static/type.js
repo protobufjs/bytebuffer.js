@@ -9,4 +9,3 @@ ByteBuffer.type = function() {
     //? else
     return ArrayBuffer;
 };
-

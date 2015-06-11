@@ -50,6 +50,7 @@ var Sandbox = function(properties) {
 
 function makeSuite(ByteBuffer) {
     var type = ByteBuffer.type(), // Buffer or ArrayBuffer
+        accessor = ByteBuffer.accessor(),
         Long = ByteBuffer.Long;
     var suite = {};
     
@@ -847,7 +848,7 @@ function makeSuite(ByteBuffer) {
         test.equal(bb.toString("base64"), "YWI=");
         test.equal(bb.toString("utf8"), "ab");
         test.equal(bb.toString("debug").substr(0,7), "<61 62>");
-        test.equal(bb.toString(), (type === ArrayBuffer ? "ByteBufferAB" : "ByteBufferNB")+"(offset=0,markedOffset=-1,limit=2,capacity=3)");
+        test.equal(bb.toString(), (type === ArrayBuffer ? (accessor === DataView ? "ByteBufferAB_DataView" : "ByteBufferAB") : "ByteBufferNB")+"(offset=0,markedOffset=-1,limit=2,capacity=3)");
         test.strictEqual(bb.offset, 0);
         test.done();
     };

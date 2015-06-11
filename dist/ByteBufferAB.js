@@ -221,6 +221,14 @@
         }
 
         /**
+         * Gets the accessor type.
+         * @returns {Function} `Buffer` under node.js, `Uint8Array` respectively `DataView` in the browser (classes)
+         * @expose
+         */
+        ByteBuffer.accessor = function() {
+            return Uint8Array;
+        };
+        /**
          * Allocates a new ByteBuffer backed by a buffer of the specified capacity.
          * @param {number=} capacity Initial capacity. Defaults to {@link ByteBuffer.DEFAULT_CAPACITY}.
          * @param {boolean=} littleEndian Whether to use little or big endian byte order. Defaults to
@@ -292,7 +300,6 @@
         ByteBuffer.type = function() {
             return ArrayBuffer;
         };
-
         /**
          * Wraps a buffer or a string. Sets the allocated ByteBuffer's {@link ByteBuffer#offset} to `0` and its
          *  {@link ByteBuffer#limit} to the length of the wrapped data.

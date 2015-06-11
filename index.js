@@ -13,9 +13,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-var ByteBufferNB = require("./dist/ByteBufferNB.js"),
-    ByteBufferAB = require("./dist/ByteBufferAB.js");
+var ByteBufferNB          = require("./dist/ByteBufferNB.js"),
+    ByteBufferAB          = require("./dist/ByteBufferAB.js"),
+    ByteBufferAB_DataView = require("./dist/ByteBufferAB_DataView.js");
 
 module.exports = ByteBufferNB;
-module.exports.ByteBufferNB = ByteBufferNB; // node Buffer backed
-module.exports.ByteBufferAB = ByteBufferAB; // ArrayBuffer backed
+module.exports.ByteBufferNB          = ByteBufferNB;
+module.exports.ByteBufferAB          = ByteBufferAB;
+module.exports.ByteBufferAB_DataView = ByteBufferAB_DataView;
