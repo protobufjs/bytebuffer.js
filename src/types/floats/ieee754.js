@@ -24,6 +24,16 @@
  THE SOFTWARE.
 */
 
+/**
+ * Reads an IEEE754 float from an array.
+ * @param {!Array} buffer
+ * @param {number} offset
+ * @param {boolean} isLE
+ * @param {number} mLen
+ * @param {number} nBytes
+ * @returns {number}
+ * @inner
+ */
 function ieee754_read(buffer, offset, isLE, mLen, nBytes) {
     var e, m,
         eLen = nBytes * 8 - mLen - 1,
@@ -57,6 +67,16 @@ function ieee754_read(buffer, offset, isLE, mLen, nBytes) {
     return (s ? -1 : 1) * m * Math.pow(2, e - mLen);
 }
 
+/**
+ * Writes an IEEE754 float to an array.
+ * @param {!Array} buffer
+ * @param {number} value
+ * @param {number} offset
+ * @param {boolean} isLE
+ * @param {number} mLen
+ * @param {number} nBytes
+ * @inner
+ */
 function ieee754_write(buffer, value, offset, isLE, mLen, nBytes) {
     var e, m, c,
         eLen = nBytes * 8 - mLen - 1,

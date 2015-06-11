@@ -1,7 +1,7 @@
 Distributions
 =============
 
-ByteBuffer uses either ArrayBuffers in the browser or Buffers under node.js.
+ByteBuffer.js uses either ArrayBuffers in the browser or Buffers under node.js.
 
 ### Browser: [ArrayBuffer](https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer)-backed
 
@@ -24,7 +24,7 @@ Using Typed Arrays here is pretty much ideal, but it [requires a somewhat recent
 ##### Accessed through a DataView ([polyfill](https://github.com/inexorabletash/polyfill/blob/master/typedarray.js) compatible)
 
 Using DataViews is [generally slower](https://github.com/dcodeIO/ByteBuffer.js/issues/16) but works well with common polyfills for
-older browsers, as it does not utilize array access operators on Typed Arrays.
+older browsers (avoids array access operators on Typed Arrays).
 
 * **[ByteBufferAB_DataView.js](https://raw.githubusercontent.com/dcodeIO/ByteBuffer.js/master/dist/ByteBufferAB_DataView.js)**
   uses an ArrayBuffer as its backing buffer, accessed through a [DataView](https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/DataView).
