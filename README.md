@@ -53,7 +53,7 @@ Downloads
 
 Support for IE<10, FF<15, Chrome<9 etc.
 ---------------------------------------
-* Requires working ArrayBuffer & DataView implementations (i.e. use a [polyfill](https://github.com/inexorabletash/polyfill#typed-arrays-polyfill))
+* Use ByteBufferAB_DataView with a polyfill ([see](https://github.com/dcodeIO/ByteBuffer.js/tree/master/dist))
 
 Contributors
 ------------
