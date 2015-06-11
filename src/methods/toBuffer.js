@@ -36,12 +36,10 @@ ByteBufferPrototype.toBuffer = function(forceCopy) {
     //? } else {
     // NOTE: It's not possible to have another ArrayBuffer reference the same memory as the backing buffer. This is
     // possible with Uint8Array#subarray only, but we have to return an ArrayBuffer by contract. So:
-    if (!forceCopy && offset === 0 && limit === this.buffer.byteLength) {
+    if (!forceCopy && offset === 0 && limit === this.buffer.byteLength)
         return this.buffer;
-    }
-    if (offset === limit) {
+    if (offset === limit)
         return EMPTY_BUFFER;
-    }
     var buffer = new ArrayBuffer(limit - offset);
     new Uint8Array(buffer).set(new Uint8Array(this.buffer).subarray(offset, limit), 0);
     return buffer;
@@ -72,9 +70,8 @@ ByteBufferPrototype.toArrayBuffer = function() {
         memcpy(ab, 0, this.buffer, offset, limit);
     } else { // Slow
         var dst = new Uint8Array(ab);
-        for (var i=offset; i<limit; ++i) {
+        for (var i=offset; i<limit; ++i)
             dst[i-offset] = this.buffer[i];
-        }
     }
     return ab;
 };

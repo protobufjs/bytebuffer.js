@@ -1040,5 +1040,5 @@ module.exports = {
     },
     "NB": makeSuite(ByteBufferNB),
     "AB": makeSuite(ByteBufferAB),
-    "TA": makeSuite(ByteBufferAB_DataView)
+    "AB_DataView": makeSuite(ByteBufferAB_DataView)
 };

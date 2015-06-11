@@ -2726,9 +2726,8 @@ module.exports = (function() {
             memcpy(ab, 0, this.buffer, offset, limit);
         } else { // Slow
             var dst = new Uint8Array(ab);
-            for (var i=offset; i<limit; ++i) {
+            for (var i=offset; i<limit; ++i)
                 dst[i-offset] = this.buffer[i];
-            }
         }
         return ab;
     };
