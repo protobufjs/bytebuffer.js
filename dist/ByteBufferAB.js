@@ -371,6 +371,41 @@
             return bb;
         };
 
+        /**
+         * Reads the specified number of bytes.
+         * @param {number} length Number of bytes to read
+         * @param {number=} offset Offset to read from. Will use and increase {@link ByteBuffer#offset} by `length` if omitted.
+         * @returns {!ByteBuffer}
+         * @expose
+         */
+        ByteBufferPrototype.readBytes = function(length, offset) {
+            var relative = typeof offset === 'undefined';
+            if (relative) offset = this.offset;
+            if (!this.noAssert) {
+                if (typeof offset !== 'number' || offset % 1 !== 0)
+                    throw TypeError("Illegal offset: "+offset+" (not an integer)");
+                offset >>>= 0;
+                if (offset < 0 || offset + length > this.buffer.byteLength)
+                    throw RangeError("Illegal offset: 0 <= "+offset+" (+"+length+") <= "+this.buffer.byteLength);
+            }
+            var slice = this.slice(offset, offset + length);
+            if (relative) this.offset += length;
+            return slice;
+        };
+
+        /**
+         * Writes a payload of bytes. This is an alias of {@link ByteBuffer#append}.
+         * @function
+         * @param {!ByteBuffer|!ArrayBuffer|!Uint8Array|string} source Data to write. If `source` is a ByteBuffer, its offsets
+         *  will be modified according to the performed read operation.
+         * @param {(string|number)=} encoding Encoding if `data` is a string ("base64", "hex", "binary", defaults to "utf8")
+         * @param {number=} offset Offset to write to. Will use and increase {@link ByteBuffer#offset} by the number of bytes
+         *  written if omitted.
+         * @returns {!ByteBuffer} this
+         * @expose
+         */
+        ByteBufferPrototype.writeBytes = ByteBufferPrototype.append;
+
         // types/ints/int8
 
         /**
@@ -1152,7 +1187,7 @@
         */
 
         /**
-         * Reads an IEEE754 float from an array.
+         * Reads an IEEE754 float from a byte array.
          * @param {!Array} buffer
          * @param {number} offset
          * @param {boolean} isLE
@@ -1195,7 +1230,7 @@
         }
 
         /**
-         * Writes an IEEE754 float to an array.
+         * Writes an IEEE754 float to a byte array.
          * @param {!Array} buffer
          * @param {number} value
          * @param {number} offset
@@ -2266,7 +2301,7 @@
          *  will be modified according to the performed read operation.
          * @param {(string|number)=} encoding Encoding if `data` is a string ("base64", "hex", "binary", defaults to "utf8")
          * @param {number=} offset Offset to append at. Will use and increase {@link ByteBuffer#offset} by the number of bytes
-         *  read if omitted.
+         *  written if omitted.
          * @returns {!ByteBuffer} this
          * @expose
          * @example A relative `<01 02>03.append(<04 05>)` will result in `<01 02 04 05>, 04 05|`

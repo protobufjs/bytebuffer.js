@@ -25,7 +25,7 @@
 */
 
 /**
- * Reads an IEEE754 float from an array.
+ * Reads an IEEE754 float from a byte array.
  * @param {!Array} buffer
  * @param {number} offset
  * @param {boolean} isLE
@@ -68,7 +68,7 @@ function ieee754_read(buffer, offset, isLE, mLen, nBytes) {
 }
 
 /**
- * Writes an IEEE754 float to an array.
+ * Writes an IEEE754 float to a byte array.
  * @param {!Array} buffer
  * @param {number} value
  * @param {number} offset

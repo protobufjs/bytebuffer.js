@@ -42,7 +42,8 @@ var scope = {
     UTF8       : true,                  // Include utf8 encoding (required for STRINGS)
     
     // Primitive types
-    
+
+    BYTES      : true,                  // Include bytes
     INTS       : true,                  // Include int types in general (catches all)
     INT8       : true,                  // Include int8/uint8
     INT16      : true,                  // Include int16/uint16

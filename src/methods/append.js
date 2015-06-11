@@ -10,7 +10,7 @@
 //? }
  * @param {(string|number)=} encoding Encoding if `data` is a string ("base64", "hex", "binary", defaults to "utf8")
  * @param {number=} offset Offset to append at. Will use and increase {@link ByteBuffer#offset} by the number of bytes
- *  read if omitted.
+ *  written if omitted.
  * @returns {!ByteBuffer} this
  * @expose
  * @example A relative `<01 02>03.append(<04 05>)` will result in `<01 02 04 05>, 04 05|`

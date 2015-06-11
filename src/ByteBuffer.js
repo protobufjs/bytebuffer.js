@@ -189,6 +189,10 @@ var ByteBufferPrototype = ByteBuffer.prototype;
 //? include("helpers.js");
 
 //? include("methods/static/*.js");
+//? if (BYTES) {
+
+//? include("types/bytes/*.js");
+//? }
 //? if (INTS) {
 
 //? include("types/ints/*.js");
