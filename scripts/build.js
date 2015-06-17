@@ -96,7 +96,7 @@ delete scope.BUFFERVIEW;
 console.log("Building ByteBufferAB with scope", JSON.stringify(scope, null, 2));
 fs.writeFileSync(
     path.join(distDir, "ByteBufferAB.js"),
-    MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "ByteBufferAB.js")), filename, scope)
+    MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "wrap.js")), filename, scope)
 );
 
 // Build alternative browser ByteBuffer using a DataView
@@ -105,7 +105,7 @@ scope.DATAVIEW = true;
 console.log("Building ByteBufferAB_DataView with scope", JSON.stringify(scope, null, 2));
 fs.writeFileSync(
     path.join(distDir, "ByteBufferAB_DataView.js"),
-    MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "ByteBufferAB_DataView.js")), filename, scope)
+    MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "wrap.js")), filename, scope)
 );
 
 // Update bower.json

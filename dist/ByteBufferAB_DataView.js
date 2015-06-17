@@ -16,10 +16,10 @@
 
 /**
  * @license ByteBuffer.js (c) 2015 Daniel Wirtz <dcode@dcode.io>
- * [BUILD] ByteBufferAB_DataView - Backing buffer: ArrayBuffer, Accessor: DataView
+ * [BUILD] ByteBufferAB - Backing buffer: ArrayBuffer, Accessor: DataView
  * Released under the Apache License, Version 2.0
  * see: https://github.com/dcodeIO/ByteBuffer.js for details
- */ //
+ */
 (function(global, factory) {
 
     /* AMD */ if (typeof define === 'function' && define["amd"])
@@ -3399,7 +3399,6 @@
         bb.limit = i;
         return bb;
     };
-
 
     return ByteBuffer;
 });

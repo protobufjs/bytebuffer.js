@@ -13,14 +13,16 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-//? NODE = false; DATAVIEW = false;
 
 /**
  * @license ByteBuffer.js (c) 2015 Daniel Wirtz <dcode@dcode.io>
+//? if (DATAVIEW)
+ * [BUILD] ByteBufferAB - Backing buffer: ArrayBuffer, Accessor: DataView
+//? else
  * [BUILD] ByteBufferAB - Backing buffer: ArrayBuffer, Accessor: Uint8Array
  * Released under the Apache License, Version 2.0
  * see: https://github.com/dcodeIO/ByteBuffer.js for details
- */ //
+ */
 (function(global, factory) {
 
     /* AMD */ if (typeof define === 'function' && define["amd"])
@@ -37,6 +39,5 @@
     "use strict";
 
     //? include("ByteBuffer.js");
-
     return ByteBuffer;
 });
