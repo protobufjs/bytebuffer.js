@@ -21,29 +21,22 @@
  * Released under the Apache License, Version 2.0
  * see: https://github.com/dcodeIO/ByteBuffer.js for details
  */ //
-(function(global) {
-    "use strict";
+(function(global, factory) {
 
-    /**
-     * @param {function(new: Long, number, number, boolean=)=} Long
-     * @returns {function(new: ByteBuffer, number=, boolean=, boolean=)}}
-     * @inner
-     */
-    function loadByteBuffer(Long) {
-
-        //? include("ByteBuffer.js");
-
-        return ByteBuffer;
-    }
-
-    /* CommonJS */ if (typeof require === 'function' && typeof module === 'object' && module && typeof exports === 'object' && exports)
+    /* AMD */ if (typeof define === 'function' && define["amd"])
+        define(["Long"], factory);
+    /* CommonJS */ else if (typeof require === 'function' && typeof module === "object" && module && module["exports"])
         module['exports'] = (function() {
             var Long; try { Long = require("long"); } catch (e) {}
-            return loadByteBuffer(Long);
+            return factory(Long);
         })();
-    /* AMD */ else if (typeof define === 'function' && define["amd"])
-        define("ByteBuffer", ["Long"], function(Long) { return loadByteBuffer(Long); });
     /* Global */ else
-        (global["dcodeIO"] = global["dcodeIO"] || {})["ByteBuffer"] = loadByteBuffer(global["dcodeIO"]["Long"]);
+        (global["dcodeIO"] = global["dcodeIO"] || {})["ByteBuffer"] = factory(global["dcodeIO"]["Long"]);
 
-})(this);
+})(this, function(Long) {
+    "use strict";
+
+    //? include("ByteBuffer.js");
+
+    return ByteBuffer;
+});

@@ -985,8 +985,7 @@ function makeSuite(ByteBuffer) {
             });
             vm.runInNewContext(code, sandbox, "amd-sandbox");
             test.ok(sandbox.define.called);
-            test.equal(sandbox.define.called[0], "ByteBuffer");
-            test.equal(sandbox.define.called[1][0], "Long");
+            test.equal(sandbox.define.called[0][0], "Long");
             test.done();
         };
         
