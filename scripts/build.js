@@ -86,7 +86,7 @@ scope.NODE = true;
 console.log("Building ByteBufferNB with scope", JSON.stringify(scope, null, 2));
 fs.writeFileSync(
     path.join(distDir, "ByteBufferNB.js"),
-    MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "ByteBufferNB.js")), filename, scope, srcDir)
+    MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "wrap_node.js")), filename, scope, srcDir)
 );
 
 // Build browser ByteBuffer using Typed Arrays

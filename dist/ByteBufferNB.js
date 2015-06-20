@@ -24,7 +24,7 @@ module.exports = (function() {
     "use strict";
 
     var buffer = require("buffer"),
-        Buffer = buffer['Buffer'],
+        Buffer = buffer["Buffer"],
         Long = require("long"),
         memcpy = null; try { memcpy = require("memcpy"); } catch (e) {}
 

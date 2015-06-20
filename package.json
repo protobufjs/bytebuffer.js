@@ -1,41 +1,52 @@
 {
-    "name": "bytebuffer",
-    "version": "4.0.0-pre",
-    "author": "Daniel Wirtz <dcode@dcode.io>",
-    "description": "The swiss army knife for binary data in JavaScript.",
-    "main": "index.js",
-    "browser": "dist/ByteBufferAB.js",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/dcodeIO/ByteBuffer.js.git"
-    },
-    "bugs": {
-        "url": "https://github.com/dcodeIO/ByteBuffer.js/issues"
-    },
-    "keywords": ["net", "array", "buffer", "arraybuffer", "typed array", "bytebuffer", "json", "websocket", "webrtc"],
-    "dependencies": {
-        "long": "~2 >=2.2.3",
-        "bufferview": "~1"
-    },
-    "devDependencies": {
-        "utfx": "~1",
-        "lxiv": "~0.2",
-        "testjs": "~1",
-        "metascript": "~0",
-        "closurecompiler": "~1"
-    },
-    "license": "Apache-2.0",
-    "engines": {
-        "node": ">=0.8"
-    },
-    "scripts": {
-        "prepublish": "npm test",
-        "test": "node node_modules/testjs/bin/testjs tests/suite.js",
-        "make": "npm run-script build && npm run-script compile && npm run-script compress && npm test",
-        "build": "node scripts/build.js",
-        "compile": "npm run-script compileAB && npm run-script compileAB_DataView",
-        "compileAB": "ccjs dist/ByteBufferAB.js --create_source_map=dist/ByteBufferAB.min.map --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --externs=node_modules/long/externs/Long.js > dist/ByteBufferAB.min.js",
-        "compileAB_DataView": "ccjs dist/ByteBufferAB_DataView.js --create_source_map=dist/ByteBufferAB_DataView.min.map --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --externs=node_modules/long/externs/Long.js > dist/ByteBufferAB_DataView.min.js",
-        "compress": "gzip -c -9 dist/ByteBufferAB.min.js > dist/ByteBufferAB.min.js.gz && gzip -c -9 dist/ByteBufferAB_DataView.min.js > dist/ByteBufferAB_DataView.min.js.gz"
-    }
+  "name": "bytebuffer",
+  "version": "4.0.0-pre",
+  "author": "Daniel Wirtz <dcode@dcode.io>",
+  "description": "The swiss army knife for binary data in JavaScript.",
+  "main": "index.js",
+  "browser": "dist/ByteBufferAB.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dcodeIO/ByteBuffer.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dcodeIO/ByteBuffer.js/issues"
+  },
+  "keywords": [
+    "net",
+    "array",
+    "buffer",
+    "arraybuffer",
+    "typed array",
+    "bytebuffer",
+    "json",
+    "websocket",
+    "webrtc"
+  ],
+  "dependencies": {
+    "long": "~2 >=2.2.3",
+    "bufferview": "~1"
+  },
+  "devDependencies": {
+    "closurecompiler": "~1",
+    "lxiv": "~0.2",
+    "metascript": "~0",
+    "pretty-hrtime": "^1.0.0",
+    "testjs": "~1",
+    "utfx": "~1"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=0.8"
+  },
+  "scripts": {
+    "prepublish": "npm test",
+    "test": "node node_modules/testjs/bin/testjs tests/suite.js",
+    "make": "npm run-script build && npm run-script compile && npm run-script compress && npm test",
+    "build": "node scripts/build.js",
+    "compile": "npm run-script compileAB && npm run-script compileAB_DataView",
+    "compileAB": "ccjs dist/ByteBufferAB.js --create_source_map=dist/ByteBufferAB.min.map --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --externs=node_modules/long/externs/Long.js > dist/ByteBufferAB.min.js",
+    "compileAB_DataView": "ccjs dist/ByteBufferAB_DataView.js --create_source_map=dist/ByteBufferAB_DataView.min.map --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --externs=node_modules/long/externs/Long.js > dist/ByteBufferAB_DataView.min.js",
+    "compress": "gzip -c -9 dist/ByteBufferAB.min.js > dist/ByteBufferAB.min.js.gz && gzip -c -9 dist/ByteBufferAB_DataView.min.js > dist/ByteBufferAB_DataView.min.js.gz"
+  }
 }

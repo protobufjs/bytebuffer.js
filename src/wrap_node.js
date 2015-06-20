@@ -25,7 +25,7 @@ module.exports = (function() {
     "use strict";
     
     var buffer = require("buffer"),
-        Buffer = buffer['Buffer'],
+        Buffer = buffer["Buffer"],
         //? if (BUFFERVIEW)
         BufferView = require("bufferview"),
         Long = require("long"),
