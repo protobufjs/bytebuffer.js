@@ -195,7 +195,7 @@ var ByteBufferPrototype = ByteBuffer.prototype;
  */
 ByteBufferPrototype.__isByteBuffer__;
 
-Object.defineProperty(ByteBuffer.prototype, "__isByteBuffer__", {
+Object.defineProperty(ByteBufferPrototype, "__isByteBuffer__", {
     value: true,
     enumerable: false,
     configurable: false

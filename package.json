@@ -33,7 +33,7 @@
     "metascript": "~0",
     "pretty-hrtime": "^1.0.0",
     "testjs": "~1",
-    "utfx": "~1"
+    "utfx": "^1.0.1"
   },
   "license": "Apache-2.0",
   "engines": {
