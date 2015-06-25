@@ -186,6 +186,21 @@ ByteBuffer.Long = Long || null;
  */
 var ByteBufferPrototype = ByteBuffer.prototype;
 
+/**
+ * An indicator used to reliably determine if an object is a ByteBuffer or not.
+ * @type {boolean}
+ * @const
+ * @expose
+ * @private
+ */
+ByteBufferPrototype.__isByteBuffer__;
+
+Object.defineProperty(ByteBuffer.prototype, "__isByteBuffer__", {
+    value: true,
+    enumerable: false,
+    configurable: false
+});
+
 //? include("helpers.js");
 
 //? include("methods/static/*.js");

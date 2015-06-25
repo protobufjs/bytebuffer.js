@@ -21,7 +21,7 @@
 var ByteBuffer = require("../dist/ByteBufferNB.js");
 var ByteBufferNB = ByteBuffer.ByteBufferNB = ByteBuffer;
 var ByteBufferAB = ByteBuffer.ByteBufferAB = require("../dist/ByteBufferAB.min.js");
-var ByteBufferAB_DataView = ByteBuffer.ByteBufferAB_DataView = require("../dist/ByteBufferAB_DataView.js");
+var ByteBufferAB_DataView = ByteBuffer.ByteBufferAB_DataView = require("../dist/ByteBufferAB_DataView.min.js");
 
 /**
  * Constructs a new Sandbox for module loaders and shim testing.
@@ -86,6 +86,18 @@ function makeSuite(ByteBuffer) {
         test.equal(bb.capacity(), ByteBuffer.DEFAULT_CAPACITY);
         test.equal(bb.littleEndian, !ByteBuffer.DEFAULT_ENDIAN);
         test.equal(bb.noAssert, !ByteBuffer.DEFAULT_NOASSERT);
+
+        // __isByteBuffer__
+        test.strictEqual(bb.__isByteBuffer__, true);
+        bb.__isByteBuffer__ = false;
+        test.strictEqual(bb.__isByteBuffer__, true);
+        test.equal(ByteBuffer.isByteBuffer(bb), true);
+
+        // Fixed set of properties
+        for (var i in bb)
+            if (bb.hasOwnProperty(i) && ["offset", "markedOffset", "limit", "littleEndian", "noAssert", "buffer", "view"].indexOf(i) < 0)
+                test.fail("Illegal enumerable property: "+i);
+
         test.done();
     };
 

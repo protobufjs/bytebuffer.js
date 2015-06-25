@@ -164,6 +164,21 @@ module.exports = (function() {
      */
     var ByteBufferPrototype = ByteBuffer.prototype;
 
+    /**
+     * An indicator used to reliably determine if an object is a ByteBuffer or not.
+     * @type {boolean}
+     * @const
+     * @expose
+     * @private
+     */
+    ByteBufferPrototype.__isByteBuffer__;
+
+    Object.defineProperty(ByteBuffer.prototype, "__isByteBuffer__", {
+        value: true,
+        enumerable: false,
+        configurable: false
+    });
+
     // helpers
 
     /**
@@ -280,7 +295,7 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.isByteBuffer = function(bb) {
-        return (bb && bb instanceof ByteBuffer) === true;
+        return (bb && bb["__isByteBuffer__"]) === true;
     };
     /**
      * Gets the backing buffer type.
@@ -1960,7 +1975,6 @@ module.exports = (function() {
     /**
      * Calculates the number of UTF8 characters of a string. JavaScript itself uses UTF-16, so that a string's
      *  `length` property does not reflect its actual UTF8 size if it contains code points larger than 0xFFFF.
-     * @function
      * @param {string} str String to calculate
      * @returns {number} Number of UTF8 characters
      * @expose
@@ -1971,7 +1985,6 @@ module.exports = (function() {
 
     /**
      * Calculates the number of UTF8 bytes of a string.
-     * @function
      * @param {string} str String to calculate
      * @returns {number} Number of UTF8 bytes
      * @expose
@@ -1981,6 +1994,15 @@ module.exports = (function() {
             throw TypeError("Illegal argument: "+(typeof str));
         return Buffer.byteLength(str, "utf8");
     };
+
+    /**
+     * Calculates the number of UTF8 bytes of a string. This is an alias of {@link ByteBuffer.calculateUTF8Bytes}.
+     * @function
+     * @param {string} str String to calculate
+     * @returns {number} Number of UTF8 bytes
+     * @expose
+     */
+    ByteBuffer.calculateString = ByteBuffer.calculateUTF8Bytes;
 
     /**
      * Reads an UTF8 encoded string.
@@ -2021,7 +2043,7 @@ module.exports = (function() {
                 return i < length && offset < this.limit ? this.buffer[offset++] : null;
             }.bind(this), function(cp) {
                 ++i; utfx.UTF8toUTF16(cp, sd);
-            }.bind(this));
+            });
             if (i !== length)
                 throw RangeError("Illegal range: Truncated data, "+i+" == "+length);
             if (relative) {

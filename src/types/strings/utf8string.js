@@ -72,7 +72,6 @@ ByteBufferPrototype.writeString = ByteBufferPrototype.writeUTF8String;
 /**
  * Calculates the number of UTF8 characters of a string. JavaScript itself uses UTF-16, so that a string's
  *  `length` property does not reflect its actual UTF8 size if it contains code points larger than 0xFFFF.
- * @function
  * @param {string} str String to calculate
  * @returns {number} Number of UTF8 characters
  * @expose
@@ -83,7 +82,6 @@ ByteBuffer.calculateUTF8Chars = function(str) {
 
 /**
  * Calculates the number of UTF8 bytes of a string.
- * @function
  * @param {string} str String to calculate
  * @returns {number} Number of UTF8 bytes
  * @expose
@@ -96,6 +94,17 @@ ByteBuffer.calculateUTF8Bytes = function(str) {
     //? } else
     return utfx.calculateUTF16asUTF8(stringSource(str))[1];
 };
+//? if (ALIASES) {
+
+/**
+ * Calculates the number of UTF8 bytes of a string. This is an alias of {@link ByteBuffer.calculateUTF8Bytes}.
+ * @function
+ * @param {string} str String to calculate
+ * @returns {number} Number of UTF8 bytes
+ * @expose
+ */
+ByteBuffer.calculateString = ByteBuffer.calculateUTF8Bytes;
+//? }
 
 /**
  * Reads an UTF8 encoded string.
@@ -135,7 +144,7 @@ ByteBufferPrototype.readUTF8String = function(length, metrics, offset) {
             return i < length && offset < this.limit ? this.view[offset++] : null;
         }.bind(this), function(cp) {
             ++i; utfx.UTF8toUTF16(cp, sd);
-        }.bind(this));
+        });
         if (i !== length)
             throw RangeError("Illegal range: Truncated data, "+i+" == "+length);
         if (relative) {

@@ -64,6 +64,13 @@ bench["readString"] = function(ByteBuffer, n) {
     return n;
 };
 
+bench["calculateString"] = function(ByteBuffer, n) {
+    n = n || 100000;
+    for (var i=0; i<n; ++i)
+        ByteBuffer.calculateString("abcdefghijklmnopqrstuvwxyz");
+    return n;
+};
+
 Object.keys(bench).forEach(function(key) {
     var func = bench[key];
     console.log(key);

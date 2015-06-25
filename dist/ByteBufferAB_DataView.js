@@ -179,6 +179,21 @@
      */
     var ByteBufferPrototype = ByteBuffer.prototype;
 
+    /**
+     * An indicator used to reliably determine if an object is a ByteBuffer or not.
+     * @type {boolean}
+     * @const
+     * @expose
+     * @private
+     */
+    ByteBufferPrototype.__isByteBuffer__;
+
+    Object.defineProperty(ByteBuffer.prototype, "__isByteBuffer__", {
+        value: true,
+        enumerable: false,
+        configurable: false
+    });
+
     // helpers
 
     /**
@@ -296,7 +311,7 @@
      * @expose
      */
     ByteBuffer.isByteBuffer = function(bb) {
-        return (bb && bb instanceof ByteBuffer) === true;
+        return (bb && bb["__isByteBuffer__"]) === true;
     };
     /**
      * Gets the backing buffer type.
@@ -370,7 +385,7 @@
         } else if (Object.prototype.toString.call(buffer) === "[object Array]") { // Create from octets
             bb = new ByteBuffer(buffer.length, littleEndian, noAssert);
             bb.limit = buffer.length;
-            for (i=0; i<buffer.length; ++i)
+            for (var i=0; i<buffer.length; ++i)
                 bb.view.setUint8(i, buffer[i]);
         } else
             throw TypeError("Illegal buffer"); // Otherwise fail
@@ -1806,7 +1821,6 @@
     /**
      * Calculates the number of UTF8 characters of a string. JavaScript itself uses UTF-16, so that a string's
      *  `length` property does not reflect its actual UTF8 size if it contains code points larger than 0xFFFF.
-     * @function
      * @param {string} str String to calculate
      * @returns {number} Number of UTF8 characters
      * @expose
@@ -1817,7 +1831,6 @@
 
     /**
      * Calculates the number of UTF8 bytes of a string.
-     * @function
      * @param {string} str String to calculate
      * @returns {number} Number of UTF8 bytes
      * @expose
@@ -1825,6 +1838,15 @@
     ByteBuffer.calculateUTF8Bytes = function(str) {
         return utfx.calculateUTF16asUTF8(stringSource(str))[1];
     };
+
+    /**
+     * Calculates the number of UTF8 bytes of a string. This is an alias of {@link ByteBuffer.calculateUTF8Bytes}.
+     * @function
+     * @param {string} str String to calculate
+     * @returns {number} Number of UTF8 bytes
+     * @expose
+     */
+    ByteBuffer.calculateString = ByteBuffer.calculateUTF8Bytes;
 
     /**
      * Reads an UTF8 encoded string.
@@ -1864,7 +1886,7 @@
                 return i < length && offset < this.limit ? this.view.getUint8(offset++) : null;
             }.bind(this), function(cp) {
                 ++i; utfx.UTF8toUTF16(cp, sd);
-            }.bind(this));
+            });
             if (i !== length)
                 throw RangeError("Illegal range: Truncated data, "+i+" == "+length);
             if (relative) {
