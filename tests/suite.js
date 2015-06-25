@@ -22,6 +22,7 @@ var ByteBuffer = require("../dist/ByteBufferNB.js");
 var ByteBufferNB = ByteBuffer.ByteBufferNB = ByteBuffer;
 var ByteBufferAB = ByteBuffer.ByteBufferAB = require("../dist/ByteBufferAB.min.js");
 var ByteBufferAB_DataView = ByteBuffer.ByteBufferAB_DataView = require("../dist/ByteBufferAB_DataView.min.js");
+var pkg = require("../package.json");
 
 /**
  * Constructs a new Sandbox for module loaders and shim testing.
@@ -65,6 +66,7 @@ function makeSuite(ByteBuffer) {
             test.log("\n\n                      --- ByteBufferAB_DataView ---\n".bold.white);
         test.ok(type === Buffer || type === ArrayBuffer);
         test.ok(typeof ByteBuffer == "function");
+        test.strictEqual(pkg.version, ByteBuffer.VERSION);
         test.done();
     };
     

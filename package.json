@@ -1,6 +1,6 @@
 {
   "name": "bytebuffer",
-  "version": "4.0.0-pre",
+  "version": "4.0.0",
   "author": "Daniel Wirtz <dcode@dcode.io>",
   "description": "The swiss army knife for binary data in JavaScript.",
   "main": "index.js",

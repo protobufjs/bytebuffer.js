@@ -1,7 +1,6 @@
 /**
  * Returns a copy of the backing buffer that contains this ByteBuffer's contents. Contents are the bytes between
- *  {@link ByteBuffer#offset} and {@link ByteBuffer#limit}. Will transparently {@link ByteBuffer#flip} this
- *  ByteBuffer if `offset > limit` but the actual offsets remain untouched.
+ *  {@link ByteBuffer#offset} and {@link ByteBuffer#limit}.
  * @param {boolean=} forceCopy If `true` returns a copy, otherwise returns a view referencing the same memory if
  *  possible. Defaults to `false`
 //? if (NODE) {
@@ -14,11 +13,6 @@
 ByteBufferPrototype.toBuffer = function(forceCopy) {
     var offset = this.offset,
         limit = this.limit;
-    if (offset > limit) {
-        var t = offset;
-        offset = limit;
-        limit = t;
-    }
     if (!this.noAssert) {
         //? ASSERT_RANGE('offset', 'limit');
     }
@@ -49,19 +43,12 @@ ByteBufferPrototype.toBuffer = function(forceCopy) {
 //? if (NODE) {
 /**
  * Returns a copy of the backing buffer compacted to contain this ByteBuffer's contents. Contents are the bytes between
- *  {@link ByteBuffer#offset} and {@link ByteBuffer#limit}. Will transparently {@link ByteBuffer#flip} this
- *  ByteBuffer if `offset > limit` but the actual offsets remain untouched.
- *  Defaults to `false`
+ *  {@link ByteBuffer#offset} and {@link ByteBuffer#limit}.
  * @returns {!ArrayBuffer} Contents as an ArrayBuffer
  */
 ByteBufferPrototype.toArrayBuffer = function() {
     var offset = this.offset,
         limit = this.limit;
-    if (offset > limit) {
-        var t = offset;
-        offset = limit;
-        limit = t;
-    }
     if (!this.noAssert) {
         //? ASSERT_RANGE('offset', 'limit');
     }
@@ -78,9 +65,7 @@ ByteBufferPrototype.toArrayBuffer = function() {
 //? } else {
 /**
  * Returns a raw buffer compacted to contain this ByteBuffer's contents. Contents are the bytes between
- *  {@link ByteBuffer#offset} and {@link ByteBuffer#limit}. Will transparently {@link ByteBuffer#flip} this
- *  ByteBuffer if `offset > limit` but the actual offsets remain untouched. This is an alias of
- *  {@link ByteBuffer#toBuffer}.
+ *  {@link ByteBuffer#offset} and {@link ByteBuffer#limit}. This is an alias of {@link ByteBuffer#toBuffer}.
  * @function
  * @param {boolean=} forceCopy If `true` returns a copy, otherwise returns a view referencing the same memory.
  *  Defaults to `false`

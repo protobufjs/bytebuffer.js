@@ -124,7 +124,7 @@
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "4.0.0-pre";
+    ByteBuffer.VERSION = "4.0.0";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -2881,8 +2881,7 @@
     };
     /**
      * Returns a copy of the backing buffer that contains this ByteBuffer's contents. Contents are the bytes between
-     *  {@link ByteBuffer#offset} and {@link ByteBuffer#limit}. Will transparently {@link ByteBuffer#flip} this
-     *  ByteBuffer if `offset > limit` but the actual offsets remain untouched.
+     *  {@link ByteBuffer#offset} and {@link ByteBuffer#limit}.
      * @param {boolean=} forceCopy If `true` returns a copy, otherwise returns a view referencing the same memory if
      *  possible. Defaults to `false`
      * @returns {!ArrayBuffer} Contents as an ArrayBuffer
@@ -2891,11 +2890,6 @@
     ByteBufferPrototype.toBuffer = function(forceCopy) {
         var offset = this.offset,
             limit = this.limit;
-        if (offset > limit) {
-            var t = offset;
-            offset = limit;
-            limit = t;
-        }
         if (!this.noAssert) {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: Not an integer");
@@ -2919,9 +2913,7 @@
 
     /**
      * Returns a raw buffer compacted to contain this ByteBuffer's contents. Contents are the bytes between
-     *  {@link ByteBuffer#offset} and {@link ByteBuffer#limit}. Will transparently {@link ByteBuffer#flip} this
-     *  ByteBuffer if `offset > limit` but the actual offsets remain untouched. This is an alias of
-     *  {@link ByteBuffer#toBuffer}.
+     *  {@link ByteBuffer#offset} and {@link ByteBuffer#limit}. This is an alias of {@link ByteBuffer#toBuffer}.
      * @function
      * @param {boolean=} forceCopy If `true` returns a copy, otherwise returns a view referencing the same memory.
      *  Defaults to `false`
