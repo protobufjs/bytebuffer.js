@@ -72,7 +72,7 @@ var scope = {
     
     ALIASES    : true,                  // Include aliases like writeByte, writeShort ..
     BUFFERVIEW : false,                 // Include BufferView as ByteBuffer#view under node
-    INLINE     : true,                  // Inline whatever possible for maximum performance
+    INLINE     : true,                  // Inline any assertion code
     VERBOSE_MS : false                  // Include MetaScript details as comments
 };
 

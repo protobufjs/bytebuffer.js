@@ -1,3 +1,17 @@
+// a simple benchmark utility comparing performance between the different builds.
+
+// Uint8Array observations (compared to node Buffers)
+// - seems to be pretty much equal for byte ops
+
+// DataView observations (compared to Uint8Array):
+// - allocation is about 2 times slower
+// - writing is about 5 times (int32) to 10 times (varint) slower
+// - reading is about 3 times slower
+
+// UTF8 encoding observations (compared to node's string/buffer API)
+// - the longer the string, the poorer is read/write performance
+// - either utfx doesn't cut it yet, or node's bindings simply outperform everything js here
+
 var ByteBuffer = require("../index.js"),
     prettyHrTime = require("pretty-hrtime");
 
