@@ -313,22 +313,6 @@
     ByteBuffer.isByteBuffer = function(bb) {
         return (bb && bb["__isByteBuffer__"]) === true;
     };
-    // TODO
-
-    /**
-     * Registers an additional string encoding.
-     * @param {string} name Short name of the encoding (i.e. "utf8")
-     * @param {function(!ByteBuffer, string, number)} fromString A function capable of decoding a string using this encoding
-     *  to a ByteBuffer
-     * @param {function(!ByteBuffer, number, number)} toString A function capable of encoding a string using this encoding
-     *  from a ByteBuffer
-     */
-    ByteBuffer.registerEncoding = function(name, fromString, toString) {
-        ByteBuffer.ENCODINGS[name] = {
-            fromString: fromString,
-            toString: toString
-        };
-    };
     /**
      * Gets the backing buffer type.
      * @returns {Function} `Buffer` under node.js, `ArrayBuffer` in the browser (classes)
@@ -1324,7 +1308,7 @@
             }
             b = this.view.getUint8(offset++);
             if (c < 5)
-                value |= (b & 0x7f)<<(7*c);
+                value |= (b & 0x7f) << (7*c);
             ++c;
         } while ((b & 0x80) !== 0);
         value |= 0;
@@ -1430,9 +1414,6 @@
             // ref: src/google/protobuf/wire_format_lite.h
             return value.shiftRightUnsigned(1).xor(value.and(Long.ONE).toSigned().negate()).toSigned();
         };
-
-        var Long0x80 = Long.fromNumber(0x80),
-            Long0x7f = Long.fromNumber(0x7f);
 
         /**
          * Writes a 64bit base 128 variable-length integer.
@@ -2940,9 +2921,8 @@
                 b = this.view.getUint8(i);
                 if (b < 0x10) hex += "0"+b.toString(16).toUpperCase();
                 else hex += b.toString(16).toUpperCase();
-                if (columns) {
+                if (columns)
                     asc += b > 32 && b < 127 ? String.fromCharCode(b) : '.';
-                }
             }
             ++i;
             if (columns) {
@@ -2962,8 +2942,9 @@
                 hex += i === this.markedOffset ? "'" : (columns || (i !== 0 && i !== k) ? " " : "");
         }
         if (columns && hex !== " ") {
-            while (hex.length < 3*16+3) hex += " ";
-            out += hex+asc+"\n";
+            while (hex.length < 3*16+3)
+                hex += " ";
+            out += hex + asc + "\n";
         }
         return columns ? out : hex;
     };
@@ -2984,14 +2965,15 @@
             bb = new ByteBuffer(((k+1)/3)|0, littleEndian, noAssert);
         var i = 0, j = 0, ch, b,
             rs = false, // Require symbol next
-            ho = false, hm = false, hl = false, // Already has offset, markedOffset, limit?
+            ho = false, hm = false, hl = false, // Already has offset (ho), markedOffset (hm), limit (hl)?
             fail = false;
         while (i<k) {
             switch (ch = str.charAt(i++)) {
                 case '!':
                     if (!noAssert) {
                         if (ho || hm || hl) {
-                            fail = true; break;
+                            fail = true;
+                            break;
                         }
                         ho = hm = hl = true;
                     }
@@ -3001,7 +2983,8 @@
                 case '|':
                     if (!noAssert) {
                         if (ho || hl) {
-                            fail = true; break;
+                            fail = true;
+                            break;
                         }
                         ho = hl = true;
                     }
@@ -3011,7 +2994,8 @@
                 case '[':
                     if (!noAssert) {
                         if (ho || hm) {
-                            fail = true; break;
+                            fail = true;
+                            break;
                         }
                         ho = hm = true;
                     }
@@ -3021,7 +3005,8 @@
                 case '<':
                     if (!noAssert) {
                         if (ho) {
-                            fail = true; break;
+                            fail = true;
+                            break;
                         }
                         ho = true;
                     }
@@ -3031,7 +3016,8 @@
                 case ']':
                     if (!noAssert) {
                         if (hl || hm) {
-                            fail = true; break;
+                            fail = true;
+                            break;
                         }
                         hl = hm = true;
                     }
@@ -3041,7 +3027,8 @@
                 case '>':
                     if (!noAssert) {
                         if (hl) {
-                            fail = true; break;
+                            fail = true;
+                            break;
                         }
                         hl = true;
                     }
@@ -3051,7 +3038,8 @@
                 case "'":
                     if (!noAssert) {
                         if (hm) {
-                            fail = true; break;
+                            fail = true;
+                            break;
                         }
                         hm = true;
                     }
@@ -3064,7 +3052,8 @@
                 default:
                     if (!noAssert) {
                         if (rs) {
-                            fail = true; break;
+                            fail = true;
+                            break;
                         }
                     }
                     b = parseInt(ch+str.charAt(i++), 16);

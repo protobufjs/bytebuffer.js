@@ -38,9 +38,8 @@ ByteBufferPrototype.toDebug = function(columns) {
             b = this.view[i];
             if (b < 0x10) hex += "0"+b.toString(16).toUpperCase();
             else hex += b.toString(16).toUpperCase();
-            if (columns) {
+            if (columns)
                 asc += b > 32 && b < 127 ? String.fromCharCode(b) : '.';
-            }
         }
         ++i;
         if (columns) {
@@ -60,8 +59,9 @@ ByteBufferPrototype.toDebug = function(columns) {
             hex += i === this.markedOffset ? "'" : (columns || (i !== 0 && i !== k) ? " " : "");
     }
     if (columns && hex !== " ") {
-        while (hex.length < 3*16+3) hex += " ";       
-        out += hex+asc+"\n";
+        while (hex.length < 3*16+3)
+            hex += " ";
+        out += hex + asc + "\n";
     }
     return columns ? out : hex;
 };
@@ -89,14 +89,15 @@ ByteBuffer.fromDebug = function(str, littleEndian, noAssert) {
         bb = new ByteBuffer(((k+1)/3)|0, littleEndian, noAssert);
     var i = 0, j = 0, ch, b,
         rs = false, // Require symbol next
-        ho = false, hm = false, hl = false, // Already has offset, markedOffset, limit?
+        ho = false, hm = false, hl = false, // Already has offset (ho), markedOffset (hm), limit (hl)?
         fail = false;
     while (i<k) {
         switch (ch = str.charAt(i++)) {
             case '!':
                 if (!noAssert) {
                     if (ho || hm || hl) {
-                        fail = true; break;
+                        fail = true;
+                        break;
                     }
                     ho = hm = hl = true;
                 }
@@ -106,7 +107,8 @@ ByteBuffer.fromDebug = function(str, littleEndian, noAssert) {
             case '|':
                 if (!noAssert) {
                     if (ho || hl) {
-                        fail = true; break;
+                        fail = true;
+                        break;
                     }
                     ho = hl = true;
                 }
@@ -116,7 +118,8 @@ ByteBuffer.fromDebug = function(str, littleEndian, noAssert) {
             case '[':
                 if (!noAssert) {
                     if (ho || hm) {
-                        fail = true; break;
+                        fail = true;
+                        break;
                     }
                     ho = hm = true;
                 }
@@ -126,7 +129,8 @@ ByteBuffer.fromDebug = function(str, littleEndian, noAssert) {
             case '<':
                 if (!noAssert) {
                     if (ho) {
-                        fail = true; break;
+                        fail = true;
+                        break;
                     }
                     ho = true;
                 }
@@ -136,7 +140,8 @@ ByteBuffer.fromDebug = function(str, littleEndian, noAssert) {
             case ']':
                 if (!noAssert) {
                     if (hl || hm) {
-                        fail = true; break;
+                        fail = true;
+                        break;
                     }
                     hl = hm = true;
                 }
@@ -146,7 +151,8 @@ ByteBuffer.fromDebug = function(str, littleEndian, noAssert) {
             case '>':
                 if (!noAssert) {
                     if (hl) {
-                        fail = true; break;
+                        fail = true;
+                        break;
                     }
                     hl = true;
                 }
@@ -156,7 +162,8 @@ ByteBuffer.fromDebug = function(str, littleEndian, noAssert) {
             case "'":
                 if (!noAssert) {
                     if (hm) {
-                        fail = true; break;
+                        fail = true;
+                        break;
                     }
                     hm = true;
                 }
@@ -169,7 +176,8 @@ ByteBuffer.fromDebug = function(str, littleEndian, noAssert) {
             default:
                 if (!noAssert) {
                     if (rs) {
-                        fail = true; break;
+                        fail = true;
+                        break;
                     }
                 }
                 b = parseInt(ch+str.charAt(i++), 16);

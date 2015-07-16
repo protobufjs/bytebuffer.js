@@ -129,7 +129,7 @@ ByteBufferPrototype.readVarint32 = function(offset) {
         //? else
         b = this.view[offset++];
         if (c < 5)
-            value |= (b & 0x7f)<<(7*c);
+            value |= (b & 0x7f) << (7*c);
         ++c;
     } while ((b & 0x80) !== 0);
     value |= 0;
