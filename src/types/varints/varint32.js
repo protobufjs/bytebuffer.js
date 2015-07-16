@@ -62,74 +62,32 @@ ByteBufferPrototype.writeVarint32 = function(value, offset) {
     var size = ByteBuffer.calculateVarint32(value),
         b;
     //? ENSURE_CAPACITY('size');
-    // ref: http://code.google.com/searchframe#WTeibokF6gE/trunk/src/google/protobuf/io/coded_stream.cc
-    //? var dst = NODE ? 'this.buffer' : 'this.view';
-    //? if (NODE || !DATAVIEW) {
-    /*?= dst */[offset] = b = value | 0x80;
-    //? } else
-    this.view.setUint8(offset, b = value | 0x80);
     value >>>= 0;
-    if (value >= 1 << 7) {
-        b = (value >> 7) | 0x80;
-        //? if (NODE || !DATAVIEW) {
-        /*?= dst */[offset+1] = b;
-        //? } else
-        this.view.setUint8(offset+1, b);
-        if (value >= 1 << 14) {
-            b = (value >> 14) | 0x80;
-            //? if (NODE || !DATAVIEW) {
-            /*?= dst */[offset+2] = b;
-            //? } else
-            this.view.setUint8(offset+2, b);
-            if (value >= 1 << 21) {
-                b = (value >> 21) | 0x80;
-                //? if (NODE || !DATAVIEW) {
-                /*?= dst */[offset+3] = b;
-                //? } else
-                this.view.setUint8(offset+3, b);
-                if (value >= 1 << 28) {
-                    //? if (NODE || !DATAVIEW) {
-                    /*?= dst */[offset+4] = (value >> 28) & 0x0F;
-                    //? } else
-                    this.view.setUint8(offset+4, (value >> 28) & 0x0F);
-                    size = 5;
-                } else {
-                    //? if (NODE || !DATAVIEW) {
-                    /*?= dst */[offset+3] = b & 0x7F;
-                    //? } else
-                    this.view.setUint8(offset+3, b & 0x7F);
-                    size = 4;
-                }
-            } else {
-                //? if (NODE || !DATAVIEW) {
-                /*?= dst */[offset+2] = b & 0x7F;
-                //? } else
-                this.view.setUint8(offset+2, b & 0x7F);
-                size = 3;
-            }
-        } else {
-            //? if (NODE || !DATAVIEW) {
-            /*?= dst */[offset+1] = b & 0x7F;
-            //? } else
-            this.view.setUint8(offset+1, b & 0x7F);
-            size = 2;
-        }
-    } else {
-        //? if (NODE || !DATAVIEW) {
-        /*?= dst */[offset] = b & 0x7F;
-        //? } else
-        this.view.setUint8(offset, b & 0x7F);
-        size = 1;
+    while (value >= 0x80) {
+        b = (value & 0x7f) | 0x80;
+        //? if (NODE)
+        this.buffer[offset++] = b;
+        //? else if (DATAVIEW)
+        this.view.setUint8(offset++, b);
+        //? else
+        this.view[offset++] = b;
+        value >>>= 7;
     }
+    //? if (NODE)
+    this.buffer[offset++] = value;
+    //? else if (DATAVIEW)
+    this.view.setUint8(offset++, value);
+    //? else
+    this.view[offset++] = value;
     if (relative) {
-        this.offset += size;
+        this.offset = offset;
         return this;
     }
     return size;
 };
 
 /**
- * Writes a zig-zag encoded 32bit base 128 variable-length integer.
+ * Writes a zig-zag encoded (signed) 32bit base 128 variable-length integer.
  * @param {number} value Value to write
  * @param {number=} offset Offset to write to. Will use and increase {@link ByteBuffer#offset} by the number of bytes
  *  written if omitted.
@@ -155,41 +113,38 @@ ByteBufferPrototype.readVarint32 = function(offset) {
     if (!this.noAssert) {
         //? ASSERT_OFFSET(1);
     }
-    // ref: src/google/protobuf/io/coded_stream.cc
-    var size = 0,
+    var c = 0,
         value = 0 >>> 0,
-        temp,
-        ioffset;
+        b;
     do {
-        ioffset = offset+size;
-        if (!this.noAssert && ioffset > this.limit) {
+        if (!this.noAssert && offset > this.limit) {
             var err = Error("Truncated");
             err['truncated'] = true;
             throw err;
         }
         //? if (NODE)
-        temp = this.buffer[ioffset];
+        b = this.buffer[offset++];
         //? else if (DATAVIEW)
-        temp = this.view.getUint8(ioffset);
+        b = this.view.getUint8(offset++);
         //? else
-        temp = this.view[ioffset];
-        if (size < 5)
-            value |= ((temp&0x7F)<<(7*size)) >>> 0;
-        ++size;
-    } while ((temp & 0x80) === 0x80);
-    value = value | 0; // Make sure to discard the higher order bits
+        b = this.view[offset++];
+        if (c < 5)
+            value |= (b & 0x7f)<<(7*c);
+        ++c;
+    } while ((b & 0x80) !== 0);
+    value |= 0;
     if (relative) {
-        this.offset += size;
+        this.offset = offset;
         return value;
     }
     return {
         "value": value,
-        "length": size
+        "length": c
     };
 };
 
 /**
- * Reads a zig-zag encoded 32bit base 128 variable-length integer.
+ * Reads a zig-zag encoded (signed) 32bit base 128 variable-length integer.
  * @param {number=} offset Offset to read from. Will use and increase {@link ByteBuffer#offset} by the number of bytes
  *  written if omitted.
  * @returns {number|!{value: number, length: number}} The value read if offset is omitted, else the value read

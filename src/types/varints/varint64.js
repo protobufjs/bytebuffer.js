@@ -62,6 +62,9 @@ if (Long) {
         // ref: src/google/protobuf/wire_format_lite.h
         return value.shiftRightUnsigned(1).xor(value.and(Long.ONE).toSigned().negate()).toSigned();
     };
+
+    var Long0x80 = Long.fromNumber(0x80),
+        Long0x7f = Long.fromNumber(0x7f);
     
     /**
      * Writes a 64bit base 128 variable-length integer.
