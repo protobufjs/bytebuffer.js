@@ -4,7 +4,10 @@
   "author": "Daniel Wirtz <dcode@dcode.io>",
   "description": "The swiss army knife for binary data in JavaScript.",
   "main": "index.js",
-  "browser": "dist/ByteBufferAB.js",
+  "browser": {
+    "index.js": "bytebuffer/dist/ByteBufferAB.js",
+    "Long": "bytebuffer/node_modules/long/dist/Long.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/dcodeIO/ByteBuffer.js.git"
