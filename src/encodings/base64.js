@@ -12,6 +12,7 @@
  * @param {number=} begin Offset to begin at, defaults to {@link ByteBuffer#offset}.
  * @param {number=} end Offset to end at, defaults to {@link ByteBuffer#limit}.
  * @returns {string} Base64 encoded string
+ * @throws {RangeError} If `begin` or `end` is out of bounds
  * @expose
  */
 ByteBufferPrototype.toBase64 = function(begin, end) {
@@ -19,9 +20,9 @@ ByteBufferPrototype.toBase64 = function(begin, end) {
         begin = this.offset;
     if (typeof end === 'undefined')
         end = this.limit;
-    if (!this.noAssert) {
-        //? ASSERT_RANGE();
-    }
+    begin = begin | 0; end = end | 0;
+    if (begin < 0 || end > this.capacity || begin > end)
+        throw RangeError("begin, end");
     //? if (NODE)
     return this.buffer.toString("base64", begin, end);
     //? else {
@@ -40,26 +41,16 @@ ByteBufferPrototype.toBase64 = function(begin, end) {
  * @param {string} str String to decode
  * @param {boolean=} littleEndian Whether to use little or big endian byte order. Defaults to
  *  {@link ByteBuffer.DEFAULT_ENDIAN}.
- * @param {boolean=} noAssert Whether to skip assertions of offsets and values. Defaults to
- *  {@link ByteBuffer.DEFAULT_NOASSERT}.
  * @returns {!ByteBuffer} ByteBuffer
  * @expose
  */
-ByteBuffer.fromBase64 = function(str, littleEndian, noAssert) {
-    if (!noAssert) {
-        if (typeof str !== 'string')
-            throw TypeError("Illegal str: Not a string");
-        if (str.length % 4 !== 0)
-            throw TypeError("Illegal str: Length not a multiple of 4");
-    }
+ByteBuffer.fromBase64 = function(str, littleEndian) {
     //? if (NODE) {
-    var bb = new ByteBuffer(0, littleEndian, noAssert);
-    bb.buffer = new Buffer(str, "base64");
-    //? if (BUFFERVIEW)
-    bb.view = new BufferView(bb.buffer);
-    bb.limit = bb.buffer.length;
+    return ByteBuffer.wrap(new Buffer(str, "base64"), littleEndian);
     //? } else {
-    var bb = new ByteBuffer(str.length/4*3, littleEndian, noAssert),
+    if (typeof str !== 'string')
+        throw TypeError("str");
+    var bb = new ByteBuffer(str.length/4*3, littleEndian),
         i = 0;
     lxiv.decode(stringSource(str), function(b) {
         //? if (DATAVIEW)

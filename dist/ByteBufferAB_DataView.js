@@ -124,7 +124,7 @@
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "4.0.0";
+    ByteBuffer.VERSION = "4.1.0";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -2076,7 +2076,6 @@
     ByteBufferPrototype.capacity = function() {
         return this.buffer.byteLength;
     };
-
     /**
      * Clears this ByteBuffer's offsets by setting {@link ByteBuffer#offset} to `0` and {@link ByteBuffer#limit} to the
      *  backing buffer's capacity. Discards {@link ByteBuffer#markedOffset}.
@@ -2757,6 +2756,7 @@
      * @param {number=} begin Offset to begin at, defaults to {@link ByteBuffer#offset}.
      * @param {number=} end Offset to end at, defaults to {@link ByteBuffer#limit}.
      * @returns {string} Base64 encoded string
+     * @throws {RangeError} If `begin` or `end` is out of bounds
      * @expose
      */
     ByteBufferPrototype.toBase64 = function(begin, end) {
@@ -2764,16 +2764,9 @@
             begin = this.offset;
         if (typeof end === 'undefined')
             end = this.limit;
-        if (!this.noAssert) {
-            if (typeof begin !== 'number' || begin % 1 !== 0)
-                throw TypeError("Illegal begin: Not an integer");
-            begin >>>= 0;
-            if (typeof end !== 'number' || end % 1 !== 0)
-                throw TypeError("Illegal end: Not an integer");
-            end >>>= 0;
-            if (begin < 0 || begin > end || end > this.buffer.byteLength)
-                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
-        }
+        begin = begin | 0; end = end | 0;
+        if (begin < 0 || end > this.capacity || begin > end)
+            throw RangeError("begin, end");
         var sd; lxiv.encode(function() {
             return begin < end ? this.view.getUint8(begin++) : null;
         }.bind(this), sd = stringDestination());
@@ -2785,19 +2778,13 @@
      * @param {string} str String to decode
      * @param {boolean=} littleEndian Whether to use little or big endian byte order. Defaults to
      *  {@link ByteBuffer.DEFAULT_ENDIAN}.
-     * @param {boolean=} noAssert Whether to skip assertions of offsets and values. Defaults to
-     *  {@link ByteBuffer.DEFAULT_NOASSERT}.
      * @returns {!ByteBuffer} ByteBuffer
      * @expose
      */
-    ByteBuffer.fromBase64 = function(str, littleEndian, noAssert) {
-        if (!noAssert) {
-            if (typeof str !== 'string')
-                throw TypeError("Illegal str: Not a string");
-            if (str.length % 4 !== 0)
-                throw TypeError("Illegal str: Length not a multiple of 4");
-        }
-        var bb = new ByteBuffer(str.length/4*3, littleEndian, noAssert),
+    ByteBuffer.fromBase64 = function(str, littleEndian) {
+        if (typeof str !== 'string')
+            throw TypeError("str");
+        var bb = new ByteBuffer(str.length/4*3, littleEndian),
             i = 0;
         lxiv.decode(stringSource(str), function(b) {
             bb.view.setUint8(i++, b);
@@ -2839,28 +2826,24 @@
      * @expose
      */
     ByteBufferPrototype.toBinary = function(begin, end) {
-        begin = typeof begin === 'undefined' ? this.offset : begin;
-        end = typeof end === 'undefined' ? this.limit : end;
-        if (!this.noAssert) {
-            if (typeof begin !== 'number' || begin % 1 !== 0)
-                throw TypeError("Illegal begin: Not an integer");
-            begin >>>= 0;
-            if (typeof end !== 'number' || end % 1 !== 0)
-                throw TypeError("Illegal end: Not an integer");
-            end >>>= 0;
-            if (begin < 0 || begin > end || end > this.buffer.byteLength)
-                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
-        }
+        if (typeof begin === 'undefined')
+            begin = this.offset;
+        if (typeof end === 'undefined')
+            end = this.limit;
+        begin |= 0; end |= 0;
+        if (begin < 0 || end > this.capacity() || begin > end)
+            throw RangeError("begin, end");
         if (begin === end)
             return "";
-        var cc = [], pt = [];
+        var chars = [],
+            parts = [];
         while (begin < end) {
-            cc.push(this.view.getUint8(begin++));
-            if (cc.length >= 1024)
-                pt.push(String.fromCharCode.apply(String, cc)),
-                cc = [];
+            chars.push(this.view.getUint8(begin++));
+            if (chars.length >= 1024)
+                parts.push(String.fromCharCode.apply(String, chars)),
+                chars = [];
         }
-        return pt.join('') + String.fromCharCode.apply(String, cc);
+        return parts.join('') + String.fromCharCode.apply(String, chars);
     };
 
     /**
@@ -2868,22 +2851,20 @@
      * @param {string} str String to decode
      * @param {boolean=} littleEndian Whether to use little or big endian byte order. Defaults to
      *  {@link ByteBuffer.DEFAULT_ENDIAN}.
-     * @param {boolean=} noAssert Whether to skip assertions of offsets and values. Defaults to
-     *  {@link ByteBuffer.DEFAULT_NOASSERT}.
      * @returns {!ByteBuffer} ByteBuffer
      * @expose
      */
-    ByteBuffer.fromBinary = function(str, littleEndian, noAssert) {
-        if (!noAssert) {
-            if (typeof str !== 'string')
-                throw TypeError("Illegal str: Not a string");
-        }
-        var i = 0, k = str.length, charCode,
-            bb = new ByteBuffer(k, littleEndian, noAssert);
+    ByteBuffer.fromBinary = function(str, littleEndian) {
+        if (typeof str !== 'string')
+            throw TypeError("str");
+        var i = 0,
+            k = str.length,
+            charCode,
+            bb = new ByteBuffer(k, littleEndian);
         while (i<k) {
             charCode = str.charCodeAt(i);
-            if (!noAssert && charCode > 255)
-                throw RangeError("Illegal charCode at "+i+": 0 <= "+charCode+" <= 255");
+            if (charCode > 0xff)
+                throw RangeError("illegal char code: "+charCode);
             bb.view.setUint8(i++, charCode);
         }
         bb.limit = k;

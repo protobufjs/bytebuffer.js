@@ -1,6 +1,6 @@
 {
   "name": "bytebuffer",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "author": "Daniel Wirtz <dcode@dcode.io>",
   "description": "The swiss army knife for binary data in JavaScript.",
   "main": "index.js",
@@ -24,7 +24,7 @@
     "webrtc"
   ],
   "dependencies": {
-    "long": "~2 >=2.2.3",
+    "long": "~2 >=2.3.0",
     "bufferview": "~1"
   },
   "devDependencies": {

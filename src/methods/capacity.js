@@ -6,4 +6,3 @@
 ByteBufferPrototype.capacity = function() {
     return /*?= CAPACITY */;
 };
-

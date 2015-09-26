@@ -110,7 +110,7 @@ module.exports = (function() {
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "4.0.0";
+    ByteBuffer.VERSION = "4.1.0";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -2222,7 +2222,6 @@ module.exports = (function() {
     ByteBufferPrototype.capacity = function() {
         return this.buffer.length;
     };
-
     /**
      * Clears this ByteBuffer's offsets by setting {@link ByteBuffer#offset} to `0` and {@link ByteBuffer#limit} to the
      *  backing buffer's capacity. Discards {@link ByteBuffer#markedOffset}.
@@ -2799,6 +2798,7 @@ module.exports = (function() {
      * @param {number=} begin Offset to begin at, defaults to {@link ByteBuffer#offset}.
      * @param {number=} end Offset to end at, defaults to {@link ByteBuffer#limit}.
      * @returns {string} Base64 encoded string
+     * @throws {RangeError} If `begin` or `end` is out of bounds
      * @expose
      */
     ByteBufferPrototype.toBase64 = function(begin, end) {
@@ -2806,16 +2806,9 @@ module.exports = (function() {
             begin = this.offset;
         if (typeof end === 'undefined')
             end = this.limit;
-        if (!this.noAssert) {
-            if (typeof begin !== 'number' || begin % 1 !== 0)
-                throw TypeError("Illegal begin: Not an integer");
-            begin >>>= 0;
-            if (typeof end !== 'number' || end % 1 !== 0)
-                throw TypeError("Illegal end: Not an integer");
-            end >>>= 0;
-            if (begin < 0 || begin > end || end > this.buffer.length)
-                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length);
-        }
+        begin = begin | 0; end = end | 0;
+        if (begin < 0 || end > this.capacity || begin > end)
+            throw RangeError("begin, end");
         return this.buffer.toString("base64", begin, end);
     };
 
@@ -2824,21 +2817,11 @@ module.exports = (function() {
      * @param {string} str String to decode
      * @param {boolean=} littleEndian Whether to use little or big endian byte order. Defaults to
      *  {@link ByteBuffer.DEFAULT_ENDIAN}.
-     * @param {boolean=} noAssert Whether to skip assertions of offsets and values. Defaults to
-     *  {@link ByteBuffer.DEFAULT_NOASSERT}.
      * @returns {!ByteBuffer} ByteBuffer
      * @expose
      */
-    ByteBuffer.fromBase64 = function(str, littleEndian, noAssert) {
-        if (!noAssert) {
-            if (typeof str !== 'string')
-                throw TypeError("Illegal str: Not a string");
-            if (str.length % 4 !== 0)
-                throw TypeError("Illegal str: Length not a multiple of 4");
-        }
-        var bb = new ByteBuffer(0, littleEndian, noAssert);
-        bb.buffer = new Buffer(str, "base64");
-        bb.limit = bb.buffer.length;
+    ByteBuffer.fromBase64 = function(str, littleEndian) {
+        return ByteBuffer.wrap(new Buffer(str, "base64"), littleEndian);
         return bb;
     };
 
@@ -2866,17 +2849,6 @@ module.exports = (function() {
 
     // encodings/binary
 
-    //
-    // http://nodejs.org/api/buffer.html states: "This encoding method is deprecated and should be avoided in favor of
-    // Buffer objects where possible. This encoding will be removed in future versions of Node."
-    //
-    // https://github.com/joyent/node/issues/3279 states: "The cost of doing this is too high. People use the binary
-    // encoding, apparently, and don't want it taken away. It's not in the way at all, so let's drop this."
-    //
-    // So let's assume that binary encoding will at least stay for a while and prepare for the case that it'll be removed
-    // eventually by adding NODE switches to the browser implementation as well.
-    //
-
     /**
      * Encodes this ByteBuffer to a binary encoded string, that is using only characters 0x00-0xFF as bytes.
      * @param {number=} begin Offset to begin at. Defaults to {@link ByteBuffer#offset}.
@@ -2886,18 +2858,13 @@ module.exports = (function() {
      * @expose
      */
     ByteBufferPrototype.toBinary = function(begin, end) {
-        begin = typeof begin === 'undefined' ? this.offset : begin;
-        end = typeof end === 'undefined' ? this.limit : end;
-        if (!this.noAssert) {
-            if (typeof begin !== 'number' || begin % 1 !== 0)
-                throw TypeError("Illegal begin: Not an integer");
-            begin >>>= 0;
-            if (typeof end !== 'number' || end % 1 !== 0)
-                throw TypeError("Illegal end: Not an integer");
-            end >>>= 0;
-            if (begin < 0 || begin > end || end > this.buffer.length)
-                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length);
-        }
+        if (typeof begin === 'undefined')
+            begin = this.offset;
+        if (typeof end === 'undefined')
+            end = this.limit;
+        begin |= 0; end |= 0;
+        if (begin < 0 || end > this.capacity() || begin > end)
+            throw RangeError("begin, end");
         return this.buffer.toString("binary", begin, end);
     };
 
@@ -2906,20 +2873,11 @@ module.exports = (function() {
      * @param {string} str String to decode
      * @param {boolean=} littleEndian Whether to use little or big endian byte order. Defaults to
      *  {@link ByteBuffer.DEFAULT_ENDIAN}.
-     * @param {boolean=} noAssert Whether to skip assertions of offsets and values. Defaults to
-     *  {@link ByteBuffer.DEFAULT_NOASSERT}.
      * @returns {!ByteBuffer} ByteBuffer
      * @expose
      */
-    ByteBuffer.fromBinary = function(str, littleEndian, noAssert) {
-        if (!noAssert) {
-            if (typeof str !== 'string')
-                throw TypeError("Illegal str: Not a string");
-        }
-        var bb = new ByteBuffer(0, littleEndian, noAssert);
-        bb.buffer = new Buffer(str, 'binary');
-        bb.limit = bb.buffer.length;
-        return bb;
+    ByteBuffer.fromBinary = function(str, littleEndian) {
+        return ByteBuffer.wrap(new Buffer(str, "binary"), littleEndian);
         return bb;
     };
 
