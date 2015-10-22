@@ -1855,31 +1855,16 @@ module.exports = (function() {
             if (offset < 0 || offset + 4 > this.buffer.length)
                 throw RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.length);
         }
-        var temp = 0,
-            start = offset,
-            str;
-        if (this.littleEndian) {
-            temp  = this.buffer[offset+2] << 16;
-            temp |= this.buffer[offset+1] <<  8;
-            temp |= this.buffer[offset  ];
-            temp += this.buffer[offset+3] << 24 >>> 0;
-        } else {
-            temp  = this.buffer[offset+1] << 16;
-            temp |= this.buffer[offset+2] <<  8;
-            temp |= this.buffer[offset+3];
-            temp += this.buffer[offset  ] << 24 >>> 0;
-        }
-        offset += 4;
-        if (offset + temp > this.buffer.length)
-            throw RangeError("Index out of bounds: "+offset+" + "+temp+" <= "+this.buffer.length);
-        str = this.buffer.toString("utf8", offset, offset + temp);
-        offset += temp;
+        var start = offset;
+        var len = this.readUint32(offset);
+        var str = this.readUTF8String(len, ByteBuffer.METRICS_BYTES, offset += 4);
+        offset += str['length'];
         if (relative) {
             this.offset = offset;
-            return str;
+            return str['string'];
         } else {
             return {
-                'string': str,
+                'string': str['string'],
                 'length': offset - start
             };
         }
@@ -2124,21 +2109,16 @@ module.exports = (function() {
             if (offset < 0 || offset + 1 > this.buffer.length)
                 throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.length);
         }
-        var temp = this.readVarint32(offset),
-            start = offset,
-            str;
-        offset += temp['length'];
-        temp = temp['value'];
-        if (offset + temp > this.buffer.length)
-            throw RangeError("Index out of bounds: "+offset+" + "+val.value+" <= "+this.buffer.length);
-        str = this.buffer.toString("utf8", offset, offset + temp);
-        offset += temp;
+        var start = offset;
+        var len = this.readVarint32(offset);
+        var str = this.readUTF8String(len['value'], ByteBuffer.METRICS_BYTES, offset += len['length']);
+        offset += str['length'];
         if (relative) {
             this.offset = offset;
-            return str;
+            return str['string'];
         } else {
             return {
-                'string': str,
+                'string': str['string'],
                 'length': offset - start
             };
         }

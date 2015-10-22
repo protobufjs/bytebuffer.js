@@ -1706,23 +1706,16 @@
             if (offset < 0 || offset + 4 > this.buffer.byteLength)
                 throw RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength);
         }
-        var temp = 0,
-            start = offset,
-            str;
-        temp = this.view.getUint32(offset, this.littleEndian);
-        offset += 4;
-        var k = offset + temp,
-            sd;
-        utfx.decodeUTF8toUTF16(function() {
-            return offset < k ? this.view.getUint8(offset++) : null;
-        }.bind(this), sd = stringDestination(), this.noAssert);
-        str = sd();
+        var start = offset;
+        var len = this.readUint32(offset);
+        var str = this.readUTF8String(len, ByteBuffer.METRICS_BYTES, offset += 4);
+        offset += str['length'];
         if (relative) {
             this.offset = offset;
-            return str;
+            return str['string'];
         } else {
             return {
-                'string': str,
+                'string': str['string'],
                 'length': offset - start
             };
         }
@@ -1976,23 +1969,16 @@
             if (offset < 0 || offset + 1 > this.buffer.byteLength)
                 throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength);
         }
-        var temp = this.readVarint32(offset),
-            start = offset,
-            str;
-        offset += temp['length'];
-        temp = temp['value'];
-        var k = offset + temp,
-            sd = stringDestination();
-        utfx.decodeUTF8toUTF16(function() {
-            return offset < k ? this.view.getUint8(offset++) : null;
-        }.bind(this), sd, this.noAssert);
-        str = sd();
+        var start = offset;
+        var len = this.readVarint32(offset);
+        var str = this.readUTF8String(len['value'], ByteBuffer.METRICS_BYTES, offset += len['length']);
+        offset += str['length'];
         if (relative) {
             this.offset = offset;
-            return str;
+            return str['string'];
         } else {
             return {
-                'string': str,
+                'string': str['string'],
                 'length': offset - start
             };
         }

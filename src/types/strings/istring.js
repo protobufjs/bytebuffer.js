@@ -63,38 +63,16 @@ ByteBufferPrototype.readIString = function(offset) {
     if (!this.noAssert) {
         //? ASSERT_OFFSET(4);
     }
-    var temp = 0,
-        start = offset,
-        str;
-    //? if (NODE) {
-    //? READ_UINT32_ARRAY('temp');
-    offset += 4;
-    if (offset + temp > this.buffer.length)
-        throw RangeError("Index out of bounds: "+offset+" + "+temp+" <= "+this.buffer.length);
-    str = this.buffer.toString("utf8", offset, offset + temp);
-    offset += temp;
-    //? } else {
-    //? if (DATAVIEW)
-    temp = this.view.getUint32(offset, this.littleEndian);
-    //? else
-    //? READ_UINT32_ARRAY('temp');
-    offset += 4;
-    var k = offset + temp,
-        sd;
-    utfx.decodeUTF8toUTF16(function() {
-        //? if (DATAVIEW)
-        return offset < k ? this.view.getUint8(offset++) : null;
-        //? else
-        return offset < k ? this.view[offset++] : null;
-    }.bind(this), sd = stringDestination(), this.noAssert);
-    str = sd();
-    //? }
+    var start = offset;
+    var len = this.readUint32(offset);
+    var str = this.readUTF8String(len, ByteBuffer.METRICS_BYTES, offset += 4);
+    offset += str['length'];
     if (relative) {
         this.offset = offset;
-        return str;
+        return str['string'];
     } else {
         return {
-            'string': str,
+            'string': str['string'],
             'length': offset - start
         };
     }

@@ -60,33 +60,16 @@ ByteBufferPrototype.readVString = function(offset) {
     if (!this.noAssert) {
         //? ASSERT_OFFSET(1);
     }
-    var temp = this.readVarint32(offset),
-        start = offset,
-        str;
-    offset += temp['length'];
-    temp = temp['value'];
-    //? if (NODE) {
-    if (offset + temp > this.buffer.length)
-        throw RangeError("Index out of bounds: "+offset+" + "+val.value+" <= "+this.buffer.length);
-    str = this.buffer.toString("utf8", offset, offset + temp);
-    offset += temp;
-    //? } else {
-    var k = offset + temp,
-        sd = stringDestination();
-    utfx.decodeUTF8toUTF16(function() {
-        //? if (DATAVIEW)
-        return offset < k ? this.view.getUint8(offset++) : null;
-        //? else
-        return offset < k ? this.view[offset++] : null;
-    }.bind(this), sd, this.noAssert);
-    str = sd();
-    //? }
+    var start = offset;
+    var len = this.readVarint32(offset);
+    var str = this.readUTF8String(len['value'], ByteBuffer.METRICS_BYTES, offset += len['length']);
+    offset += str['length'];
     if (relative) {
         this.offset = offset;
-        return str;
+        return str['string'];
     } else {
         return {
-            'string': str,
+            'string': str['string'],
             'length': offset - start
         };
     }
