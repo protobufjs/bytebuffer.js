@@ -7,10 +7,10 @@
   "browser": "./dist/bytebuffer.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dcodeIO/ByteBuffer.js.git"
+    "url": "https://github.com/dcodeIO/bytebuffer.js.git"
   },
   "bugs": {
-    "url": "https://github.com/dcodeIO/ByteBuffer.js/issues"
+    "url": "https://github.com/dcodeIO/bytebuffer.js/issues"
   },
   "keywords": [
     "net",
