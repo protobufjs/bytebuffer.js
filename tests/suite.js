@@ -18,10 +18,10 @@
  * ByteBuffer.js Test Suite.
  * @author Daniel Wirtz <dcode@dcode.io>
  */ //
-var ByteBuffer = require("../dist/ByteBufferNB.js");
+var ByteBuffer = require("../dist/bytebuffer-node.js");
 var ByteBufferNB = ByteBuffer.ByteBufferNB = ByteBuffer;
-var ByteBufferAB = ByteBuffer.ByteBufferAB = require("../dist/ByteBufferAB.min.js");
-var ByteBufferAB_DataView = ByteBuffer.ByteBufferAB_DataView = require("../dist/ByteBufferAB_DataView.min.js");
+var ByteBufferAB = ByteBuffer.ByteBufferAB = require("../dist/bytebuffer.min.js");
+var ByteBufferAB_DataView = ByteBuffer.ByteBufferAB_DataView = require("../dist/bytebuffer-dataview.min.js");
 var pkg = require("../package.json");
 
 /**
@@ -946,84 +946,6 @@ function makeSuite(ByteBuffer) {
 
         test.done();
     };
-    
-    suite.loaders = {};
-
-    suite.loaders.commonjs = function(test) {
-        var fs = require("fs"),
-            vm = require("vm"),
-            util = require('util');
-
-        var code = fs.readFileSync(__dirname+"/../dist/ByteBuffer"+(type === ArrayBuffer ? "AB" : "NB")+".js");
-        var Long = ByteBuffer.Long;
-        var sandbox = new Sandbox({
-            require: function(moduleName) {
-                switch (moduleName) {
-                    case 'long': return Long;
-                    case 'buffer': return require("buffer");
-                }
-            },
-            module: {
-                exports: {},
-                id: "bytebuffer"
-            },
-            exports: {},
-            ArrayBuffer: ArrayBuffer,
-            DataView: DataView
-        });
-        vm.runInNewContext(code, sandbox, "commonjs-sandbox");
-        test.equal(typeof sandbox.module.exports, 'function');
-        test.ok(sandbox.module.exports.Long);
-        test.strictEqual(sandbox.module.exports.Long, ByteBuffer.Long);
-        test.done();
-    };
-
-    if (type === ArrayBuffer) {
-        suite.loaders.amd = function(test) {
-            var fs = require("fs"),
-                vm = require("vm"),
-                util = require('util');
-    
-            var code = fs.readFileSync(__dirname+"/../dist/ByteBufferAB.min.js");
-            var sandbox = new Sandbox({
-                require: function() {},
-                define: (function() {
-                    function define(moduleName, dependencies, constructor) {
-                        define.called = [moduleName, dependencies];
-                    }
-                    define.amd = true;
-                    define.called = null;
-                    return define;
-                })(),
-                DataView: DataView
-            });
-            vm.runInNewContext(code, sandbox, "amd-sandbox");
-            test.ok(sandbox.define.called);
-            test.equal(sandbox.define.called[0][0], "Long");
-            test.done();
-        };
-        
-        suite.loaders.shim = function(test) {
-            var fs = require("fs"),
-                vm = require("vm"),
-                util = require('util');
-    
-            var code = fs.readFileSync(__dirname+"/../dist/ByteBufferAB.min.js");
-            var sandbox = new Sandbox({
-                dcodeIO: {
-                    Long: ByteBuffer.Long
-                },
-                ArrayBuffer: ArrayBuffer,
-                DataView: DataView
-            });
-            vm.runInNewContext(code, sandbox, "shim-sandbox");
-            test.notEqual(typeof sandbox.dcodeIO, 'undefined');
-            test.notEqual(typeof sandbox.dcodeIO.ByteBuffer, 'undefined');
-            test.ok(sandbox.dcodeIO.ByteBuffer.Long);
-            test.strictEqual(sandbox.dcodeIO.ByteBuffer.Long, ByteBuffer.Long);
-            test.done();
-        };
-    }
 
     suite.debug = {};
 

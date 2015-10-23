@@ -23,7 +23,7 @@
 (function(global, factory) {
 
     /* AMD */ if (typeof define === 'function' && define["amd"])
-        define(["Long"], factory);
+        define(["long"], factory);
     /* CommonJS */ else if (typeof require === 'function' && typeof module === "object" && module && module["exports"])
         module['exports'] = (function() {
             var Long; try { Long = require("long"); } catch (e) {}
@@ -124,7 +124,7 @@
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "4.1.0";
+    ByteBuffer.VERSION = "5.0.0";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.

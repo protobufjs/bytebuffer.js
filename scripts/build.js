@@ -71,40 +71,39 @@ var scope = {
     // Other
     
     ALIASES    : true,                  // Include aliases like writeByte, writeShort ..
-    BUFFERVIEW : false,                 // Include BufferView as ByteBuffer#view under node
     INLINE     : true,                  // Inline any assertion code
     VERBOSE_MS : false                  // Include MetaScript details as comments
 };
 
 // Optimize for size  : INLINE=false, ALIASES=false, VERBOSE_MS=false, WHATEVERYOUDONTNEED=false
-// Optimize for speed : INLINE=true, BUFFERVIEW=false
+// Optimize for speed : INLINE=true
 
 if (!scope.UTF8) scope.STRINGS = false;
 
 // Build node ByteBuffer using Buffers
 scope.NODE = true;
-console.log("Building ByteBufferNB with scope", JSON.stringify(scope, null, 2));
+console.log("Building bytebuffer-node with scope", JSON.stringify(scope, null, 2));
 fs.writeFileSync(
-    path.join(distDir, "ByteBufferNB.js"),
-    MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "wrap_node.js")), filename, scope, srcDir)
+    path.join(distDir, "bytebuffer-node.js"),
+    MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "wrap-node.js")), filename, scope, srcDir)
 );
 
 // Build browser ByteBuffer using Typed Arrays
 scope.NODE = false;
 scope.DATAVIEW = false;
 delete scope.BUFFERVIEW;
-console.log("Building ByteBufferAB with scope", JSON.stringify(scope, null, 2));
+console.log("Building bytebuffer.js with scope", JSON.stringify(scope, null, 2));
 fs.writeFileSync(
-    path.join(distDir, "ByteBufferAB.js"),
+    path.join(distDir, "bytebuffer.js"),
     MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "wrap.js")), filename, scope)
 );
 
 // Build alternative browser ByteBuffer using a DataView
 scope.NODE = false;
 scope.DATAVIEW = true;
-console.log("Building ByteBufferAB_DataView with scope", JSON.stringify(scope, null, 2));
+console.log("Building bytebuffer-dataview with scope", JSON.stringify(scope, null, 2));
 fs.writeFileSync(
-    path.join(distDir, "ByteBufferAB_DataView.js"),
+    path.join(distDir, "bytebuffer-dataview.js"),
     MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "wrap.js")), filename, scope)
 );
 

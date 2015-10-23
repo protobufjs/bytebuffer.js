@@ -12,8 +12,6 @@ ByteBufferPrototype.clone = function(copy) {
         var buffer = new Buffer(this.buffer.length);
         this.buffer.copy(buffer);
         bb.buffer = buffer;
-        //? if (BUFFERVIEW)
-        bb.view = new BufferView(this.buffer);
         //? } else {
         bb.buffer = new ArrayBuffer(this.buffer.byteLength);
         //? if (DATAVIEW) {
@@ -25,7 +23,7 @@ ByteBufferPrototype.clone = function(copy) {
         //? }
     } else {
         bb.buffer = this.buffer;
-        //? if (!NODE || BUFFERVIEW)
+        //? if (!NODE)
         bb.view = this.view;
     }
     bb.offset = this.offset;

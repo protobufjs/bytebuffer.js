@@ -18,7 +18,7 @@ ByteBufferPrototype.compact = function(begin, end) {
     var len = end - begin;
     if (len === 0) {
         this.buffer = EMPTY_BUFFER;
-        //? if (!NODE || BUFFERVIEW)
+        //? if (!NODE)
         this.view = null;
         if (this.markedOffset >= 0) this.markedOffset -= begin;
         this.offset = 0;
@@ -29,8 +29,6 @@ ByteBufferPrototype.compact = function(begin, end) {
     var buffer = new Buffer(len);
     this.buffer.copy(buffer, 0, begin, end);
     this.buffer = buffer;
-    //? if (BUFFERVIEW)
-    this.view = new BufferView(buffer);
     //? } else if (DATAVIEW) {
     var buffer = new ArrayBuffer(len);
     new Uint8Array(buffer).set(new Uint8Array(this.buffer).subarray(begin, end));

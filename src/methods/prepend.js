@@ -36,8 +36,6 @@ ByteBufferPrototype.prepend = function(source, encoding, offset) {
         var buffer = new Buffer(this.buffer.length + diff);
         this.buffer.copy(buffer, len, offset, this.buffer.length);
         this.buffer = buffer;
-        //? if (BUFFERVIEW)
-        this.view = new BufferView(buffer);
         //? } else if (DATAVIEW) {
         var buffer = new ArrayBuffer(this.buffer.byteLength + diff);
         var arrayView = new Uint8Array(buffer);

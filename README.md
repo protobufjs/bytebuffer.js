@@ -1,4 +1,4 @@
-![ByteBuffer.js - The swiss army knife for binary data in JavaScript.](https://raw.github.com/dcodeIO/ByteBuffer.js/master/ByteBuffer.png)
+![ByteBuffer.js - The swiss army knife for binary data in JavaScript.](https://raw.github.com/dcodeIO/ByteBuffer.js/master/bytebuffer.png)
 ======================================
 A fast and complete ByteBuffer implementation using either ArrayBuffers in the browser or node Buffers under node.js,
 generated from a single source tree through [MetaScript](https://github.com/dcodeIO/MetaScript).
@@ -9,9 +9,9 @@ generated from a single source tree through [MetaScript](https://github.com/dcod
 Features
 --------
 * Three API-compatible versions:
-  * **ByteBufferNB** &nbsp; Backing buffer / Accessor: node Buffer
-  * **ByteBufferAB** &nbsp; Backing buffer: ArrayBuffer, Accessor: Uint8Array
-  * **ByteBufferAB_DataView** &nbsp; Backing buffer: ArrayBuffer, Accessor: DataView
+  * **bytebuffer** &nbsp; Backing buffer: ArrayBuffer, Accessor: Uint8Array
+  * **bytebuffer-dataview** &nbsp; Backing buffer: ArrayBuffer, Accessor: DataView
+  * **bytebuffer-node** &nbsp; Backing buffer / Accessor: node Buffer
 * 8, 16, 32 and 64 bit signed and unsigned integers
 * 32 and 64 bit floats
 * Varints as used in protobuf (32 and 64 bit, zig-zag)
@@ -53,7 +53,7 @@ Downloads
 
 Support for IE<10, FF<15, Chrome<9 etc.
 ---------------------------------------
-* Use ByteBufferAB_DataView with a polyfill ([see](https://github.com/dcodeIO/ByteBuffer.js/tree/master/dist))
+* Use bytebuffer-dataview with a polyfill ([see](https://github.com/dcodeIO/ByteBuffer.js/tree/master/dist))
 
 Contributors
 ------------

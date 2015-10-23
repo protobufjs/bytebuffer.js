@@ -18,8 +18,6 @@ ByteBufferPrototype.resize = function(capacity) {
         var buffer = new Buffer(capacity);
         this.buffer.copy(buffer);
         this.buffer = buffer;
-        //? if (BUFFERVIEW)
-        this.view = new BufferView(buffer);
     }
     //? } else {
     if (this.buffer.byteLength < capacity) {

@@ -26,8 +26,6 @@ module.exports = (function() {
     
     var buffer = require("buffer"),
         Buffer = buffer["Buffer"],
-        //? if (BUFFERVIEW)
-        BufferView = require("bufferview"),
         Long = require("long"),
         memcpy = null; try { memcpy = require("memcpy"); } catch (e) {}
 
@@ -46,17 +44,7 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.memcpy = memcpy;
-    //? if (BUFFERVIEW) {
-    
-    /**
-     * node-BufferView. Available when compiled with `BUFFERVIEW=true`, which is the default.
-     * @type {!BufferView}
-     * @see https://npmjs.org/package/bufferview
-     * @expose
-     */
-    ByteBuffer.BufferView = BufferView;
-    //? }
-    
+
     return ByteBuffer;
 
 })();

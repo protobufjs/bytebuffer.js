@@ -16,17 +16,24 @@
 
 /**
  * @license ByteBuffer.js (c) 2015 Daniel Wirtz <dcode@dcode.io>
- * [BUILD] ByteBufferNB - Backing buffer / Accessor: node Buffer
+ * [BUILD] ByteBufferAB - Backing buffer: ArrayBuffer, Accessor: Uint8Array
  * Released under the Apache License, Version 2.0
  * see: https://github.com/dcodeIO/ByteBuffer.js for details
  */
-module.exports = (function() {
-    "use strict";
+(function(global, factory) {
 
-    var buffer = require("buffer"),
-        Buffer = buffer["Buffer"],
-        Long = require("long"),
-        memcpy = null; try { memcpy = require("memcpy"); } catch (e) {}
+    /* AMD */ if (typeof define === 'function' && define["amd"])
+        define(["long"], factory);
+    /* CommonJS */ else if (typeof require === 'function' && typeof module === "object" && module && module["exports"])
+        module['exports'] = (function() {
+            var Long; try { Long = require("long"); } catch (e) {}
+            return factory(Long);
+        })();
+    /* Global */ else
+        (global["dcodeIO"] = global["dcodeIO"] || {})["ByteBuffer"] = factory(global["dcodeIO"]["Long"]);
+
+})(this, function(Long) {
+    "use strict";
 
     /**
      * Constructs a new ByteBuffer.
@@ -56,11 +63,18 @@ module.exports = (function() {
         }
 
         /**
-         * Backing node Buffer.
-         * @type {!Buffer}
+         * Backing ArrayBuffer.
+         * @type {!ArrayBuffer}
          * @expose
          */
-        this.buffer = capacity === 0 ? EMPTY_BUFFER : new Buffer(capacity);
+        this.buffer = capacity === 0 ? EMPTY_BUFFER : new ArrayBuffer(capacity);
+
+        /**
+         * Uint8Array utilized to manipulate the backing buffer. Becomes `null` if the backing buffer has a capacity of `0`.
+         * @type {?Uint8Array}
+         * @expose
+         */
+        this.view = capacity === 0 ? null : new Uint8Array(this.buffer);
 
         /**
          * Absolute read/write offset.
@@ -110,7 +124,7 @@ module.exports = (function() {
      * @const
      * @expose
      */
-    ByteBuffer.VERSION = "4.1.0";
+    ByteBuffer.VERSION = "5.0.0";
 
     /**
      * Little endian constant that can be used instead of its boolean value. Evaluates to `true`.
@@ -150,13 +164,14 @@ module.exports = (function() {
     ByteBuffer.DEFAULT_NOASSERT = false;
 
     /**
-     * A `Long` class for representing a 64-bit two's-complement integer value.
-     * @type {!Long}
+     * A `Long` class for representing a 64-bit two's-complement integer value. May be `null` if Long.js has not been loaded
+     *  and int64 support is not available.
+     * @type {?Long}
      * @const
-     * @see https://npmjs.org/package/long
+     * @see https://github.com/dcodeIO/Long.js
      * @expose
      */
-    ByteBuffer.Long = Long;
+    ByteBuffer.Long = Long || null;
 
     /**
      * @alias ByteBuffer.prototype
@@ -182,10 +197,10 @@ module.exports = (function() {
     // helpers
 
     /**
-     * @type {!Buffer}
+     * @type {!ArrayBuffer}
      * @inner
      */
-    var EMPTY_BUFFER = new Buffer(0);
+    var EMPTY_BUFFER = new ArrayBuffer(0);
 
     /**
      * String.fromCharCode reference for compile-time renaming.
@@ -231,7 +246,7 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.accessor = function() {
-        return Buffer;
+        return Uint8Array;
     };
     /**
      * Allocates a new ByteBuffer backed by a buffer of the specified capacity.
@@ -249,7 +264,7 @@ module.exports = (function() {
 
     /**
      * Concatenates multiple ByteBuffers into one.
-     * @param {!Array.<!ByteBuffer|!Buffer|!ArrayBuffer|!Uint8Array|string>} buffers Buffers to concatenate
+     * @param {!Array.<!ByteBuffer|!ArrayBuffer|!Uint8Array|string>} buffers Buffers to concatenate
      * @param {(string|boolean)=} encoding String encoding if `buffers` contains a string ("base64", "hex", "binary",
      *  defaults to "utf8")
      * @param {boolean=} littleEndian Whether to use little or big endian byte order for the resulting ByteBuffer. Defaults
@@ -280,7 +295,7 @@ module.exports = (function() {
             bi = buffers[i++];
             length = bi.limit - bi.offset;
             if (length <= 0) continue;
-            bi.buffer.copy(bb.buffer, bb.offset, bi.offset, bi.limit);
+            bb.view.set(bi.view.subarray(bi.offset, bi.limit), bb.offset);
             bb.offset += length;
         }
         bb.limit = bb.offset;
@@ -303,12 +318,12 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.type = function() {
-        return Buffer;
+        return ArrayBuffer;
     };
     /**
      * Wraps a buffer or a string. Sets the allocated ByteBuffer's {@link ByteBuffer#offset} to `0` and its
      *  {@link ByteBuffer#limit} to the length of the wrapped data.
-     * @param {!ByteBuffer|!Buffer|!ArrayBuffer|!Uint8Array|string|!Array.<number>} buffer Anything that can be wrapped
+     * @param {!ByteBuffer|!ArrayBuffer|!Uint8Array|string|!Array.<number>} buffer Anything that can be wrapped
      * @param {(string|boolean)=} encoding String encoding if `buffer` is a string ("base64", "hex", "binary", defaults to
      *  "utf8")
      * @param {boolean=} littleEndian Whether to use little or big endian byte order. Defaults to
@@ -350,39 +365,29 @@ module.exports = (function() {
             bb.markedOffset = -1;
             return bb;
         }
-        var i = 0,
-            k = 0,
-            b;
-        if (buffer instanceof Uint8Array) { // Extract bytes from Uint8Array
-            b = new Buffer(buffer.length);
-            if (memcpy) { // Fast
-                memcpy(b, 0, buffer.buffer, buffer.byteOffset, buffer.byteOffset + buffer.length);
-            } else { // Slow
-                for (i=0, k=buffer.length; i<k; ++i)
-                    b[i] = buffer[i];
+        if (buffer instanceof Uint8Array) { // Extract ArrayBuffer from Uint8Array
+            bb = new ByteBuffer(0, littleEndian, noAssert);
+            if (buffer.length > 0) { // Avoid references to more than one EMPTY_BUFFER
+                bb.buffer = buffer.buffer;
+                bb.offset = buffer.byteOffset;
+                bb.limit = buffer.byteOffset + buffer.byteLength;
+                bb.view = new Uint8Array(buffer.buffer);
             }
-            buffer = b;
-        } else if (buffer instanceof ArrayBuffer) { // Convert ArrayBuffer to Buffer
-            b = new Buffer(buffer.byteLength);
-            if (memcpy) { // Fast
-                memcpy(b, 0, buffer, 0, buffer.byteLength);
-            } else { // Slow
-                buffer = new Uint8Array(buffer);
-                for (i=0, k=buffer.length; i<k; ++i) {
-                    b[i] = buffer[i];
-                }
+        } else if (buffer instanceof ArrayBuffer) { // Reuse ArrayBuffer
+            bb = new ByteBuffer(0, littleEndian, noAssert);
+            if (buffer.byteLength > 0) {
+                bb.buffer = buffer;
+                bb.offset = 0;
+                bb.limit = buffer.byteLength;
+                bb.view = buffer.byteLength > 0 ? new Uint8Array(buffer) : null;
             }
-            buffer = b;
-        } else if (!(buffer instanceof Buffer)) { // Create from octets if it is an error, otherwise fail
-            if (Object.prototype.toString.call(buffer) !== "[object Array]")
-                throw TypeError("Illegal buffer");
-            buffer = new Buffer(buffer);
-        }
-        bb = new ByteBuffer(0, littleEndian, noAssert);
-        if (buffer.length > 0) { // Avoid references to more than one EMPTY_BUFFER
-            bb.buffer = buffer;
+        } else if (Object.prototype.toString.call(buffer) === "[object Array]") { // Create from octets
+            bb = new ByteBuffer(buffer.length, littleEndian, noAssert);
             bb.limit = buffer.length;
-        }
+            for (var i=0; i<buffer.length; ++i)
+                bb.view[i] = buffer[i];
+        } else
+            throw TypeError("Illegal buffer"); // Otherwise fail
         return bb;
     };
 
@@ -400,8 +405,8 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + length > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+length+") <= "+this.buffer.length);
+            if (offset < 0 || offset + length > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+length+") <= "+this.buffer.byteLength);
         }
         var slice = this.slice(offset, offset + length);
         if (relative) this.offset += length;
@@ -411,8 +416,8 @@ module.exports = (function() {
     /**
      * Writes a payload of bytes. This is an alias of {@link ByteBuffer#append}.
      * @function
-     * @param {!ByteBuffer|!Buffer|!ArrayBuffer|!Uint8Array|string} source Data to write. If `source` is a ByteBuffer, its
-     * offsets will be modified according to the performed read operation.
+     * @param {!ByteBuffer|!ArrayBuffer|!Uint8Array|string} source Data to write. If `source` is a ByteBuffer, its offsets
+     *  will be modified according to the performed read operation.
      * @param {(string|number)=} encoding Encoding if `data` is a string ("base64", "hex", "binary", defaults to "utf8")
      * @param {number=} offset Offset to write to. Will use and increase {@link ByteBuffer#offset} by the number of bytes
      *  written if omitted.
@@ -440,15 +445,15 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         offset += 1;
-        var capacity0 = this.buffer.length;
+        var capacity0 = this.buffer.byteLength;
         if (offset > capacity0)
             this.resize((capacity0 *= 2) > offset ? capacity0 : offset);
         offset -= 1;
-        this.buffer[offset] = value;
+        this.view[offset] = value;
         if (relative) this.offset += 1;
         return this;
     };
@@ -476,10 +481,10 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 1 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 1 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength);
         }
-        var value = this.buffer[offset];
+        var value = this.view[offset];
         if ((value & 0x80) === 0x80) value = -(0xFF - value + 1); // Cast to signed
         if (relative) this.offset += 1;
         return value;
@@ -511,15 +516,15 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         offset += 1;
-        var capacity1 = this.buffer.length;
+        var capacity1 = this.buffer.byteLength;
         if (offset > capacity1)
             this.resize((capacity1 *= 2) > offset ? capacity1 : offset);
         offset -= 1;
-        this.buffer[offset] = value;
+        this.view[offset] = value;
         if (relative) this.offset += 1;
         return this;
     };
@@ -547,10 +552,10 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 1 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 1 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength);
         }
-        var value = this.buffer[offset];
+        var value = this.view[offset];
         if (relative) this.offset += 1;
         return value;
     };
@@ -584,20 +589,20 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         offset += 2;
-        var capacity2 = this.buffer.length;
+        var capacity2 = this.buffer.byteLength;
         if (offset > capacity2)
             this.resize((capacity2 *= 2) > offset ? capacity2 : offset);
         offset -= 2;
         if (this.littleEndian) {
-            this.buffer[offset+1] = (value & 0xFF00) >>> 8;
-            this.buffer[offset  ] =  value & 0x00FF;
+            this.view[offset+1] = (value & 0xFF00) >>> 8;
+            this.view[offset  ] =  value & 0x00FF;
         } else {
-            this.buffer[offset]   = (value & 0xFF00) >>> 8;
-            this.buffer[offset+1] =  value & 0x00FF;
+            this.view[offset]   = (value & 0xFF00) >>> 8;
+            this.view[offset+1] =  value & 0x00FF;
         }
         if (relative) this.offset += 2;
         return this;
@@ -629,16 +634,16 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 2 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+2+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 2 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+2+") <= "+this.buffer.byteLength);
         }
         var value = 0;
         if (this.littleEndian) {
-            value  = this.buffer[offset  ];
-            value |= this.buffer[offset+1] << 8;
+            value  = this.view[offset  ];
+            value |= this.view[offset+1] << 8;
         } else {
-            value  = this.buffer[offset  ] << 8;
-            value |= this.buffer[offset+1];
+            value  = this.view[offset  ] << 8;
+            value |= this.view[offset+1];
         }
         if ((value & 0x8000) === 0x8000) value = -(0xFFFF - value + 1); // Cast to signed
         if (relative) this.offset += 2;
@@ -674,20 +679,20 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         offset += 2;
-        var capacity3 = this.buffer.length;
+        var capacity3 = this.buffer.byteLength;
         if (offset > capacity3)
             this.resize((capacity3 *= 2) > offset ? capacity3 : offset);
         offset -= 2;
         if (this.littleEndian) {
-            this.buffer[offset+1] = (value & 0xFF00) >>> 8;
-            this.buffer[offset  ] =  value & 0x00FF;
+            this.view[offset+1] = (value & 0xFF00) >>> 8;
+            this.view[offset  ] =  value & 0x00FF;
         } else {
-            this.buffer[offset]   = (value & 0xFF00) >>> 8;
-            this.buffer[offset+1] =  value & 0x00FF;
+            this.view[offset]   = (value & 0xFF00) >>> 8;
+            this.view[offset+1] =  value & 0x00FF;
         }
         if (relative) this.offset += 2;
         return this;
@@ -719,16 +724,16 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 2 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+2+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 2 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+2+") <= "+this.buffer.byteLength);
         }
         var value = 0;
         if (this.littleEndian) {
-            value  = this.buffer[offset  ];
-            value |= this.buffer[offset+1] << 8;
+            value  = this.view[offset  ];
+            value |= this.view[offset+1] << 8;
         } else {
-            value  = this.buffer[offset  ] << 8;
-            value |= this.buffer[offset+1];
+            value  = this.view[offset  ] << 8;
+            value |= this.view[offset+1];
         }
         if (relative) this.offset += 2;
         return value;
@@ -763,24 +768,24 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         offset += 4;
-        var capacity4 = this.buffer.length;
+        var capacity4 = this.buffer.byteLength;
         if (offset > capacity4)
             this.resize((capacity4 *= 2) > offset ? capacity4 : offset);
         offset -= 4;
         if (this.littleEndian) {
-            this.buffer[offset+3] = (value >>> 24) & 0xFF;
-            this.buffer[offset+2] = (value >>> 16) & 0xFF;
-            this.buffer[offset+1] = (value >>>  8) & 0xFF;
-            this.buffer[offset  ] =  value         & 0xFF;
+            this.view[offset+3] = (value >>> 24) & 0xFF;
+            this.view[offset+2] = (value >>> 16) & 0xFF;
+            this.view[offset+1] = (value >>>  8) & 0xFF;
+            this.view[offset  ] =  value         & 0xFF;
         } else {
-            this.buffer[offset  ] = (value >>> 24) & 0xFF;
-            this.buffer[offset+1] = (value >>> 16) & 0xFF;
-            this.buffer[offset+2] = (value >>>  8) & 0xFF;
-            this.buffer[offset+3] =  value         & 0xFF;
+            this.view[offset  ] = (value >>> 24) & 0xFF;
+            this.view[offset+1] = (value >>> 16) & 0xFF;
+            this.view[offset+2] = (value >>>  8) & 0xFF;
+            this.view[offset+3] =  value         & 0xFF;
         }
         if (relative) this.offset += 4;
         return this;
@@ -807,20 +812,20 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 4 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 4 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength);
         }
         var value = 0;
         if (this.littleEndian) {
-            value  = this.buffer[offset+2] << 16;
-            value |= this.buffer[offset+1] <<  8;
-            value |= this.buffer[offset  ];
-            value += this.buffer[offset+3] << 24 >>> 0;
+            value  = this.view[offset+2] << 16;
+            value |= this.view[offset+1] <<  8;
+            value |= this.view[offset  ];
+            value += this.view[offset+3] << 24 >>> 0;
         } else {
-            value  = this.buffer[offset+1] << 16;
-            value |= this.buffer[offset+2] <<  8;
-            value |= this.buffer[offset+3];
-            value += this.buffer[offset  ] << 24 >>> 0;
+            value  = this.view[offset+1] << 16;
+            value |= this.view[offset+2] <<  8;
+            value |= this.view[offset+3];
+            value += this.view[offset  ] << 24 >>> 0;
         }
         value |= 0; // Cast to signed
         if (relative) this.offset += 4;
@@ -851,24 +856,24 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         offset += 4;
-        var capacity5 = this.buffer.length;
+        var capacity5 = this.buffer.byteLength;
         if (offset > capacity5)
             this.resize((capacity5 *= 2) > offset ? capacity5 : offset);
         offset -= 4;
         if (this.littleEndian) {
-            this.buffer[offset+3] = (value >>> 24) & 0xFF;
-            this.buffer[offset+2] = (value >>> 16) & 0xFF;
-            this.buffer[offset+1] = (value >>>  8) & 0xFF;
-            this.buffer[offset  ] =  value         & 0xFF;
+            this.view[offset+3] = (value >>> 24) & 0xFF;
+            this.view[offset+2] = (value >>> 16) & 0xFF;
+            this.view[offset+1] = (value >>>  8) & 0xFF;
+            this.view[offset  ] =  value         & 0xFF;
         } else {
-            this.buffer[offset  ] = (value >>> 24) & 0xFF;
-            this.buffer[offset+1] = (value >>> 16) & 0xFF;
-            this.buffer[offset+2] = (value >>>  8) & 0xFF;
-            this.buffer[offset+3] =  value         & 0xFF;
+            this.view[offset  ] = (value >>> 24) & 0xFF;
+            this.view[offset+1] = (value >>> 16) & 0xFF;
+            this.view[offset+2] = (value >>>  8) & 0xFF;
+            this.view[offset+3] =  value         & 0xFF;
         }
         if (relative) this.offset += 4;
         return this;
@@ -896,20 +901,20 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 4 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 4 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength);
         }
         var value = 0;
         if (this.littleEndian) {
-            value  = this.buffer[offset+2] << 16;
-            value |= this.buffer[offset+1] <<  8;
-            value |= this.buffer[offset  ];
-            value += this.buffer[offset+3] << 24 >>> 0;
+            value  = this.view[offset+2] << 16;
+            value |= this.view[offset+1] <<  8;
+            value |= this.view[offset  ];
+            value += this.view[offset+3] << 24 >>> 0;
         } else {
-            value  = this.buffer[offset+1] << 16;
-            value |= this.buffer[offset+2] <<  8;
-            value |= this.buffer[offset+3];
-            value += this.buffer[offset  ] << 24 >>> 0;
+            value  = this.view[offset+1] << 16;
+            value |= this.view[offset+2] <<  8;
+            value |= this.view[offset+3];
+            value += this.view[offset  ] << 24 >>> 0;
         }
         if (relative) this.offset += 4;
         return value;
@@ -948,40 +953,40 @@ module.exports = (function() {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
                     throw TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
-                if (offset < 0 || offset + 0 > this.buffer.length)
-                    throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+                if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                    throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             if (typeof value === 'number')
                 value = Long.fromNumber(value);
             else if (typeof value === 'string')
                 value = Long.fromString(value);
             offset += 8;
-            var capacity6 = this.buffer.length;
+            var capacity6 = this.buffer.byteLength;
             if (offset > capacity6)
                 this.resize((capacity6 *= 2) > offset ? capacity6 : offset);
             offset -= 8;
             var lo = value.low,
                 hi = value.high;
             if (this.littleEndian) {
-                this.buffer[offset+3] = (lo >>> 24) & 0xFF;
-                this.buffer[offset+2] = (lo >>> 16) & 0xFF;
-                this.buffer[offset+1] = (lo >>>  8) & 0xFF;
-                this.buffer[offset  ] =  lo         & 0xFF;
+                this.view[offset+3] = (lo >>> 24) & 0xFF;
+                this.view[offset+2] = (lo >>> 16) & 0xFF;
+                this.view[offset+1] = (lo >>>  8) & 0xFF;
+                this.view[offset  ] =  lo         & 0xFF;
                 offset += 4;
-                this.buffer[offset+3] = (hi >>> 24) & 0xFF;
-                this.buffer[offset+2] = (hi >>> 16) & 0xFF;
-                this.buffer[offset+1] = (hi >>>  8) & 0xFF;
-                this.buffer[offset  ] =  hi         & 0xFF;
+                this.view[offset+3] = (hi >>> 24) & 0xFF;
+                this.view[offset+2] = (hi >>> 16) & 0xFF;
+                this.view[offset+1] = (hi >>>  8) & 0xFF;
+                this.view[offset  ] =  hi         & 0xFF;
             } else {
-                this.buffer[offset  ] = (hi >>> 24) & 0xFF;
-                this.buffer[offset+1] = (hi >>> 16) & 0xFF;
-                this.buffer[offset+2] = (hi >>>  8) & 0xFF;
-                this.buffer[offset+3] =  hi         & 0xFF;
+                this.view[offset  ] = (hi >>> 24) & 0xFF;
+                this.view[offset+1] = (hi >>> 16) & 0xFF;
+                this.view[offset+2] = (hi >>>  8) & 0xFF;
+                this.view[offset+3] =  hi         & 0xFF;
                 offset += 4;
-                this.buffer[offset  ] = (lo >>> 24) & 0xFF;
-                this.buffer[offset+1] = (lo >>> 16) & 0xFF;
-                this.buffer[offset+2] = (lo >>>  8) & 0xFF;
-                this.buffer[offset+3] =  lo         & 0xFF;
+                this.view[offset  ] = (lo >>> 24) & 0xFF;
+                this.view[offset+1] = (lo >>> 16) & 0xFF;
+                this.view[offset+2] = (lo >>>  8) & 0xFF;
+                this.view[offset+3] =  lo         & 0xFF;
             }
             if (relative) this.offset += 8;
             return this;
@@ -1009,31 +1014,31 @@ module.exports = (function() {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
                     throw TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
-                if (offset < 0 || offset + 8 > this.buffer.length)
-                    throw RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.length);
+                if (offset < 0 || offset + 8 > this.buffer.byteLength)
+                    throw RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.byteLength);
             }
             var lo = 0,
                 hi = 0;
             if (this.littleEndian) {
-                lo  = this.buffer[offset+2] << 16;
-                lo |= this.buffer[offset+1] <<  8;
-                lo |= this.buffer[offset  ];
-                lo += this.buffer[offset+3] << 24 >>> 0;
+                lo  = this.view[offset+2] << 16;
+                lo |= this.view[offset+1] <<  8;
+                lo |= this.view[offset  ];
+                lo += this.view[offset+3] << 24 >>> 0;
                 offset += 4;
-                hi  = this.buffer[offset+2] << 16;
-                hi |= this.buffer[offset+1] <<  8;
-                hi |= this.buffer[offset  ];
-                hi += this.buffer[offset+3] << 24 >>> 0;
+                hi  = this.view[offset+2] << 16;
+                hi |= this.view[offset+1] <<  8;
+                hi |= this.view[offset  ];
+                hi += this.view[offset+3] << 24 >>> 0;
             } else {
-                hi  = this.buffer[offset+1] << 16;
-                hi |= this.buffer[offset+2] <<  8;
-                hi |= this.buffer[offset+3];
-                hi += this.buffer[offset  ] << 24 >>> 0;
+                hi  = this.view[offset+1] << 16;
+                hi |= this.view[offset+2] <<  8;
+                hi |= this.view[offset+3];
+                hi += this.view[offset  ] << 24 >>> 0;
                 offset += 4;
-                lo  = this.buffer[offset+1] << 16;
-                lo |= this.buffer[offset+2] <<  8;
-                lo |= this.buffer[offset+3];
-                lo += this.buffer[offset  ] << 24 >>> 0;
+                lo  = this.view[offset+1] << 16;
+                lo |= this.view[offset+2] <<  8;
+                lo |= this.view[offset+3];
+                lo += this.view[offset  ] << 24 >>> 0;
             }
             var value = new Long(lo, hi, false);
             if (relative) this.offset += 8;
@@ -1068,40 +1073,40 @@ module.exports = (function() {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
                     throw TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
-                if (offset < 0 || offset + 0 > this.buffer.length)
-                    throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+                if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                    throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             if (typeof value === 'number')
                 value = Long.fromNumber(value);
             else if (typeof value === 'string')
                 value = Long.fromString(value);
             offset += 8;
-            var capacity7 = this.buffer.length;
+            var capacity7 = this.buffer.byteLength;
             if (offset > capacity7)
                 this.resize((capacity7 *= 2) > offset ? capacity7 : offset);
             offset -= 8;
             var lo = value.low,
                 hi = value.high;
             if (this.littleEndian) {
-                this.buffer[offset+3] = (lo >>> 24) & 0xFF;
-                this.buffer[offset+2] = (lo >>> 16) & 0xFF;
-                this.buffer[offset+1] = (lo >>>  8) & 0xFF;
-                this.buffer[offset  ] =  lo         & 0xFF;
+                this.view[offset+3] = (lo >>> 24) & 0xFF;
+                this.view[offset+2] = (lo >>> 16) & 0xFF;
+                this.view[offset+1] = (lo >>>  8) & 0xFF;
+                this.view[offset  ] =  lo         & 0xFF;
                 offset += 4;
-                this.buffer[offset+3] = (hi >>> 24) & 0xFF;
-                this.buffer[offset+2] = (hi >>> 16) & 0xFF;
-                this.buffer[offset+1] = (hi >>>  8) & 0xFF;
-                this.buffer[offset  ] =  hi         & 0xFF;
+                this.view[offset+3] = (hi >>> 24) & 0xFF;
+                this.view[offset+2] = (hi >>> 16) & 0xFF;
+                this.view[offset+1] = (hi >>>  8) & 0xFF;
+                this.view[offset  ] =  hi         & 0xFF;
             } else {
-                this.buffer[offset  ] = (hi >>> 24) & 0xFF;
-                this.buffer[offset+1] = (hi >>> 16) & 0xFF;
-                this.buffer[offset+2] = (hi >>>  8) & 0xFF;
-                this.buffer[offset+3] =  hi         & 0xFF;
+                this.view[offset  ] = (hi >>> 24) & 0xFF;
+                this.view[offset+1] = (hi >>> 16) & 0xFF;
+                this.view[offset+2] = (hi >>>  8) & 0xFF;
+                this.view[offset+3] =  hi         & 0xFF;
                 offset += 4;
-                this.buffer[offset  ] = (lo >>> 24) & 0xFF;
-                this.buffer[offset+1] = (lo >>> 16) & 0xFF;
-                this.buffer[offset+2] = (lo >>>  8) & 0xFF;
-                this.buffer[offset+3] =  lo         & 0xFF;
+                this.view[offset  ] = (lo >>> 24) & 0xFF;
+                this.view[offset+1] = (lo >>> 16) & 0xFF;
+                this.view[offset+2] = (lo >>>  8) & 0xFF;
+                this.view[offset+3] =  lo         & 0xFF;
             }
             if (relative) this.offset += 8;
             return this;
@@ -1130,31 +1135,31 @@ module.exports = (function() {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
                     throw TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
-                if (offset < 0 || offset + 8 > this.buffer.length)
-                    throw RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.length);
+                if (offset < 0 || offset + 8 > this.buffer.byteLength)
+                    throw RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.byteLength);
             }
             var lo = 0,
                 hi = 0;
             if (this.littleEndian) {
-                lo  = this.buffer[offset+2] << 16;
-                lo |= this.buffer[offset+1] <<  8;
-                lo |= this.buffer[offset  ];
-                lo += this.buffer[offset+3] << 24 >>> 0;
+                lo  = this.view[offset+2] << 16;
+                lo |= this.view[offset+1] <<  8;
+                lo |= this.view[offset  ];
+                lo += this.view[offset+3] << 24 >>> 0;
                 offset += 4;
-                hi  = this.buffer[offset+2] << 16;
-                hi |= this.buffer[offset+1] <<  8;
-                hi |= this.buffer[offset  ];
-                hi += this.buffer[offset+3] << 24 >>> 0;
+                hi  = this.view[offset+2] << 16;
+                hi |= this.view[offset+1] <<  8;
+                hi |= this.view[offset  ];
+                hi += this.view[offset+3] << 24 >>> 0;
             } else {
-                hi  = this.buffer[offset+1] << 16;
-                hi |= this.buffer[offset+2] <<  8;
-                hi |= this.buffer[offset+3];
-                hi += this.buffer[offset  ] << 24 >>> 0;
+                hi  = this.view[offset+1] << 16;
+                hi |= this.view[offset+2] <<  8;
+                hi |= this.view[offset+3];
+                hi += this.view[offset  ] << 24 >>> 0;
                 offset += 4;
-                lo  = this.buffer[offset+1] << 16;
-                lo |= this.buffer[offset+2] <<  8;
-                lo |= this.buffer[offset+3];
-                lo += this.buffer[offset  ] << 24 >>> 0;
+                lo  = this.view[offset+1] << 16;
+                lo |= this.view[offset+2] <<  8;
+                lo |= this.view[offset+3];
+                lo += this.view[offset  ] << 24 >>> 0;
             }
             var value = new Long(lo, hi, true);
             if (relative) this.offset += 8;
@@ -1175,6 +1180,137 @@ module.exports = (function() {
 
     // types/floats/float32
 
+    /*
+     ieee754 - https://github.com/feross/ieee754
+
+     The MIT License (MIT)
+
+     Copyright (c) Feross Aboukhadijeh
+
+     Permission is hereby granted, free of charge, to any person obtaining a copy
+     of this software and associated documentation files (the "Software"), to deal
+     in the Software without restriction, including without limitation the rights
+     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+     copies of the Software, and to permit persons to whom the Software is
+     furnished to do so, subject to the following conditions:
+
+     The above copyright notice and this permission notice shall be included in
+     all copies or substantial portions of the Software.
+
+     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+     THE SOFTWARE.
+    */
+
+    /**
+     * Reads an IEEE754 float from a byte array.
+     * @param {!Array} buffer
+     * @param {number} offset
+     * @param {boolean} isLE
+     * @param {number} mLen
+     * @param {number} nBytes
+     * @returns {number}
+     * @inner
+     */
+    function ieee754_read(buffer, offset, isLE, mLen, nBytes) {
+        var e, m,
+            eLen = nBytes * 8 - mLen - 1,
+            eMax = (1 << eLen) - 1,
+            eBias = eMax >> 1,
+            nBits = -7,
+            i = isLE ? (nBytes - 1) : 0,
+            d = isLE ? -1 : 1,
+            s = buffer[offset + i];
+
+        i += d;
+
+        e = s & ((1 << (-nBits)) - 1);
+        s >>= (-nBits);
+        nBits += eLen;
+        for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+        m = e & ((1 << (-nBits)) - 1);
+        e >>= (-nBits);
+        nBits += mLen;
+        for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+        if (e === 0) {
+            e = 1 - eBias;
+        } else if (e === eMax) {
+            return m ? NaN : ((s ? -1 : 1) * Infinity);
+        } else {
+            m = m + Math.pow(2, mLen);
+            e = e - eBias;
+        }
+        return (s ? -1 : 1) * m * Math.pow(2, e - mLen);
+    }
+
+    /**
+     * Writes an IEEE754 float to a byte array.
+     * @param {!Array} buffer
+     * @param {number} value
+     * @param {number} offset
+     * @param {boolean} isLE
+     * @param {number} mLen
+     * @param {number} nBytes
+     * @inner
+     */
+    function ieee754_write(buffer, value, offset, isLE, mLen, nBytes) {
+        var e, m, c,
+            eLen = nBytes * 8 - mLen - 1,
+            eMax = (1 << eLen) - 1,
+            eBias = eMax >> 1,
+            rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0),
+            i = isLE ? 0 : (nBytes - 1),
+            d = isLE ? 1 : -1,
+            s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0;
+
+        value = Math.abs(value);
+
+        if (isNaN(value) || value === Infinity) {
+            m = isNaN(value) ? 1 : 0;
+            e = eMax;
+        } else {
+            e = Math.floor(Math.log(value) / Math.LN2);
+            if (value * (c = Math.pow(2, -e)) < 1) {
+                e--;
+                c *= 2;
+            }
+            if (e + eBias >= 1) {
+                value += rt / c;
+            } else {
+                value += rt * Math.pow(2, 1 - eBias);
+            }
+            if (value * c >= 2) {
+                e++;
+                c /= 2;
+            }
+
+            if (e + eBias >= eMax) {
+                m = 0;
+                e = eMax;
+            } else if (e + eBias >= 1) {
+                m = (value * c - 1) * Math.pow(2, mLen);
+                e = e + eBias;
+            } else {
+                m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
+                e = 0;
+            }
+        }
+
+        for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
+
+        e = (e << mLen) | m;
+        eLen += mLen;
+        for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
+
+        buffer[offset + i - d] |= s * 128;
+    }
+
     /**
      * Writes a 32bit float.
      * @param {number} value Value to write
@@ -1191,17 +1327,15 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         offset += 4;
-        var capacity8 = this.buffer.length;
+        var capacity8 = this.buffer.byteLength;
         if (offset > capacity8)
             this.resize((capacity8 *= 2) > offset ? capacity8 : offset);
         offset -= 4;
-        this.littleEndian
-            ? this.buffer.writeFloatLE(value, offset, true)
-            : this.buffer.writeFloatBE(value, offset, true);
+        ieee754_write(this.view, value, offset, this.littleEndian, 23, 4);
         if (relative) this.offset += 4;
         return this;
     };
@@ -1229,12 +1363,10 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 4 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 4 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength);
         }
-        var value = this.littleEndian
-            ? this.buffer.readFloatLE(offset, true)
-            : this.buffer.readFloatBE(offset, true);
+        var value = ieee754_read(this.view, offset, this.littleEndian, 23, 4);
         if (relative) this.offset += 4;
         return value;
     };
@@ -1266,17 +1398,15 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         offset += 8;
-        var capacity9 = this.buffer.length;
+        var capacity9 = this.buffer.byteLength;
         if (offset > capacity9)
             this.resize((capacity9 *= 2) > offset ? capacity9 : offset);
         offset -= 8;
-        this.littleEndian
-            ? this.buffer.writeDoubleLE(value, offset, true)
-            : this.buffer.writeDoubleBE(value, offset, true);
+        ieee754_write(this.view, value, offset, this.littleEndian, 52, 8);
         if (relative) this.offset += 8;
         return this;
     };
@@ -1304,12 +1434,10 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 8 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 8 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+8+") <= "+this.buffer.byteLength);
         }
-        var value = this.littleEndian
-            ? this.buffer.readDoubleLE(offset, true)
-            : this.buffer.readDoubleBE(offset, true);
+        var value = ieee754_read(this.view, offset, this.littleEndian, 52, 8);
         if (relative) this.offset += 8;
         return value;
     };
@@ -1388,23 +1516,23 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         var size = ByteBuffer.calculateVarint32(value),
             b;
         offset += size;
-        var capacity10 = this.buffer.length;
+        var capacity10 = this.buffer.byteLength;
         if (offset > capacity10)
             this.resize((capacity10 *= 2) > offset ? capacity10 : offset);
         offset -= size;
         value >>>= 0;
         while (value >= 0x80) {
             b = (value & 0x7f) | 0x80;
-            this.buffer[offset++] = b;
+            this.view[offset++] = b;
             value >>>= 7;
         }
-        this.buffer[offset++] = value;
+        this.view[offset++] = value;
         if (relative) {
             this.offset = offset;
             return this;
@@ -1441,8 +1569,8 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 1 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 1 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength);
         }
         var c = 0,
             value = 0 >>> 0,
@@ -1453,7 +1581,7 @@ module.exports = (function() {
                 err['truncated'] = true;
                 throw err;
             }
-            b = this.buffer[offset++];
+            b = this.view[offset++];
             if (c < 5)
                 value |= (b & 0x7f) << (7*c);
             ++c;
@@ -1583,8 +1711,8 @@ module.exports = (function() {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
                     throw TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
-                if (offset < 0 || offset + 0 > this.buffer.length)
-                    throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+                if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                    throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
             }
             if (typeof value === 'number')
                 value = Long.fromNumber(value, false);
@@ -1596,21 +1724,21 @@ module.exports = (function() {
                 part1 = value.shiftRightUnsigned(28).toInt() >>> 0,
                 part2 = value.shiftRightUnsigned(56).toInt() >>> 0;
             offset += size;
-            var capacity11 = this.buffer.length;
+            var capacity11 = this.buffer.byteLength;
             if (offset > capacity11)
                 this.resize((capacity11 *= 2) > offset ? capacity11 : offset);
             offset -= size;
             switch (size) {
-                case 10: this.buffer[offset+9] = (part2 >>>  7) & 0x01;
-                case 9 : this.buffer[offset+8] = size !== 9 ? (part2       ) | 0x80 : (part2       ) & 0x7F;
-                case 8 : this.buffer[offset+7] = size !== 8 ? (part1 >>> 21) | 0x80 : (part1 >>> 21) & 0x7F;
-                case 7 : this.buffer[offset+6] = size !== 7 ? (part1 >>> 14) | 0x80 : (part1 >>> 14) & 0x7F;
-                case 6 : this.buffer[offset+5] = size !== 6 ? (part1 >>>  7) | 0x80 : (part1 >>>  7) & 0x7F;
-                case 5 : this.buffer[offset+4] = size !== 5 ? (part1       ) | 0x80 : (part1       ) & 0x7F;
-                case 4 : this.buffer[offset+3] = size !== 4 ? (part0 >>> 21) | 0x80 : (part0 >>> 21) & 0x7F;
-                case 3 : this.buffer[offset+2] = size !== 3 ? (part0 >>> 14) | 0x80 : (part0 >>> 14) & 0x7F;
-                case 2 : this.buffer[offset+1] = size !== 2 ? (part0 >>>  7) | 0x80 : (part0 >>>  7) & 0x7F;
-                case 1 : this.buffer[offset  ] = size !== 1 ? (part0       ) | 0x80 : (part0       ) & 0x7F;
+                case 10: this.view[offset+9] = (part2 >>>  7) & 0x01;
+                case 9 : this.view[offset+8] = size !== 9 ? (part2       ) | 0x80 : (part2       ) & 0x7F;
+                case 8 : this.view[offset+7] = size !== 8 ? (part1 >>> 21) | 0x80 : (part1 >>> 21) & 0x7F;
+                case 7 : this.view[offset+6] = size !== 7 ? (part1 >>> 14) | 0x80 : (part1 >>> 14) & 0x7F;
+                case 6 : this.view[offset+5] = size !== 6 ? (part1 >>>  7) | 0x80 : (part1 >>>  7) & 0x7F;
+                case 5 : this.view[offset+4] = size !== 5 ? (part1       ) | 0x80 : (part1       ) & 0x7F;
+                case 4 : this.view[offset+3] = size !== 4 ? (part0 >>> 21) | 0x80 : (part0 >>> 21) & 0x7F;
+                case 3 : this.view[offset+2] = size !== 3 ? (part0 >>> 14) | 0x80 : (part0 >>> 14) & 0x7F;
+                case 2 : this.view[offset+1] = size !== 2 ? (part0 >>>  7) | 0x80 : (part0 >>>  7) & 0x7F;
+                case 1 : this.view[offset  ] = size !== 1 ? (part0       ) | 0x80 : (part0       ) & 0x7F;
             }
             if (relative) {
                 this.offset += size;
@@ -1648,8 +1776,8 @@ module.exports = (function() {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
                     throw TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
-                if (offset < 0 || offset + 1 > this.buffer.length)
-                    throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.length);
+                if (offset < 0 || offset + 1 > this.buffer.byteLength)
+                    throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength);
             }
             // ref: src/google/protobuf/io/coded_stream.cc
             var start = offset,
@@ -1657,16 +1785,16 @@ module.exports = (function() {
                 part1 = 0,
                 part2 = 0,
                 b  = 0;
-            b = this.buffer[offset++]; part0  = (b & 0x7F)      ; if ( b & 0x80                                                   ) {
-            b = this.buffer[offset++]; part0 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-            b = this.buffer[offset++]; part0 |= (b & 0x7F) << 14; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-            b = this.buffer[offset++]; part0 |= (b & 0x7F) << 21; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-            b = this.buffer[offset++]; part1  = (b & 0x7F)      ; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-            b = this.buffer[offset++]; part1 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-            b = this.buffer[offset++]; part1 |= (b & 0x7F) << 14; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-            b = this.buffer[offset++]; part1 |= (b & 0x7F) << 21; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-            b = this.buffer[offset++]; part2  = (b & 0x7F)      ; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
-            b = this.buffer[offset++]; part2 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+            b = this.view[offset++]; part0  = (b & 0x7F)      ; if ( b & 0x80                                                   ) {
+            b = this.view[offset++]; part0 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+            b = this.view[offset++]; part0 |= (b & 0x7F) << 14; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+            b = this.view[offset++]; part0 |= (b & 0x7F) << 21; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+            b = this.view[offset++]; part1  = (b & 0x7F)      ; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+            b = this.view[offset++]; part1 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+            b = this.view[offset++]; part1 |= (b & 0x7F) << 14; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+            b = this.view[offset++]; part1 |= (b & 0x7F) << 21; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+            b = this.view[offset++]; part2  = (b & 0x7F)      ; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
+            b = this.view[offset++]; part2 |= (b & 0x7F) <<  7; if ((b & 0x80) || (this.noAssert && typeof b === 'undefined')) {
             throw Error("Buffer overrun"); }}}}}}}}}}
             var value = Long.fromBits(part0 | (part1 << 28), (part1 >>> 4) | (part2) << 24, false);
             if (relative) {
@@ -1727,18 +1855,20 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         // UTF8 strings do not contain zero bytes in between except for the zero character, so:
-        k = Buffer.byteLength(str, "utf8");
+        k = utfx.calculateUTF16asUTF8(stringSource(str))[1];
         offset += k+1;
-        var capacity12 = this.buffer.length;
+        var capacity12 = this.buffer.byteLength;
         if (offset > capacity12)
             this.resize((capacity12 *= 2) > offset ? capacity12 : offset);
         offset -= k+1;
-        offset += this.buffer.write(str, offset, k, "utf8");
-        this.buffer[offset++] = 0;
+        utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
+            this.view[offset++] = b;
+        }.bind(this));
+        this.view[offset++] = 0;
         if (relative) {
             this.offset = offset;
             return this;
@@ -1762,24 +1892,26 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 1 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 1 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength);
         }
         var start = offset,
             temp;
         // UTF8 strings do not contain zero bytes in between except for the zero character itself, so:
-        do {
-            if (offset >= this.buffer.length)
-                throw RangeError("Index out of range: "+offset+" <= "+this.buffer.length);
-            temp = this.buffer[offset++];
-        } while (temp !== 0);
-        var str = this.buffer.toString("utf8", start, offset-1);
+        var sd, b = -1;
+        utfx.decodeUTF8toUTF16(function() {
+            if (b === 0) return null;
+            if (offset >= this.limit)
+                throw RangeError("Illegal range: Truncated data, "+offset+" < "+this.limit);
+            b = this.view[offset++];
+            return b === 0 ? null : b;
+        }.bind(this), sd = stringDestination(), true);
         if (relative) {
             this.offset = offset;
-            return str;
+            return sd();
         } else {
             return {
-                "string": str,
+                "string": sd(),
                 "length": offset - start
             };
         }
@@ -1805,30 +1937,34 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         var start = offset,
             k;
-        k = Buffer.byteLength(str, "utf8");
+        k = utfx.calculateUTF16asUTF8(stringSource(str), this.noAssert)[1];
         offset += 4+k;
-        var capacity13 = this.buffer.length;
+        var capacity13 = this.buffer.byteLength;
         if (offset > capacity13)
             this.resize((capacity13 *= 2) > offset ? capacity13 : offset);
         offset -= 4+k;
         if (this.littleEndian) {
-            this.buffer[offset+3] = (k >>> 24) & 0xFF;
-            this.buffer[offset+2] = (k >>> 16) & 0xFF;
-            this.buffer[offset+1] = (k >>>  8) & 0xFF;
-            this.buffer[offset  ] =  k         & 0xFF;
+            this.view[offset+3] = (k >>> 24) & 0xFF;
+            this.view[offset+2] = (k >>> 16) & 0xFF;
+            this.view[offset+1] = (k >>>  8) & 0xFF;
+            this.view[offset  ] =  k         & 0xFF;
         } else {
-            this.buffer[offset  ] = (k >>> 24) & 0xFF;
-            this.buffer[offset+1] = (k >>> 16) & 0xFF;
-            this.buffer[offset+2] = (k >>>  8) & 0xFF;
-            this.buffer[offset+3] =  k         & 0xFF;
+            this.view[offset  ] = (k >>> 24) & 0xFF;
+            this.view[offset+1] = (k >>> 16) & 0xFF;
+            this.view[offset+2] = (k >>>  8) & 0xFF;
+            this.view[offset+3] =  k         & 0xFF;
         }
         offset += 4;
-        offset += this.buffer.write(str, offset, k, "utf8");
+        utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
+            this.view[offset++] = b;
+        }.bind(this));
+        if (offset !== start + 4 + k)
+            throw RangeError("Illegal range: Truncated data, "+offset+" == "+(offset+4+k));
         if (relative) {
             this.offset = offset;
             return this;
@@ -1852,8 +1988,8 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 4 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 4 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+4+") <= "+this.buffer.byteLength);
         }
         var start = offset;
         var len = this.readUint32(offset);
@@ -1902,22 +2038,25 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         var k;
-        k = Buffer.byteLength(str, "utf8");
+        var start = offset;
+        k = utfx.calculateUTF16asUTF8(stringSource(str))[1];
         offset += k;
-        var capacity14 = this.buffer.length;
+        var capacity14 = this.buffer.byteLength;
         if (offset > capacity14)
             this.resize((capacity14 *= 2) > offset ? capacity14 : offset);
         offset -= k;
-        offset += this.buffer.write(str, offset, k, "utf8");
+        utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
+            this.view[offset++] = b;
+        }.bind(this));
         if (relative) {
             this.offset = offset;
             return this;
         }
-        return k;
+        return offset - start;
     };
 
     /**
@@ -1948,9 +2087,7 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.calculateUTF8Bytes = function(str) {
-        if (typeof str !== 'string')
-            throw TypeError("Illegal argument: "+(typeof str));
-        return Buffer.byteLength(str, "utf8");
+        return utfx.calculateUTF16asUTF8(stringSource(str))[1];
     };
 
     /**
@@ -1988,17 +2125,16 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         var i = 0,
             start = offset,
-            temp,
             sd;
         if (metrics === ByteBuffer.METRICS_CHARS) { // The same for node and the browser
             sd = stringDestination();
             utfx.decodeUTF8(function() {
-                return i < length && offset < this.limit ? this.buffer[offset++] : null;
+                return i < length && offset < this.limit ? this.view[offset++] : null;
             }.bind(this), function(cp) {
                 ++i; utfx.UTF8toUTF16(cp, sd);
             });
@@ -2018,17 +2154,22 @@ module.exports = (function() {
                 if (typeof offset !== 'number' || offset % 1 !== 0)
                     throw TypeError("Illegal offset: "+offset+" (not an integer)");
                 offset >>>= 0;
-                if (offset < 0 || offset + length > this.buffer.length)
-                    throw RangeError("Illegal offset: 0 <= "+offset+" (+"+length+") <= "+this.buffer.length);
+                if (offset < 0 || offset + length > this.buffer.byteLength)
+                    throw RangeError("Illegal offset: 0 <= "+offset+" (+"+length+") <= "+this.buffer.byteLength);
             }
-            temp = this.buffer.toString("utf8", offset, offset+length);
+            var k = offset + length;
+            utfx.decodeUTF8toUTF16(function() {
+                return offset < k ? this.view[offset++] : null;
+            }.bind(this), sd = stringDestination(), this.noAssert);
+            if (offset !== k)
+                throw RangeError("Illegal range: Truncated data, "+offset+" == "+k);
             if (relative) {
-                this.offset += length;
-                return temp;
+                this.offset = offset;
+                return sd();
             } else {
                 return {
-                    'string': temp,
-                    'length': length
+                    'string': sd(),
+                    'length': offset - start
                 };
             }
         } else
@@ -2069,20 +2210,24 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         var start = offset,
             k, l;
-        k = Buffer.byteLength(str, "utf8");
+        k = utfx.calculateUTF16asUTF8(stringSource(str), this.noAssert)[1];
         l = ByteBuffer.calculateVarint32(k);
         offset += l+k;
-        var capacity15 = this.buffer.length;
+        var capacity15 = this.buffer.byteLength;
         if (offset > capacity15)
             this.resize((capacity15 *= 2) > offset ? capacity15 : offset);
         offset -= l+k;
         offset += this.writeVarint32(k, offset);
-        offset += this.buffer.write(str, offset, k, "utf8");
+        utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
+            this.view[offset++] = b;
+        }.bind(this));
+        if (offset !== start+k+l)
+            throw RangeError("Illegal range: Truncated data, "+offset+" == "+(offset+k+l));
         if (relative) {
             this.offset = offset;
             return this;
@@ -2106,8 +2251,8 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 1 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 1 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+1+") <= "+this.buffer.byteLength);
         }
         var start = offset;
         var len = this.readVarint32(offset);
@@ -2128,8 +2273,8 @@ module.exports = (function() {
     /**
      * Appends some data to this ByteBuffer. This will overwrite any contents behind the specified offset up to the appended
      *  data's length.
-     * @param {!ByteBuffer|!Buffer|!ArrayBuffer|!Uint8Array|string} source Data to append. If `source` is a ByteBuffer, its
-     * offsets will be modified according to the performed read operation.
+     * @param {!ByteBuffer|!ArrayBuffer|!Uint8Array|string} source Data to append. If `source` is a ByteBuffer, its offsets
+     *  will be modified according to the performed read operation.
      * @param {(string|number)=} encoding Encoding if `data` is a string ("base64", "hex", "binary", defaults to "utf8")
      * @param {number=} offset Offset to append at. Will use and increase {@link ByteBuffer#offset} by the number of bytes
      *  written if omitted.
@@ -2149,19 +2294,19 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         if (!(source instanceof ByteBuffer))
             source = ByteBuffer.wrap(source, encoding);
         var length = source.limit - source.offset;
         if (length <= 0) return this; // Nothing to append
         offset += length;
-        var capacity16 = this.buffer.length;
+        var capacity16 = this.buffer.byteLength;
         if (offset > capacity16)
             this.resize((capacity16 *= 2) > offset ? capacity16 : offset);
         offset -= length;
-        source.buffer.copy(this.buffer, offset, source.offset, source.limit);
+        this.view.set(source.view.subarray(source.offset, source.limit), offset);
         source.offset += length;
         if (relative) this.offset += length;
         return this;
@@ -2200,7 +2345,7 @@ module.exports = (function() {
      * @expose
      */
     ByteBufferPrototype.capacity = function() {
-        return this.buffer.length;
+        return this.buffer.byteLength;
     };
     /**
      * Clears this ByteBuffer's offsets by setting {@link ByteBuffer#offset} to `0` and {@link ByteBuffer#limit} to the
@@ -2210,7 +2355,7 @@ module.exports = (function() {
      */
     ByteBufferPrototype.clear = function() {
         this.offset = 0;
-        this.limit = this.buffer.length;
+        this.limit = this.buffer.byteLength;
         this.markedOffset = -1;
         return this;
     };
@@ -2225,11 +2370,11 @@ module.exports = (function() {
     ByteBufferPrototype.clone = function(copy) {
         var bb = new ByteBuffer(0, this.littleEndian, this.noAssert);
         if (copy) {
-            var buffer = new Buffer(this.buffer.length);
-            this.buffer.copy(buffer);
-            bb.buffer = buffer;
+            bb.buffer = new ArrayBuffer(this.buffer.byteLength);
+            bb.view = new Uint8Array(bb.buffer);
         } else {
             bb.buffer = this.buffer;
+            bb.view = this.view;
         }
         bb.offset = this.offset;
         bb.markedOffset = this.markedOffset;
@@ -2256,22 +2401,25 @@ module.exports = (function() {
             if (typeof end !== 'number' || end % 1 !== 0)
                 throw TypeError("Illegal end: Not an integer");
             end >>>= 0;
-            if (begin < 0 || begin > end || end > this.buffer.length)
-                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length);
+            if (begin < 0 || begin > end || end > this.buffer.byteLength)
+                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
         }
-        if (begin === 0 && end === this.buffer.length)
+        if (begin === 0 && end === this.buffer.byteLength)
             return this; // Already compacted
         var len = end - begin;
         if (len === 0) {
             this.buffer = EMPTY_BUFFER;
+            this.view = null;
             if (this.markedOffset >= 0) this.markedOffset -= begin;
             this.offset = 0;
             this.limit = 0;
             return this;
         }
-        var buffer = new Buffer(len);
-        this.buffer.copy(buffer, 0, begin, end);
+        var buffer = new ArrayBuffer(len);
+        var view = new Uint8Array(buffer);
+        view.set(this.view.subarray(begin, end));
         this.buffer = buffer;
+        this.view = view;
         if (this.markedOffset >= 0) this.markedOffset -= begin;
         this.offset = 0;
         this.limit = len;
@@ -2296,8 +2444,8 @@ module.exports = (function() {
             if (typeof end !== 'number' || end % 1 !== 0)
                 throw TypeError("Illegal end: Not an integer");
             end >>>= 0;
-            if (begin < 0 || begin > end || end > this.buffer.length)
-                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length);
+            if (begin < 0 || begin > end || end > this.buffer.byteLength)
+                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
         }
         if (begin === end)
             return new ByteBuffer(0, this.littleEndian, this.noAssert);
@@ -2333,10 +2481,10 @@ module.exports = (function() {
         sourceOffset = (relative = typeof sourceOffset === 'undefined') ? this.offset : sourceOffset | 0;
         sourceLimit = typeof sourceLimit === 'undefined' ? this.limit : sourceLimit | 0;
 
-        if (targetOffset < 0 || targetOffset > target.buffer.length)
-            throw RangeError("Illegal target range: 0 <= "+targetOffset+" <= "+target.buffer.length);
-        if (sourceOffset < 0 || sourceLimit > this.buffer.length)
-            throw RangeError("Illegal source range: 0 <= "+sourceOffset+" <= "+this.buffer.length);
+        if (targetOffset < 0 || targetOffset > target.buffer.byteLength)
+            throw RangeError("Illegal target range: 0 <= "+targetOffset+" <= "+target.buffer.byteLength);
+        if (sourceOffset < 0 || sourceLimit > this.buffer.byteLength)
+            throw RangeError("Illegal source range: 0 <= "+sourceOffset+" <= "+this.buffer.byteLength);
 
         var len = sourceLimit - sourceOffset;
         if (len === 0)
@@ -2344,7 +2492,7 @@ module.exports = (function() {
 
         target.ensureCapacity(targetOffset + len);
 
-        this.buffer.copy(target.buffer, targetOffset, sourceOffset, sourceLimit);
+        target.view.set(this.view.subarray(sourceOffset, sourceLimit), targetOffset);
 
         if (relative) this.offset += len;
         if (targetRelative) target.offset += len;
@@ -2361,7 +2509,7 @@ module.exports = (function() {
      * @expose
      */
     ByteBufferPrototype.ensureCapacity = function(capacity) {
-        var current = this.buffer.length;
+        var current = this.buffer.byteLength;
         if (current < capacity)
             return this.resize((current *= 2) > capacity ? current : capacity);
         return this;
@@ -2395,13 +2543,12 @@ module.exports = (function() {
             if (typeof end !== 'number' || end % 1 !== 0)
                 throw TypeError("Illegal end: Not an integer");
             end >>>= 0;
-            if (begin < 0 || begin > end || end > this.buffer.length)
-                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length);
+            if (begin < 0 || begin > end || end > this.buffer.byteLength)
+                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
         }
         if (begin >= end)
             return this; // Nothing to fill
-        this.buffer.fill(value, begin, end);
-        begin = end;
+        while (begin < end) this.view[begin++] = value;
         if (relative) this.offset = begin;
         return this;
     };
@@ -2432,8 +2579,8 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         this.markedOffset = offset;
         return this;
@@ -2478,8 +2625,8 @@ module.exports = (function() {
      * Prepends some data to this ByteBuffer. This will overwrite any contents before the specified offset up to the
      *  prepended data's length. If there is not enough space available before the specified `offset`, the backing buffer
      *  will be resized and its contents moved accordingly.
-     * @param {!ByteBuffer|string||!Buffer} source Data to prepend. If `source` is a ByteBuffer, its offset will be modified
-     *  according to the performed read operation.
+     * @param {!ByteBuffer|string|!ArrayBuffer} source Data to prepend. If `source` is a ByteBuffer, its offset will be
+     *  modified according to the performed read operation.
      * @param {(string|number)=} encoding Encoding if `data` is a string ("base64", "hex", "binary", defaults to "utf8")
      * @param {number=} offset Offset to prepend at. Will use and decrease {@link ByteBuffer#offset} by the number of bytes
      *  prepended if omitted.
@@ -2499,8 +2646,8 @@ module.exports = (function() {
             if (typeof offset !== 'number' || offset % 1 !== 0)
                 throw TypeError("Illegal offset: "+offset+" (not an integer)");
             offset >>>= 0;
-            if (offset < 0 || offset + 0 > this.buffer.length)
-                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.length);
+            if (offset < 0 || offset + 0 > this.buffer.byteLength)
+                throw RangeError("Illegal offset: 0 <= "+offset+" (+"+0+") <= "+this.buffer.byteLength);
         }
         if (!(source instanceof ByteBuffer))
             source = ByteBuffer.wrap(source, encoding);
@@ -2508,14 +2655,19 @@ module.exports = (function() {
         if (len <= 0) return this; // Nothing to prepend
         var diff = len - offset;
         if (diff > 0) { // Not enough space before offset, so resize + move
-            var buffer = new Buffer(this.buffer.length + diff);
-            this.buffer.copy(buffer, len, offset, this.buffer.length);
+            var buffer = new ArrayBuffer(this.buffer.byteLength + diff);
+            var view = new Uint8Array(buffer);
+            view.set(this.view.subarray(offset, this.buffer.byteLength), len);
             this.buffer = buffer;
+            this.view = view;
             this.offset += diff;
             if (this.markedOffset >= 0) this.markedOffset += diff;
             this.limit += diff;
             offset += diff;
-        }        source.buffer.copy(this.buffer, offset - len, source.offset, source.limit);
+        } else {
+            var arrayView = new Uint8Array(this.buffer);
+        }
+        this.view.set(source.view.subarray(source.offset, source.limit), offset - len);
 
         source.offset = source.limit;
         if (relative)
@@ -2595,10 +2747,12 @@ module.exports = (function() {
             if (capacity < 0)
                 throw RangeError("Illegal capacity: 0 <= "+capacity);
         }
-        if (this.buffer.length < capacity) {
-            var buffer = new Buffer(capacity);
-            this.buffer.copy(buffer);
+        if (this.buffer.byteLength < capacity) {
+            var buffer = new ArrayBuffer(capacity);
+            var view = new Uint8Array(buffer);
+            view.set(this.view);
             this.buffer = buffer;
+            this.view = view;
         }
         return this;
     };
@@ -2619,12 +2773,12 @@ module.exports = (function() {
             if (typeof end !== 'number' || end % 1 !== 0)
                 throw TypeError("Illegal end: Not an integer");
             end >>>= 0;
-            if (begin < 0 || begin > end || end > this.buffer.length)
-                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length);
+            if (begin < 0 || begin > end || end > this.buffer.byteLength)
+                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
         }
         if (begin === end)
             return this; // Nothing to reverse
-        Array.prototype.reverse.call(this.buffer.slice(begin, end));
+        Array.prototype.reverse.call(this.view.subarray(begin, end));
         return this;
     };
     /**
@@ -2641,8 +2795,8 @@ module.exports = (function() {
         }
         var offset = this.offset + length;
         if (!this.noAssert) {
-            if (offset < 0 || offset > this.buffer.length)
-                throw RangeError("Illegal length: 0 <= "+this.offset+" + "+length+" <= "+this.buffer.length);
+            if (offset < 0 || offset > this.buffer.byteLength)
+                throw RangeError("Illegal length: 0 <= "+this.offset+" + "+length+" <= "+this.buffer.byteLength);
         }
         this.offset = offset;
         return this;
@@ -2665,8 +2819,8 @@ module.exports = (function() {
             if (typeof end !== 'number' || end % 1 !== 0)
                 throw TypeError("Illegal end: Not an integer");
             end >>>= 0;
-            if (begin < 0 || begin > end || end > this.buffer.length)
-                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length);
+            if (begin < 0 || begin > end || end > this.buffer.byteLength)
+                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
         }
         var bb = this.clone();
         bb.offset = begin;
@@ -2678,7 +2832,7 @@ module.exports = (function() {
      *  {@link ByteBuffer#offset} and {@link ByteBuffer#limit}.
      * @param {boolean=} forceCopy If `true` returns a copy, otherwise returns a view referencing the same memory if
      *  possible. Defaults to `false`
-     * @returns {!Buffer} Contents as a Buffer
+     * @returns {!ArrayBuffer} Contents as an ArrayBuffer
      * @expose
      */
     ByteBufferPrototype.toBuffer = function(forceCopy) {
@@ -2691,49 +2845,30 @@ module.exports = (function() {
             if (typeof limit !== 'number' || limit % 1 !== 0)
                 throw TypeError("Illegal limit: Not an integer");
             limit >>>= 0;
-            if (offset < 0 || offset > limit || limit > this.buffer.length)
-                throw RangeError("Illegal range: 0 <= "+offset+" <= "+limit+" <= "+this.buffer.length);
+            if (offset < 0 || offset > limit || limit > this.buffer.byteLength)
+                throw RangeError("Illegal range: 0 <= "+offset+" <= "+limit+" <= "+this.buffer.byteLength);
         }
-        if (forceCopy) {
-            var buffer = new Buffer(limit - offset);
-            this.buffer.copy(buffer, 0, offset, limit);
-            return buffer;
-        } else {
-            if (offset === 0 && limit === this.buffer.length)
-                return this.buffer;
-            else
-                return this.buffer.slice(offset, limit);
-        }
+        // NOTE: It's not possible to have another ArrayBuffer reference the same memory as the backing buffer. This is
+        // possible with Uint8Array#subarray only, but we have to return an ArrayBuffer by contract. So:
+        if (!forceCopy && offset === 0 && limit === this.buffer.byteLength)
+            return this.buffer;
+        if (offset === limit)
+            return EMPTY_BUFFER;
+        var buffer = new ArrayBuffer(limit - offset);
+        new Uint8Array(buffer).set(new Uint8Array(this.buffer).subarray(offset, limit), 0);
+        return buffer;
     };
 
     /**
-     * Returns a copy of the backing buffer compacted to contain this ByteBuffer's contents. Contents are the bytes between
-     *  {@link ByteBuffer#offset} and {@link ByteBuffer#limit}.
+     * Returns a raw buffer compacted to contain this ByteBuffer's contents. Contents are the bytes between
+     *  {@link ByteBuffer#offset} and {@link ByteBuffer#limit}. This is an alias of {@link ByteBuffer#toBuffer}.
+     * @function
+     * @param {boolean=} forceCopy If `true` returns a copy, otherwise returns a view referencing the same memory.
+     *  Defaults to `false`
      * @returns {!ArrayBuffer} Contents as an ArrayBuffer
+     * @expose
      */
-    ByteBufferPrototype.toArrayBuffer = function() {
-        var offset = this.offset,
-            limit = this.limit;
-        if (!this.noAssert) {
-            if (typeof offset !== 'number' || offset % 1 !== 0)
-                throw TypeError("Illegal offset: Not an integer");
-            offset >>>= 0;
-            if (typeof limit !== 'number' || limit % 1 !== 0)
-                throw TypeError("Illegal limit: Not an integer");
-            limit >>>= 0;
-            if (offset < 0 || offset > limit || limit > this.buffer.length)
-                throw RangeError("Illegal range: 0 <= "+offset+" <= "+limit+" <= "+this.buffer.length);
-        }
-        var ab = new ArrayBuffer(limit - offset);
-        if (memcpy) { // Fast
-            memcpy(ab, 0, this.buffer, offset, limit);
-        } else { // Slow
-            var dst = new Uint8Array(ab);
-            for (var i=offset; i<limit; ++i)
-                dst[i-offset] = this.buffer[i];
-        }
-        return ab;
-    };
+    ByteBufferPrototype.toArrayBuffer = ByteBufferPrototype.toBuffer;
 
     /**
      * Converts the ByteBuffer's contents to a string.
@@ -2748,7 +2883,7 @@ module.exports = (function() {
      */
     ByteBufferPrototype.toString = function(encoding, begin, end) {
         if (typeof encoding === 'undefined')
-            return "ByteBufferNB(offset="+this.offset+",markedOffset="+this.markedOffset+",limit="+this.limit+",capacity="+this.capacity()+")";
+            return "ByteBufferAB(offset="+this.offset+",markedOffset="+this.markedOffset+",limit="+this.limit+",capacity="+this.capacity()+")";
         if (typeof encoding === 'number')
             encoding = "utf8",
             begin = encoding,
@@ -2771,6 +2906,120 @@ module.exports = (function() {
         }
     };
 
+    // lxiv-embeddable
+
+    /**
+     * lxiv-embeddable (c) 2014 Daniel Wirtz <dcode@dcode.io>
+     * Released under the Apache License, Version 2.0
+     * see: https://github.com/dcodeIO/lxiv for details
+     */
+    var lxiv = function() {
+        "use strict";
+
+        /**
+         * lxiv namespace.
+         * @type {!Object.<string,*>}
+         * @exports lxiv
+         */
+        var lxiv = {};
+
+        /**
+         * Character codes for output.
+         * @type {!Array.<number>}
+         * @inner
+         */
+        var aout = [
+            65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80,
+            81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102,
+            103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118,
+            119, 120, 121, 122, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 43, 47
+        ];
+
+        /**
+         * Character codes for input.
+         * @type {!Array.<number>}
+         * @inner
+         */
+        var ain = [];
+        for (var i=0, k=aout.length; i<k; ++i)
+            ain[aout[i]] = i;
+
+        /**
+         * Encodes bytes to base64 char codes.
+         * @param {!function():number|null} src Bytes source as a function returning the next byte respectively `null` if
+         *  there are no more bytes left.
+         * @param {!function(number)} dst Characters destination as a function successively called with each encoded char
+         *  code.
+         */
+        lxiv.encode = function(src, dst) {
+            var b, t;
+            while ((b = src()) !== null) {
+                dst(aout[(b>>2)&0x3f]);
+                t = (b&0x3)<<4;
+                if ((b = src()) !== null) {
+                    t |= (b>>4)&0xf;
+                    dst(aout[(t|((b>>4)&0xf))&0x3f]);
+                    t = (b&0xf)<<2;
+                    if ((b = src()) !== null)
+                        dst(aout[(t|((b>>6)&0x3))&0x3f]),
+                        dst(aout[b&0x3f]);
+                    else
+                        dst(aout[t&0x3f]),
+                        dst(61);
+                } else
+                    dst(aout[t&0x3f]),
+                    dst(61),
+                    dst(61);
+            }
+        };
+
+        /**
+         * Decodes base64 char codes to bytes.
+         * @param {!function():number|null} src Characters source as a function returning the next char code respectively
+         *  `null` if there are no more characters left.
+         * @param {!function(number)} dst Bytes destination as a function successively called with the next byte.
+         * @throws {Error} If a character code is invalid
+         */
+        lxiv.decode = function(src, dst) {
+            var c, t1, t2;
+            function fail(c) {
+                throw Error("Illegal character code: "+c);
+            }
+            while ((c = src()) !== null) {
+                t1 = ain[c];
+                if (typeof t1 === 'undefined') fail(c);
+                if ((c = src()) !== null) {
+                    t2 = ain[c];
+                    if (typeof t2 === 'undefined') fail(c);
+                    dst((t1<<2)>>>0|(t2&0x30)>>4);
+                    if ((c = src()) !== null) {
+                        t1 = ain[c];
+                        if (typeof t1 === 'undefined')
+                            if (c === 61) break; else fail(c);
+                        dst(((t2&0xf)<<4)>>>0|(t1&0x3c)>>2);
+                        if ((c = src()) !== null) {
+                            t2 = ain[c];
+                            if (typeof t2 === 'undefined')
+                                if (c === 61) break; else fail(c);
+                            dst(((t1&0x3)<<6)>>>0|t2);
+                        }
+                    }
+                }
+            }
+        };
+
+        /**
+         * Tests if a string is valid base64.
+         * @param {string} str String to test
+         * @returns {boolean} `true` if valid, otherwise `false`
+         */
+        lxiv.test = function(str) {
+            return /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(str);
+        };
+
+        return lxiv;
+    }();
+
     // encodings/base64
 
     /**
@@ -2789,7 +3038,10 @@ module.exports = (function() {
         begin = begin | 0; end = end | 0;
         if (begin < 0 || end > this.capacity || begin > end)
             throw RangeError("begin, end");
-        return this.buffer.toString("base64", begin, end);
+        var sd; lxiv.encode(function() {
+            return begin < end ? this.view[begin++] : null;
+        }.bind(this), sd = stringDestination());
+        return sd();
     };
 
     /**
@@ -2801,7 +3053,14 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.fromBase64 = function(str, littleEndian) {
-        return ByteBuffer.wrap(new Buffer(str, "base64"), littleEndian);
+        if (typeof str !== 'string')
+            throw TypeError("str");
+        var bb = new ByteBuffer(str.length/4*3, littleEndian),
+            i = 0;
+        lxiv.decode(stringSource(str), function(b) {
+            bb.view[i++] = b;
+        });
+        bb.limit = i;
         return bb;
     };
 
@@ -2845,7 +3104,17 @@ module.exports = (function() {
         begin |= 0; end |= 0;
         if (begin < 0 || end > this.capacity() || begin > end)
             throw RangeError("begin, end");
-        return this.buffer.toString("binary", begin, end);
+        if (begin === end)
+            return "";
+        var chars = [],
+            parts = [];
+        while (begin < end) {
+            chars.push(this.view[begin++]);
+            if (chars.length >= 1024)
+                parts.push(String.fromCharCode.apply(String, chars)),
+                chars = [];
+        }
+        return parts.join('') + String.fromCharCode.apply(String, chars);
     };
 
     /**
@@ -2857,7 +3126,19 @@ module.exports = (function() {
      * @expose
      */
     ByteBuffer.fromBinary = function(str, littleEndian) {
-        return ByteBuffer.wrap(new Buffer(str, "binary"), littleEndian);
+        if (typeof str !== 'string')
+            throw TypeError("str");
+        var i = 0,
+            k = str.length,
+            charCode,
+            bb = new ByteBuffer(k, littleEndian);
+        while (i<k) {
+            charCode = str.charCodeAt(i);
+            if (charCode > 0xff)
+                throw RangeError("illegal char code: "+charCode);
+            bb.view[i++] = charCode;
+        }
+        bb.limit = k;
         return bb;
     };
 
@@ -2882,14 +3163,14 @@ module.exports = (function() {
      */
     ByteBufferPrototype.toDebug = function(columns) {
         var i = -1,
-            k = this.buffer.length,
+            k = this.buffer.byteLength,
             b,
             hex = "",
             asc = "",
             out = "";
         while (i<k) {
             if (i !== -1) {
-                b = this.buffer[i];
+                b = this.view[i];
                 if (b < 0x10) hex += "0"+b.toString(16).toUpperCase();
                 else hex += b.toString(16).toUpperCase();
                 if (columns)
@@ -3032,7 +3313,7 @@ module.exports = (function() {
                         if (isNaN(b) || b < 0 || b > 255)
                             throw TypeError("Illegal str: Not a debug encoded string");
                     }
-                    bb.buffer[j++] = b;
+                    bb.view[j++] = b;
                     rs = true;
             }
             if (fail)
@@ -3041,7 +3322,7 @@ module.exports = (function() {
         if (!noAssert) {
             if (!ho || !hl)
                 throw TypeError("Illegal str: Missing offset or limit");
-            if (j<bb.buffer.length)
+            if (j<bb.buffer.byteLength)
                 throw TypeError("Illegal str: Not a debug encoded string (is it hex?) "+j+" < "+k);
         }
         return bb;
@@ -3066,10 +3347,18 @@ module.exports = (function() {
             if (typeof end !== 'number' || end % 1 !== 0)
                 throw TypeError("Illegal end: Not an integer");
             end >>>= 0;
-            if (begin < 0 || begin > end || end > this.buffer.length)
-                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length);
+            if (begin < 0 || begin > end || end > this.buffer.byteLength)
+                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
         }
-        return this.buffer.toString("hex", begin, end);
+        var out = new Array(end - begin),
+            b;
+        while (begin < end) {
+            b = this.view[begin++];
+            if (b < 0x10)
+                out.push("0", b.toString(16));
+            else out.push(b.toString(16));
+        }
+        return out.join('');
     };
 
     /**
@@ -3089,9 +3378,17 @@ module.exports = (function() {
             if (str.length % 2 !== 0)
                 throw TypeError("Illegal str: Length not a multiple of 2");
         }
-        var bb = new ByteBuffer(0, littleEndian, true);
-        bb.buffer = new Buffer(str, "hex");
-        bb.limit = bb.buffer.length;
+        var k = str.length,
+            bb = new ByteBuffer((k / 2) | 0, littleEndian),
+            b;
+        for (var i=0, j=0; i<k; i+=2) {
+            b = parseInt(str.substring(i, i+2), 16);
+            if (!noAssert)
+                if (!isFinite(b) || b < 0 || b > 255)
+                    throw TypeError("Illegal str: Contains non-hex characters");
+            bb.view[j++] = b;
+        }
+        bb.limit = j;
         return bb;
     };
 
@@ -3313,10 +3610,18 @@ module.exports = (function() {
             if (typeof end !== 'number' || end % 1 !== 0)
                 throw TypeError("Illegal end: Not an integer");
             end >>>= 0;
-            if (begin < 0 || begin > end || end > this.buffer.length)
-                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.length);
+            if (begin < 0 || begin > end || end > this.buffer.byteLength)
+                throw RangeError("Illegal range: 0 <= "+begin+" <= "+end+" <= "+this.buffer.byteLength);
         }
-        return this.buffer.toString("utf8", begin, end);
+        var sd; try {
+            utfx.decodeUTF8toUTF16(function() {
+                return begin < end ? this.view[begin++] : null;
+            }.bind(this), sd = stringDestination());
+        } catch (e) {
+            if (begin !== end)
+                throw RangeError("Illegal range: Truncated data, "+begin+" != "+end);
+        }
+        return sd();
     };
 
     /**
@@ -3333,27 +3638,14 @@ module.exports = (function() {
         if (!noAssert)
             if (typeof str !== 'string')
                 throw TypeError("Illegal str: Not a string");
-        var bb = new ByteBuffer(0, littleEndian, noAssert);
-        bb.buffer = new Buffer(str, "utf8");
-        bb.limit = bb.buffer.length;
+        var bb = new ByteBuffer(utfx.calculateUTF16asUTF8(stringSource(str), true)[1], littleEndian, noAssert),
+            i = 0;
+        utfx.encodeUTF16toUTF8(stringSource(str), function(b) {
+            bb.view[i++] = b;
+        });
+        bb.limit = i;
         return bb;
     };
 
-
-    /**
-     * node-memcpy. This is an optional binding dependency and may not be present.
-     * @function
-     * @param {!(Buffer|ArrayBuffer|Uint8Array)} target Destination
-     * @param {number|!(Buffer|ArrayBuffer)} targetStart Destination start, defaults to 0.
-     * @param {(!(Buffer|ArrayBuffer|Uint8Array)|number)=} source Source
-     * @param {number=} sourceStart Source start, defaults to 0.
-     * @param {number=} sourceEnd Source end, defaults to capacity.
-     * @returns {number} Number of bytes copied
-     * @throws {Error} If any index is out of bounds
-     * @expose
-     */
-    ByteBuffer.memcpy = memcpy;
-
     return ByteBuffer;
-
-})();
+});

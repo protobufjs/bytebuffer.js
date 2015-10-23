@@ -53,8 +53,6 @@ ByteBuffer.fromUTF8 = function(str, littleEndian, noAssert) {
     //? if (NODE) {
     var bb = new ByteBuffer(0, littleEndian, noAssert);
     bb.buffer = new Buffer(str, "utf8");
-    //? if (BUFFERVIEW)
-    bb.view = new BufferView(bb.buffer);
     bb.limit = bb.buffer.length;
     //? } else {
     var bb = new ByteBuffer(utfx.calculateUTF16asUTF8(stringSource(str), true)[1], littleEndian, noAssert),

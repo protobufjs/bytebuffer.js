@@ -26,7 +26,7 @@
 (function(global, factory) {
 
     /* AMD */ if (typeof define === 'function' && define["amd"])
-        define(["Long"], factory);
+        define(["long"], factory);
     /* CommonJS */ else if (typeof require === 'function' && typeof module === "object" && module && module["exports"])
         module['exports'] = (function() {
             var Long; try { Long = require("long"); } catch (e) {}
@@ -38,6 +38,6 @@
 })(this, function(Long) {
     "use strict";
 
-    //? include("ByteBuffer.js");
+    //? include("bytebuffer.js");
     return ByteBuffer;
 });

@@ -85,8 +85,6 @@ ByteBuffer.wrap = function(buffer, encoding, littleEndian, noAssert) {
     bb = new ByteBuffer(0, littleEndian, noAssert);
     if (buffer.length > 0) { // Avoid references to more than one EMPTY_BUFFER
         bb.buffer = buffer;
-        //? if (BUFFERVIEW)
-        bb.view = new BufferView(buffer);
         bb.limit = buffer.length;
     }
     //? } else {
