@@ -14,12 +14,7 @@
  limitations under the License.
  */
 
-/**
- * @overview ByteBuffer.js Build Script (c) 2013 Daniel Wirtz <dcode@dcode.io>
- * Released under the Apache License, Version 2.0
- * see: https://github.com/dcodeIO/ByteBuffer.js for details
- */ //
-var MetaScript = require("../../MetaScript/MetaScript.js"),
+var MetaScript = require("metascript"),
     path = require("path"),
     fs = require("fs");
 
@@ -80,7 +75,7 @@ var scope = {
 
 if (!scope.UTF8) scope.STRINGS = false;
 
-// Build node ByteBuffer using Buffers
+// Build node version using Buffers
 scope.NODE = true;
 console.log("Building bytebuffer-node with scope", JSON.stringify(scope, null, 2));
 fs.writeFileSync(
@@ -88,7 +83,7 @@ fs.writeFileSync(
     MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "wrap-node.js")), filename, scope, srcDir)
 );
 
-// Build browser ByteBuffer using Typed Arrays
+// Build browser version using Typed Arrays
 scope.NODE = false;
 scope.DATAVIEW = false;
 delete scope.BUFFERVIEW;
@@ -98,7 +93,7 @@ fs.writeFileSync(
     MetaScript.transform(fs.readFileSync(filename = path.join(srcDir, "wrap.js")), filename, scope)
 );
 
-// Build alternative browser ByteBuffer using a DataView
+// Build alternative browser version using a DataView
 scope.NODE = false;
 scope.DATAVIEW = true;
 console.log("Building bytebuffer-dataview with scope", JSON.stringify(scope, null, 2));

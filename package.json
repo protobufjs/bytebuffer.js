@@ -3,8 +3,8 @@
   "version": "5.0.0",
   "author": "Daniel Wirtz <dcode@dcode.io>",
   "description": "The swiss army knife for binary data in JavaScript.",
-  "main": "./dist/bytebuffer-node.js",
-  "browser": "./dist/bytebuffer.js",
+  "main": "dist/bytebuffer-node.js",
+  "browser": "dist/bytebuffer.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/dcodeIO/bytebuffer.js.git"

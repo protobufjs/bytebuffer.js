@@ -14,14 +14,10 @@
  limitations under the License.
  */
 
-/**
- * ByteBuffer.js Test Suite.
- * @author Daniel Wirtz <dcode@dcode.io>
- */ //
 var ByteBuffer = require("../dist/bytebuffer-node.js");
-var ByteBufferNB = ByteBuffer.ByteBufferNB = ByteBuffer;
-var ByteBufferAB = ByteBuffer.ByteBufferAB = require("../dist/bytebuffer.min.js");
-var ByteBufferAB_DataView = ByteBuffer.ByteBufferAB_DataView = require("../dist/bytebuffer-dataview.min.js");
+var ByteBufferNode = ByteBuffer;
+var ByteBufferBrowser = require("../dist/bytebuffer.min.js");
+var ByteBufferBrowser_DataView = require("../dist/bytebuffer-dataview.min.js");
 var pkg = require("../package.json");
 
 /**
@@ -57,12 +53,12 @@ function makeSuite(ByteBuffer) {
     
     suite.init = function(test) {
         test.ok(require("../index.js"));
-        if (ByteBuffer == ByteBufferNB)
+        if (ByteBuffer == ByteBufferNode)
             test.log("\n\n                           --- ByteBufferNB ---\n".bold.white),
             test.log("[optional] node-memcpy is "+(ByteBuffer.memcpy ? "present" : "not present"));
-        else if (ByteBuffer == ByteBufferAB)
+        else if (ByteBuffer == ByteBufferBrowser)
             test.log("\n\n                           --- ByteBufferAB ---\n".bold.white);
-        else if (ByteBuffer == ByteBufferAB_DataView)
+        else if (ByteBuffer == ByteBufferBrowser_DataView)
             test.log("\n\n                      --- ByteBufferAB_DataView ---\n".bold.white);
         test.ok(type === Buffer || type === ArrayBuffer);
         test.ok(typeof ByteBuffer == "function");
@@ -959,7 +955,7 @@ function makeSuite(ByteBuffer) {
     
     if (type === ArrayBuffer) {
         suite.debug.printDebugVisual = function(test) {
-            var bb = ByteBuffer.wrap("Hello world! from ByteBuffer.js. This is just a last visual test of ByteBuffer#printDebug.");
+            var bb = ByteBuffer.wrap("Hello world! from byteBuffer.js. This is just a last visual test of ByteBuffer#printDebug.");
             console.log("");
             bb.printDebug(console.log);
             test.done();
@@ -974,7 +970,7 @@ module.exports = {
         test.log("Version "+ByteBuffer.VERSION+", "+new Date().toISOString()+"\n");
         test.done();
     },
-    "NB": makeSuite(ByteBufferNB),
-    "AB": makeSuite(ByteBufferAB),
-    "AB_DataView": makeSuite(ByteBufferAB_DataView)
+    "node": makeSuite(ByteBufferNode),
+    "browser": makeSuite(ByteBufferBrowser),
+    "dataview": makeSuite(ByteBufferBrowser_DataView)
 };

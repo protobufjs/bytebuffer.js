@@ -16,10 +16,10 @@
 //? NODE = true;
 
 /**
- * @license ByteBuffer.js (c) 2015 Daniel Wirtz <dcode@dcode.io>
- * [BUILD] ByteBufferNB - Backing buffer / Accessor: node Buffer
+ * @license bytebuffer.js (c) 2015 Daniel Wirtz <dcode@dcode.io>
+ * Backing buffer / Accessor: node Buffer
  * Released under the Apache License, Version 2.0
- * see: https://github.com/dcodeIO/ByteBuffer.js for details
+ * see: https://github.com/dcodeIO/bytebuffer.js for details
  */
 module.exports = (function() {
     "use strict";
