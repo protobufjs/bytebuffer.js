@@ -12,7 +12,7 @@ Features
   * **bytebuffer** &nbsp; Backing buffer: ArrayBuffer, Accessor: Uint8Array
   * **bytebuffer-dataview** &nbsp; Backing buffer: ArrayBuffer, Accessor: DataView
   * **bytebuffer-node** &nbsp; Backing buffer / Accessor: node Buffer
-* 8, 16, 32 and 64 bit signed and unsigned integers
+* 8, 16, 32 and 64 bit (through [long.js](https://github.com/dcodeIO/long.js)) signed and unsigned integers
 * 32 and 64 bit floats
 * Varints as used in protobuf (32 and 64 bit, zig-zag)
 * [Base64](https://github.com/dcodeIO/lxiv), [utf8](https://github.com/dcodeIO/utfx), binary, hex and debug encodings
