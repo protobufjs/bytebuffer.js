@@ -1,7 +1,7 @@
 // encodings/impl/utf8
 
 /**
- * Encodes a standard JavaScript string (UTF16) to UTF8 bytes.
+ * Encodes a standard JavaScript string to UTF8 bytes.
  * @param {string} src Source string
  * @param {number} srcOffset Source offset
  * @param {!ByteBuffer} dst Destination ByteBuffer
@@ -10,7 +10,7 @@
  * @returns {number} Number of bytes encoded
  * @inner
  */
-function bytebuffer_utf8_encode(src, srcOffset, dst, dstOffset, count) {
+function utf8_encode(src, srcOffset, dst, dstOffset, count) {
     if (count === 0)
         return 0;
     var n = 0;
@@ -46,14 +46,14 @@ function bytebuffer_utf8_encode(src, srcOffset, dst, dstOffset, count) {
 }
 
 /**
- * Decodes UTF8 bytes to a standard JavaScript string (UTF16).
+ * Decodes UTF8 bytes to a standard JavaScript string.
  * @param {!ByteBuffer} src Source ByteBuffer
  * @param {number} srcOffset Source offset
  * @param {number} count Number of bytes to decode
  * @returns {string} Decoded string
  * @inner
  */
-function bytebuffer_utf8_decode(src, srcOffset, count) {
+function utf8_decode(src, srcOffset, count) {
     if (count === 0)
         return "";
     var parts = [], // readily assembled parts
@@ -96,14 +96,14 @@ function bytebuffer_utf8_decode(src, srcOffset, count) {
 }
 
 /**
- * Calculates the number of UTF8 bytes required to store a standard JavaScript string (UTF16).
+ * Calculates the number of UTF8 bytes required to store a standard JavaScript string.
  * @param {string} src Source string
  * @param {number} srcOffset Source offset
  * @param {number} count Number of char codes to calculate
  * @returns {number} Number of bytes required
  * @inner
  */
-function bytebuffer_utf8_calculate(src, srcOffset, count) {
+function utf8_calculate(src, srcOffset, count) {
     if (count === 0)
         return 0;
     var n = 0;
@@ -117,10 +117,10 @@ function bytebuffer_utf8_calculate(src, srcOffset, count) {
         } else if (cc < 0xD800 || cc >= 0xE000) {
             n += 3;
         } else {
-            if (count === 0)
-                throw Error("truncated utf8 surrogate");
             n += 4;
         }
     } while (count > 0);
     return n;
 }
+
+ByteBuffer.registerEncoding("utf8", utf8_encode, utf8_decode, utf8_calculate);

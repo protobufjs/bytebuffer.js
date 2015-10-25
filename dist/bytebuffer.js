@@ -108,14 +108,14 @@
          * @type {boolean}
          * @expose
          */
-        this.littleEndian = typeof littleEndian !== 'undefined' ? !!littleEndian : false;
+        this.littleEndian = littleEndian;
 
         /**
          * Whether to skip assertions of offsets and values, defaults to `false`.
          * @type {boolean}
          * @expose
          */
-        this.noAssert = !!noAssert;
+        this.noAssert = noAssert;
     };
 
     /**
@@ -168,7 +168,7 @@
      *  and int64 support is not available.
      * @type {?Long}
      * @const
-     * @see https://github.com/dcodeIO/Long.js
+     * @see https://github.com/dcodeIO/long.js
      * @expose
      */
     ByteBuffer.Long = Long || null;

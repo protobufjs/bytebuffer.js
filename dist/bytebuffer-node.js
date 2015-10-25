@@ -94,14 +94,14 @@ module.exports = (function() {
          * @type {boolean}
          * @expose
          */
-        this.littleEndian = typeof littleEndian !== 'undefined' ? !!littleEndian : false;
+        this.littleEndian = littleEndian;
 
         /**
          * Whether to skip assertions of offsets and values, defaults to `false`.
          * @type {boolean}
          * @expose
          */
-        this.noAssert = !!noAssert;
+        this.noAssert = noAssert;
     };
 
     /**

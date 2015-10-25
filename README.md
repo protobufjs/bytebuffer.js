@@ -4,7 +4,7 @@ A fast and complete ByteBuffer implementation using either ArrayBuffers in the b
 generated from a single source tree through [MetaScript](https://github.com/dcodeIO/MetaScript).
 
 [![Build Status](https://travis-ci.org/dcodeIO/bytebuffer.js.svg?branch=master)](https://travis-ci.org/dcodeIO/bytebuffer.js)
-[![Donate](https://raw.githubusercontent.com/dcodeIO/bytebuffer.js/master/donate.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=dcode%40dcode.io&item_name=Open%20Source%3A%20bytebuffer.js)
+[![Donate](https://raw.githubusercontent.com/dcodeIO/bytebuffer.js/master/donate.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=dcode%40dcode.io&item_name=%3C3%20bytebuffer.js)
 
 Features
 --------
@@ -61,4 +61,4 @@ Contributors
 
 License
 -------
-Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.html
+**License:** [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html) - Logo derived from [W3C HTML5 Logos](http://www.w3.org/html/logo/) (CC A 3.0)
