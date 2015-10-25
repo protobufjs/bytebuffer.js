@@ -195,4 +195,28 @@ WRITE_UINT32_ARRAY = function(varValue, varOffset, varTarget, varEndian) {
     if (VERBOSE_MS) writeln(__+'// </WRITE_UINT32>');
 };
 
+SET = function(varValue, varOffset, varTarget) { // with varTarget referencing a ByteBuffer
+    if (typeof varValue  === 'undefined') varValue = 'value';
+    if (typeof varOffset === 'undefined') varOffset = 'offset';
+    if (typeof varTarget === 'undefined') varTarget = 'this';
+    if (NODE) {
+        writeln(__+varTarget+'.buffer['+varOffset+'] = '+varValue+';');
+    } else if (DATAVIEW) {
+        writeln(__+varTarget+'.view.setUint8('+varValue+', '+varOffset+');');
+    } else {
+        writeln(__+varTarget+'.view['+varOffset+'] = '+varValue+';');
+    }
+};
+
+GET = function(varOffset, varTarget) { // with varTarget referencing a ByteBuffer
+    if (typeof varOffset === 'undefined') varOffset = 'offset';
+    if (typeof varTarget === 'undefined') varTarget = 'this';
+    if (NODE) {
+        write(varTarget+'.buffer['+varOffset+']');
+    } else if (DATAVIEW) {
+        write(varTarget+'.view.getUint8('+varOffset+')');
+    } else {
+        write(varTarget+'.view['+varOffset+']');
+    }
+};
 //?.
