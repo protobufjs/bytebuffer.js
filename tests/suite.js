@@ -633,6 +633,35 @@ function makeSuite(ByteBuffer) {
         };
     });
     
+    suite.types.bitset = function(test) {
+      var bb = new ByteBuffer(2),
+          arr;
+
+      function run(data) {
+        bb.reset();
+        bb.writeBitSet(data);
+        bb.reset();
+        test.deepEqual(bb.readBitSet(),data);
+      };
+
+      run([]);
+      run([true]);
+      run([false]);
+      run([false,true]);
+      run([false,false,false,false,false,false,false,false]);
+      run([true,false,true,false,true,false,true,false]);
+      run([true,true,true,true,true,true,true,true]);
+      run([true,false,true,false,true,false,true,false]);
+      run([true,false,true,false,true,false,true,false,true]);
+      
+      bb.reset();
+      bb.writeBitSet([,null,"",0,42,"hello world",new Date(0),{},[]]);
+      bb.reset();
+      test.deepEqual(bb.readBitSet(),[false,false,false,false,true,true,true,true,true]);
+
+      test.done();
+    };
+
     suite.types.calculateVarint = function(test) {
         test.equal(ByteBuffer.MAX_VARINT32_BYTES, 5);
         test.equal(ByteBuffer.MAX_VARINT64_BYTES, 10);
