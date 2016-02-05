@@ -114,6 +114,47 @@ ByteBuffer.prototype.LE = function(littleEndian) {};
 ByteBuffer.prototype.BE = function(bigEndian) {};
 
 /**
+ * @param {string} str
+ * @param {boolean} littleEndian
+ * @param {boolean} noAssert
+ * @returns {!ByteBuffer}
+ */
+ByteBuffer.prototype.fromBase64 = function(str, littleEndian, noAssert) {};
+
+/**
+ * @param {string} str
+ * @param {boolean} littleEndian
+ * @param {boolean} noAssert
+ * @returns {!ByteBuffer}
+ */
+ByteBuffer.prototype.fromBinary = function(str, littleEndian, noAssert) {};
+
+/**
+ * @param {string} str
+ * @param {boolean} littleEndian
+ * @param {boolean} noAssert
+ * @returns {!ByteBuffer}
+ */
+ByteBuffer.prototype.fromDebug = function(str, littleEndian, noAssert) {};
+
+/**
+ * @param {string} str
+ * @param {boolean} littleEndian
+ * @param {boolean} noAssert
+ * @returns {!ByteBuffer}
+ */
+ByteBuffer.prototype.fromHex = function(str, littleEndian, noAssert) {};
+
+/**
+ * @param {string} str
+ * @param {boolean} littleEndian
+ * @param {boolean} noAssert
+ * @returns {!ByteBuffer}
+ */
+ByteBuffer.prototype.fromUTF8 = function(str, littleEndian, noAssert) {};
+
+
+/**
  * @param {number} capacity
  * @returns {boolean}
  */
@@ -211,6 +252,15 @@ ByteBuffer.prototype.append = function(src, offset) {};
  * @throws {Error}
  */
 ByteBuffer.prototype.prepend = function(src, offset) {};
+
+/**
+ * @param {number|string} value
+ * @param {number} begin
+ * @param {number} end
+ * @returns {!ByteBuffer}
+ */
+ByteBuffer.prototype.fill = function(value, begin, end) {};
+
 
 /**
  * @param {number} value
@@ -495,6 +545,21 @@ ByteBuffer.prototype.writeZigZagVarint64 = function(value, offset) {};
 ByteBuffer.prototype.readZigZagVarint64 = function(offset) {};
 
 /**
+ * @param {number|Long} value
+ * @param {number=} offset
+ * @returns {!ByteBuffer|number}
+ * @throws {Error}
+ */
+ByteBuffer.prototype.writeVarint64ZigZag = function(value, offset) {};
+
+/**
+ * @param {number=} offset
+ * @returns {!Long|{value: !Long, length: number}}
+ * @throws {Error}
+ */
+ByteBuffer.prototype.readVarint64ZigZag = function(offset) {};
+
+/**
  * @param {number} value
  * @param {number=} offset
  * @returns {!ByteBuffer|number}
@@ -544,6 +609,12 @@ ByteBuffer.calculateVarint64 = function(value) {};
  * @nosideeffects
  */
 ByteBuffer.calculateUTF8String = function(str) {};
+
+/**
+ * @param {string} str
+ * @returns {number}
+ */
+ByteBuffer.prototype.calculateUTF8Bytes = function(str) {};
 
 /**
  * @param {string} str
