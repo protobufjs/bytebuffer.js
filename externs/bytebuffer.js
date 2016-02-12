@@ -681,6 +681,34 @@ ByteBuffer.prototype.writeCString = function(str, offset) {};
 ByteBuffer.prototype.readCString = function(offset) {};
 
 /**
+ * @param {number} length
+ * @param {number=} offset
+ * @returns {!ByteBuffer}
+ */
+ByteBuffer.prototype.readBytes = function(length, offset) {};
+
+/**
+ * @param {!ByteBuffer} src
+ * @param {number=} offset
+ * @returns {!ByteBuffer}
+ * @throws {Error}
+ */
+ByteBuffer.prototype.writeBytes = function(src, offset) {};
+
+/**
+ * @param {number=} offset
+ * @returns {Array<boolean>}
+ */
+ByteBufferPrototype.readBitSet = function(offset) {};
+
+/**
+ * @param {Array<boolean>}
+ * @param {number=}
+ * @returns {!ByteBuffer}
+ */
+ByteBuffer.prototype.writeBitSet = function(value, offset) {};
+
+/**
  * @param {number=} wrap
  * @returns {string}
  * @nosideeffects

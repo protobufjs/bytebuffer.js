@@ -1,6 +1,6 @@
 {
   "name": "bytebuffer",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "author": "Daniel Wirtz <dcode@dcode.io>",
   "description": "The swiss army knife for binary data in JavaScript.",
   "main": "dist/bytebuffer-node.js",
@@ -44,8 +44,8 @@
     "make": "npm run-script build && npm run-script compile && npm run-script compress && npm test",
     "build": "node scripts/build.js",
     "compile": "npm run-script compile-default && npm run-script compile-dataview",
-    "compile-default": "ccjs dist/bytebuffer.js --create_source_map=dist/bytebuffer.min.map --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --externs=node_modules/long/externs/long.js > dist/bytebuffer.min.js",
-    "compile-dataview": "ccjs dist/bytebuffer-dataview.js --create_source_map=dist/bytebuffer-dataview.min.map --compilation_level=ADVANCED_OPTIMIZATIONS --externs=externs/minimal-env.js --externs=node_modules/long/externs/long.js > dist/bytebuffer-dataview.min.js",
+    "compile-default": "ccjs dist/bytebuffer.js --create_source_map=dist/bytebuffer.min.map --externs=externs/minimal-env.js --externs=node_modules/long/externs/long.js > dist/bytebuffer.min.js",
+    "compile-dataview": "ccjs dist/bytebuffer-dataview.js --create_source_map=dist/bytebuffer-dataview.min.map --externs=externs/minimal-env.js --externs=node_modules/long/externs/long.js > dist/bytebuffer-dataview.min.js",
     "compress": "gzip -c -9 dist/bytebuffer.min.js > dist/bytebuffer.min.js.gz && gzip -c -9 dist/bytebuffer-dataview.min.js > dist/bytebuffer-dataview.min.js.gz"
   }
 }
