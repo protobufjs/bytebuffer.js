@@ -153,12 +153,17 @@ ByteBuffer.prototype.fromHex = function(str, littleEndian, noAssert) {};
  */
 ByteBuffer.prototype.fromUTF8 = function(str, littleEndian, noAssert) {};
 
-
 /**
  * @param {number} capacity
  * @returns {boolean}
  */
 ByteBuffer.prototype.resize = function(capacity) {};
+
+/**
+ * @param {number} length
+ * @returns {!ByteBuffer}
+ */
+ByteBuffer.prototype.skip = function(length) {};
 
 /**
  * @param {number} begin
@@ -699,7 +704,7 @@ ByteBuffer.prototype.writeBytes = function(src, offset) {};
  * @param {number=} offset
  * @returns {Array<boolean>}
  */
-ByteBufferPrototype.readBitSet = function(offset) {};
+ByteBuffer.prototype.readBitSet = function(offset) {};
 
 /**
  * @param {Array<boolean>}
