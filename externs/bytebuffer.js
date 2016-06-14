@@ -699,11 +699,11 @@ ByteBuffer.prototype.writeBytes = function(src, offset) {};
  * @param {number=} offset
  * @returns {Array<boolean>}
  */
-ByteBufferPrototype.readBitSet = function(offset) {};
+ByteBuffer.prototype.readBitSet = function(offset) {};
 
 /**
- * @param {Array<boolean>}
- * @param {number=}
+ * @param {Array<boolean>} value
+ * @param {number=} offset
  * @returns {!ByteBuffer}
  */
 ByteBuffer.prototype.writeBitSet = function(value, offset) {};
