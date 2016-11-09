@@ -415,7 +415,7 @@ function makeSuite(ByteBuffer) {
         test.notStrictEqual(bb.buffer, prevBuffer);
         test.strictEqual(bb.buffer, new ByteBuffer(0).buffer); // EMPTY_BUFFER
         if (type === ArrayBuffer) {
-            test.strictEqual(bb.view, null);
+            test.equal(bb.view.length, 0);
         }
         test.equal(bb.capacity(), 0);
         test.equal(bb.offset, 0);
