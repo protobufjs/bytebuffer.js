@@ -508,18 +508,6 @@
         return slice;
     };
 
-    /**
-     * Writes a payload of bytes. This is an alias of {@link ByteBuffer#append}.
-     * @function
-     * @param {!ByteBuffer|!ArrayBuffer|!Uint8Array|string} source Data to write. If `source` is a ByteBuffer, its offsets
-     *  will be modified according to the performed read operation.
-     * @param {(string|number)=} encoding Encoding if `data` is a string ("base64", "hex", "binary", defaults to "utf8")
-     * @param {number=} offset Offset to write to. Will use and increase {@link ByteBuffer#offset} by the number of bytes
-     *  written if omitted.
-     * @returns {!ByteBuffer} this
-     * @expose
-     */
-    ByteBufferPrototype.writeBytes = ByteBufferPrototype.append;
 
     // types/ints/int8
 
@@ -2422,6 +2410,18 @@
         return this;
     };
 
+    /**
+     * Writes a payload of bytes. This is an alias of {@link ByteBuffer#append}.
+     * @function
+     * @param {!ByteBuffer|!ArrayBuffer|!Uint8Array|string} source Data to write. If `source` is a ByteBuffer, its offsets
+     *  will be modified according to the performed read operation.
+     * @param {(string|number)=} encoding Encoding if `data` is a string ("base64", "hex", "binary", defaults to "utf8")
+     * @param {number=} offset Offset to write to. Will use and increase {@link ByteBuffer#offset} by the number of bytes
+     *  written if omitted.
+     * @returns {!ByteBuffer} this
+     * @expose
+     */
+    ByteBufferPrototype.writeBytes = ByteBufferPrototype.append;
     /**
      * Enables or disables assertions of argument types and offsets. Assertions are enabled by default but you can opt to
      *  disable them if your code already makes sure that everything is valid.
