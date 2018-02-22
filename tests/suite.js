@@ -451,6 +451,20 @@ function makeSuite(ByteBuffer) {
         test.equal(bb2.toString("debug"), "56 78|");
         test.done();
     };
+
+    suite.methods.writeBytes = function(test) {
+        var bb = ByteBuffer.wrap("\x12\x34");
+        var bb2 = ByteBuffer.wrap("\x56\x78");
+        bb.offset = 2;
+        bb.writeBytes(bb2); // Modifies offsets of both
+        test.equal(bb.toString("debug"), "12 34>56 78<");
+        test.equal(bb2.toString("debug"), "56 78|");
+        bb2.reset();
+        bb.writeBytes(bb2, 1); // Modifies offsets of bb2 only
+        test.equal(bb.toString("debug"), "12 56>78 78<");
+        test.equal(bb2.toString("debug"), "56 78|");
+        test.done();
+    };
     
     suite.methods.prepend = function(test) {
         var bb = ByteBuffer.wrap("\x12\x34"),
