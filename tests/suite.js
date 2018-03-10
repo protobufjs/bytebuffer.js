@@ -130,7 +130,7 @@ function makeSuite(ByteBuffer) {
             buf[0] = 0x01;
             var bb = ByteBuffer.wrap(buf);
             test.strictEqual(bb.capacity(), 1);
-            test.strictEqual(bb.buffer, buf);
+            test.deepStrictEqual(bb.buffer, buf);
             test.strictEqual(bb.toDebug(), "<01>");
             test.done();
         };
