@@ -22,8 +22,8 @@ ByteBufferPrototype.writeFloat32 = function(value, offset) {
     //? ENSURE_CAPACITY(4);
     //? if (NODE) { // FIXME: Is there any way to inline the following in a sane way?
     this.littleEndian
-        ? this.buffer.writeFloatLE(value, offset, true)
-        : this.buffer.writeFloatBE(value, offset, true);
+        ? this.buffer.writeFloatLE(value, offset)
+        : this.buffer.writeFloatBE(value, offset);
     //? } else if (DATAVIEW)
     this.view.setFloat32(offset, value, this.littleEndian);
     //? else
