@@ -51,11 +51,11 @@ var ByteBuffer = function(capacity, littleEndian, noAssert) {
     this.view = capacity === 0 ? null : new DataView(this.buffer);
     //? } else {
     /**
-     * Uint8Array utilized to manipulate the backing buffer. Becomes `null` if the backing buffer has a capacity of `0`.
+     * Uint8Array utilized to manipulate the backing buffer.
      * @type {?Uint8Array}
      * @expose
      */
-    this.view = capacity === 0 ? null : new Uint8Array(this.buffer);
+    this.view = new Uint8Array(this.buffer);
     //? }
     //? }
     
