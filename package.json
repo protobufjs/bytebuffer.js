@@ -24,7 +24,7 @@
     "webrtc"
   ],
   "dependencies": {
-    "long": "~3"
+    "long": "~4"
   },
   "devDependencies": {
     "closurecompiler": "~1",
