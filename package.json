@@ -39,7 +39,7 @@
     "node": ">=0.8"
   },
   "scripts": {
-    "prepublish": "npm test",
+    "prepublishOnly": "npm test",
     "test": "node node_modules/testjs/bin/testjs tests/suite.js",
     "make": "npm run-script build && npm run-script compile && npm run-script compress && npm test",
     "build": "node scripts/build.js",
