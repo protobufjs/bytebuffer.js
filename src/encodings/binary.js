@@ -67,8 +67,8 @@ ByteBuffer.fromBinary = function(str, littleEndian) {
         bb.view[i++] = charCode;
     }
     bb.limit = k;
-    //? }
     return bb;
+    //? }
 };
 
 //? }
