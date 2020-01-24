@@ -59,8 +59,8 @@ ByteBuffer.fromBase64 = function(str, littleEndian) {
         bb.view[i++] = b;
     });
     bb.limit = i;
-    //? }
     return bb;
+    //? }
 };
 
 /**
