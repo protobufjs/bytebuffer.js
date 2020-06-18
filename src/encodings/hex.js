@@ -51,7 +51,7 @@ ByteBuffer.fromHex = function(str, littleEndian, noAssert) {
     }
     //? if (NODE) {
     var bb = new ByteBuffer(0, littleEndian, true);
-    bb.buffer = new Buffer(str, "hex");
+    bb.buffer = Buffer.from(str, "hex");
     bb.limit = bb.buffer.length;
     //? } else {
     var k = str.length,

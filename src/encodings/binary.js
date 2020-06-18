@@ -49,7 +49,7 @@ ByteBufferPrototype.toBinary = function(begin, end) {
  */
 ByteBuffer.fromBinary = function(str, littleEndian) {
     //? if (NODE) {
-    return ByteBuffer.wrap(new Buffer(str, "binary"), littleEndian);
+    return ByteBuffer.wrap(Buffer.from(str, "binary"), littleEndian);
     //? } else {
     if (typeof str !== 'string')
         throw TypeError("str");

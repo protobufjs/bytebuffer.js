@@ -33,7 +33,7 @@ ByteBufferPrototype.prepend = function(source, encoding, offset) {
     var diff = len - offset;
     if (diff > 0) { // Not enough space before offset, so resize + move
         //? if (NODE) {
-        var buffer = new Buffer(this.buffer.length + diff);
+        var buffer = Buffer.alloc(this.buffer.length + diff);
         this.buffer.copy(buffer, len, offset, this.buffer.length);
         this.buffer = buffer;
         //? } else if (DATAVIEW) {

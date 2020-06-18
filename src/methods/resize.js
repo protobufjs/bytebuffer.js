@@ -15,7 +15,7 @@ ByteBufferPrototype.resize = function(capacity) {
     }
     //? if (NODE) {
     if (this.buffer.length < capacity) {
-        var buffer = new Buffer(capacity);
+        var buffer = Buffer.alloc(capacity);
         this.buffer.copy(buffer);
         this.buffer = buffer;
     }

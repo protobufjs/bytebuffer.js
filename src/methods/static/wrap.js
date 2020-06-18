@@ -58,7 +58,7 @@ ByteBuffer.wrap = function(buffer, encoding, littleEndian, noAssert) {
         k = 0,
         b;
     if (buffer instanceof Uint8Array) { // Extract bytes from Uint8Array
-        b = new Buffer(buffer.length);
+        b = Buffer.alloc(buffer.length);
         if (memcpy) { // Fast
             memcpy(b, 0, buffer.buffer, buffer.byteOffset, buffer.byteOffset + buffer.length);
         } else { // Slow
@@ -67,7 +67,7 @@ ByteBuffer.wrap = function(buffer, encoding, littleEndian, noAssert) {
         }
         buffer = b;
     } else if (buffer instanceof ArrayBuffer) { // Convert ArrayBuffer to Buffer
-        b = new Buffer(buffer.byteLength);
+        b = Buffer.alloc(buffer.byteLength);
         if (memcpy) { // Fast
             memcpy(b, 0, buffer, 0, buffer.byteLength);
         } else { // Slow
@@ -80,7 +80,7 @@ ByteBuffer.wrap = function(buffer, encoding, littleEndian, noAssert) {
     } else if (!(buffer instanceof Buffer)) { // Create from octets if it is an error, otherwise fail
         if (Object.prototype.toString.call(buffer) !== "[object Array]")
             throw TypeError("Illegal buffer");
-        buffer = new Buffer(buffer);
+        buffer = Buffer.from(buffer);
     }
     bb = new ByteBuffer(0, littleEndian, noAssert);
     if (buffer.length > 0) { // Avoid references to more than one EMPTY_BUFFER

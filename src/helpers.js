@@ -5,7 +5,7 @@
  * @type {!Buffer}
  * @inner
  */
-var EMPTY_BUFFER = new Buffer(0);
+var EMPTY_BUFFER = Buffer.alloc(0);
 //? } else {
 
 /**

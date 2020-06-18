@@ -52,7 +52,7 @@ ByteBuffer.fromUTF8 = function(str, littleEndian, noAssert) {
             throw TypeError("Illegal str: Not a string");
     //? if (NODE) {
     var bb = new ByteBuffer(0, littleEndian, noAssert);
-    bb.buffer = new Buffer(str, "utf8");
+    bb.buffer = Buffer.from(str, "utf8");
     bb.limit = bb.buffer.length;
     //? } else {
     var bb = new ByteBuffer(utfx.calculateUTF16asUTF8(stringSource(str), true)[1], littleEndian, noAssert),
