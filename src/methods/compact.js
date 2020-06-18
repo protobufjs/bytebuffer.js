@@ -26,7 +26,7 @@ ByteBufferPrototype.compact = function(begin, end) {
         return this;
     }
     //? if (NODE) {
-    var buffer = new Buffer(len);
+    var buffer = Buffer.alloc(len);
     this.buffer.copy(buffer, 0, begin, end);
     this.buffer = buffer;
     //? } else if (DATAVIEW) {

@@ -46,7 +46,7 @@ ByteBufferPrototype.toBase64 = function(begin, end) {
  */
 ByteBuffer.fromBase64 = function(str, littleEndian) {
     //? if (NODE) {
-    return ByteBuffer.wrap(new Buffer(str, "base64"), littleEndian);
+    return ByteBuffer.wrap(Buffer.from(str, "base64"), littleEndian);
     //? } else {
     if (typeof str !== 'string')
         throw TypeError("str");

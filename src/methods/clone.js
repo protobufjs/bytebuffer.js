@@ -9,7 +9,7 @@ ByteBufferPrototype.clone = function(copy) {
     var bb = new ByteBuffer(0, this.littleEndian, this.noAssert);
     if (copy) {
         //? if (NODE) {
-        var buffer = new Buffer(this.buffer.length);
+        var buffer = Buffer.alloc(this.buffer.length);
         this.buffer.copy(buffer);
         bb.buffer = buffer;
         //? } else {

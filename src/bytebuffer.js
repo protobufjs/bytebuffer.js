@@ -32,7 +32,7 @@ var ByteBuffer = function(capacity, littleEndian, noAssert) {
      * @type {!Buffer}
      * @expose
      */
-    this.buffer = capacity === 0 ? EMPTY_BUFFER : new Buffer(capacity);
+    this.buffer = capacity === 0 ? EMPTY_BUFFER : Buffer.alloc(capacity);
     //? } else {
     
     /**

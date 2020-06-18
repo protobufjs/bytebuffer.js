@@ -18,7 +18,7 @@ ByteBufferPrototype.toBuffer = function(forceCopy) {
     }
     //? if (NODE) {
     if (forceCopy) {
-        var buffer = new Buffer(limit - offset);
+        var buffer = Buffer.alloc(limit - offset);
         this.buffer.copy(buffer, 0, offset, limit);
         return buffer;
     } else {

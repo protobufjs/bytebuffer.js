@@ -126,7 +126,7 @@ function makeSuite(ByteBuffer) {
     
     if (type === Buffer) {
         suite.wrap.Buffer = function(test) {
-            var buf = new Buffer(1);
+            var buf = Buffer.alloc(1);
             buf[0] = 0x01;
             var bb = ByteBuffer.wrap(buf);
             test.strictEqual(bb.capacity(), 1);
@@ -270,7 +270,7 @@ function makeSuite(ByteBuffer) {
             ByteBuffer.fromDebug('00 01 02<03>00'),
             ByteBuffer.fromDebug('00|'),
             ByteBuffer.fromDebug('<04>'),
-            type === Buffer ? new Buffer(0) : new ArrayBuffer(0),
+            type === Buffer ? Buffer.alloc(0) : new ArrayBuffer(0),
             new Uint8Array(0),
             '05'
         ];
