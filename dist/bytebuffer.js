@@ -1578,6 +1578,9 @@
      * @expose
      */
     ByteBuffer.zigZagDecode32 = function(n) {
+        if (n > 0x7fffffff) {
+            return Math.round(Math.floor(n / 2) - (n % 2 != 0 ? 1 : 0));
+        }
         return ((n >>> 1) ^ -(n & 1)) | 0; // // ref: src/google/protobuf/wire_format_lite.h
     };
 
@@ -1665,11 +1668,18 @@
                 throw err;
             }
             b = this.view[offset++];
-            if (c < 5)
+            if (c < 4) {
                 value |= (b & 0x7f) << (7*c);
+            } else if (c < 10) {
+                value += (b & 0x7f) * Math.pow(2, 7*c);
+            }
             ++c;
         } while ((b & 0x80) !== 0);
-        value |= 0;
+        if (value <= 2147483647) {
+            value |= 0;
+        } else {
+            value = Math.floor(value);
+        }
         if (relative) {
             this.offset = offset;
             return value;
