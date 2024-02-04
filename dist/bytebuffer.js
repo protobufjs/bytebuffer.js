@@ -1671,7 +1671,6 @@
             if (c < 4) {
                 value |= (b & 0x7f) << (7*c);
             } else if (c < 10) {
-                let valCopy = Number(value);
                 value += (b & 0x7f) * Math.pow(2, 7*c);
             }
             ++c;
